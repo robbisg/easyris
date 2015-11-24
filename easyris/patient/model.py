@@ -1,32 +1,37 @@
 from mongoalchemy.session import Session
 from mongoalchemy.document import Document, Index
 from mongoalchemy.fields import *
+from pymongo import *
 
 class Patient(Document):
     config_collection_name = 'patients'
 
     # Setting the possible values by using fields
-    id_patient = StringField()
-    last_name = StringField()
-    first_name = StringField()
-    birthdate = StringField()
-    birthplace = StringField()
-    cf_code = StringField()
+    id_patient =StringField(required=True)
+    last_name = StringField(required=True)
+    gender = EnumField(StringField(), 'M', 'F',required=True)
+    first_name = StringField(required=True)
+    birthdate = DateTimeField(required=True)
+    birthplace = StringField(required=True)
+    cf_code = StringField(required=True)
     last_name_parents =  StringField(required=False)
     name_parents = StringField(required=False)
-    address = StringField()
-    city = StringField()
-    province = StringField()
-    CAP = StringField()
-    phone_number = StringField()
-    email = StringField()
-    note = StringField()
+    address = StringField(required=False)
+    city = StringField(required=False)
+    province = StringField(required=False)
+    CAP = IntField()
+    phone_number = StringField(required=True)
+    email = StringField(required=False)
+    note = StringField(required=False)
+
+    @computed_field
+    def age(obj):
+     return ((datetime.now() - birthdate).days) / 365
 
 me = Patient(id_patient='1234',first_name='Piero', last_name='Chiacchiaretta',
-            birthdate='27/09/1979', birthplace='Pescara', cf_code='CHCPRI79P27G482U',
-            address='Via Aldo Moro, 114', city='San Giovanni Teatino', province='Chieti',
-            CAP='66020', phone_number='3294946261', email='piero.chiacchiaretta@gmail.com',
-            )
+birthdate=datetime(year=1979, day=27, month=9), birthplace='Pescara', cf_code='CHCPRI79P27G482U',
+gender="M", address='Via Aldo Moro, 114', city='San Giovanni Teatino', province='Chieti',
+CAP=66020, phone_number='3294946261', email='piero.chiacchiaretta@gmail.com')
 
 
 # This connections to the DB and starts the session
