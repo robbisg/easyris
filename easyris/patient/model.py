@@ -26,7 +26,7 @@ me = Patient(id_patient='1234',first_name='Piero', last_name='Chiacchiaretta',
             birthdate='27/09/1979', birthplace='Pescara', cf_code='CHCPRI79P27G482U',
             address='Via Aldo Moro, 114', city='San Giovanni Teatino', province='Chieti',
             CAP='66020', phone_number='3294946261', email='piero.chiacchiaretta@gmail.com',
-            note='ciao')
+            )
 
 
 # This connections to the DB and starts the session
