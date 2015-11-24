@@ -1,52 +1,37 @@
-import os
-import sys
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
-from sqlalchemy import create_engine
+from mongoalchemy.session import Session
+from mongoalchemy.document import Document, Index
+from mongoalchemy.fields import *
 
-Base = declarative_base()
+class Patient(Document):
+    config_collection_name = 'patients'
 
-class Patient(Base):
-    
-    __tablename__ = 'patient'
-    
-    id = Column(Integer, primary_key=True)
-    name = Column(String(50))
-    surname = Column(String(50))
-    birthplace = Column(String(250))
-    birthdate = Column(DateTime)
-    codicefiscale = Column(String(15))
-    parentsurname = Column(String(50), nullable=True)
-    parentname = Column(String(50), nullable=True)
-    address = Column(String(50))
-    city = Column(String(50))
-    province = Column(String(2))
-    cap = Column(String(5))
-    phone = Column(String(20))
-    email = Column(String(50))
-    medico_id = Column(Integer, ForeignKey('medico.id'))
-    note = Column(String(250))
+    # Setting the possible values by using fields
+    id_patient = StringField()
+    last_name = StringField()
+    first_name = StringField()
+    birthdate = StringField()
+    birthplace = StringField()
+    cf_code = StringField()
+    last_name_parents =  StringField(required=False)
+    name_parents = StringField(required=False)
+    address = StringField()
+    city = StringField()
+    province = StringField()
+    CAP = StringField()
+    phone_number = StringField()
+    email = StringField()
+    note = StringField()
 
-class Medico(Base):
-    
-    __tablename__ = 'medico'
-    
-    id = Column(Integer, primary_key=True)
-    name = Column(String(50))
-    surname = Column(String(50))
-    address = Column(String(50))
-    city = Column(String(50))
-    province = Column(String(2))
-    cap = Column(String(5))
-    phone = Column(String(20))
-    email = Column(String(50))
-    
-    
-    
-    
-    
-    
-    
-    
-    
+me = Patient(id_patient='1234',first_name='Piero', last_name='Chiacchiaretta',
+            birthdate='27/09/1979', birthplace='Pescara', cf_code='CHCPRI79P27G482U',
+            address='Via Aldo Moro, 114', city='San Giovanni Teatino', province='Chieti',
+            CAP='66020', phone_number='3294946261', email='piero.chiacchiaretta@gmail.com',
+            note='ciao')
+
+
+# This connections to the DB and starts the session
+session = Session.connect('easyris')
+session.clear_collection(Patient) # clear previous runs of this code!
+# Insert on a session will infer the correct collection and push the object
+# into the database
+session.save(me)
