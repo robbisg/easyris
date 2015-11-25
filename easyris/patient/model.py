@@ -2,6 +2,8 @@ from mongoalchemy.session import Session
 from mongoalchemy.document import Document, Index
 from mongoalchemy.fields import *
 from pymongo import *
+from codicefiscale import build
+
 
 class Patient(Document):
     config_collection_name = 'patients'
@@ -27,6 +29,9 @@ class Patient(Document):
     @computed_field
     def age(obj):
      return ((datetime.now() - birthdate).days) / 365
+
+    def cf_code2(obj):
+     return build(last_name, first_name, birthdate, gender, 'G482')
 
 me = Patient(id_patient='1234',first_name='Piero', last_name='Chiacchiaretta',
 birthdate=datetime(year=1979, day=27, month=9), birthplace='Pescara', cf_code='CHCPRI79P27G482U',
