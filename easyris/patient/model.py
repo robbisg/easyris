@@ -25,18 +25,29 @@ class Patient(Document):
     phone_number = StringField(required=True)
     email = StringField(required=False)
     note = StringField(required=False)
+    age = IntField()
+    cf_calc = StringField(required=True)
+    nationality = StringField(required=True)
 
-    @computed_field
-    def age(obj):
-     return ((datetime.now() - birthdate).days) / 365
+    @property
+    def age_calc(self):
+     return ((datetime.now() - self.birthdate).days) / 365
 
-    def cf_code2(obj):
-     return build(last_name, first_name, birthdate, gender, 'G482')
+    @property
+    def cf_code_calc(self):
+     return build(self.last_name, self.first_name, self.birthdate, self.gender, 'G482')
+
 
 me = Patient(id_patient='1234',first_name='Piero', last_name='Chiacchiaretta',
 birthdate=datetime(year=1979, day=27, month=9), birthplace='Pescara', cf_code='CHCPRI79P27G482U',
 gender="M", address='Via Aldo Moro, 114', city='San Giovanni Teatino', province='Chieti',
-CAP=66020, phone_number='3294946261', email='piero.chiacchiaretta@gmail.com')
+CAP=66020, phone_number='3294946261', email='piero.chiacchiaretta@gmail.com', nationality='italiana' )
+
+me = Patient(id_patient='1234',first_name='Piero', last_name='Chiacchiaretta',
+birthdate=datetime(year=1979, day=27, month=9), birthplace='Pescara', cf_code='CHCPRI79P27G482U',
+gender="M", address='Via Aldo Moro, 114', city='San Giovanni Teatino', province='Chieti',
+CAP=66020, phone_number='3294946261', email='piero.chiacchiaretta@gmail.com', nationality='italiana',
+age= me.age_calc, cf_calc=me.cf_code_calc)
 
 
 # This connections to the DB and starts the session
