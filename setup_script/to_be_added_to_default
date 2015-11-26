@@ -1,0 +1,15 @@
+        # Check user and group to be the owners of flask app (not of application.wsgi)
+        WSGIDaemonProcess myapplicationd user=pi group=pi threads=5
+
+        # This is to redirect http://mywebsite.com/app to my application
+        # instead of using /hellopy as entry point
+        WSGIScriptAlias /app /var/www/hellopy/application.wsgi
+
+        # Directory permissions
+        <Directory /var/www/hellopy>
+            WSGIProcessGroup myapplicationd
+            WSGIApplicationGroup %{GLOBAL}
+            Order deny,allow
+            Allow from all
+        </Directory>
+
