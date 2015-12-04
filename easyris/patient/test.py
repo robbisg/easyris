@@ -10,25 +10,38 @@ class TestStringMethods(unittest.TestCase):
 
   def test_upper(self):
 
-      me = Patient(id_patient='1234',first_name='Piero', last_name='Chiacchiaretta',
-      birthdate=datetime(year=1979, day=27, month=9), birthplace='AGRIGENTO', cf_code='CHCPRI79P27G482U',
-      gender="M", address='Via Aldo Moro, 114', city='San Giovanni Teatino', province='Chieti',
-      CAP=66020, phone_number='3294946261', email='piero.chiacchiaretta@gmail.com', nationality='italiana')
-
-      me = Patient(id_patient='1234',first_name='Piero', last_name='Chiacchiaretta',
-      birthdate=datetime(year=1979, day=27, month=9), birthplace='AGRIGENTO', cf_code='CHCPRI79P27G482U',
-      gender="M", address='Via Aldo Moro, 114', city='San Giovanni Teatino', province='Chieti',
-      CAP=66020, phone_number='3294946261', email='piero.chiacchiaretta@gmail.com', nationality='italiana',
-      age= me.age_calc, cf_calc=me.cf_code_calc)
-
-
       # This connections to the DB and starts the session
       session = Session.connect('easyris')
       session.clear_collection(Patient) # clear previous runs of this code!
       # Insert on a session will infer the correct collection and push the object
       # into the database
+
+
+      me = Patient(first_name='Piero', last_name='Chiacchiaretta',
+      birthdate=datetime(year=1979, day=27, month=9), birthplace='AGRIGENTO', cf_code='CHCPRI79P27G482U',
+      gender="M", address='Via Aldo Moro, 114', city='San Giovanni Teatino', province='Chieti',
+      CAP=66020, phone_number='3294946261', email='piero.chiacchiaretta@gmail.com', nationality='italiana')
+
+      me = Patient(id_patient=me.id_calc,first_name='Piero', last_name='Chiacchiaretta',
+      birthdate=datetime(year=1979, day=27, month=9), birthplace='AGRIGENTO', cf_code='CHCPRI79P27G482U',
+      gender="M", address='Via Aldo Moro, 114', city='San Giovanni Teatino', province='Chieti',
+      CAP=66020, phone_number='3294946261', email='piero.chiacchiaretta@gmail.com', nationality='italiana',
+      age= me.age_calc, cf_calc=me.cf_code_calc)
+
       session.save(me)
 
+      you = Patient(first_name='Riccardo', last_name='Navarra',
+      birthdate=datetime(year=1972, day=10, month=9), birthplace='L\'AQUILA', cf_code='NVRRCR7210345G',
+      gender="M", address='Via G. Carducci, 25', city='L\'Aquila', province='L\'Aquila',
+      CAP=66020, phone_number='3294946261', email='riccardo.navarra@gmail.com', nationality='italiana')
+
+      you = Patient(id_patient=you.id_calc,first_name='Riccardo', last_name='Navarra',
+      birthdate=datetime(year=1972, day=10, month=9), birthplace='L\'AQUILA', cf_code='NVRRCR7210345G',
+      gender="M", address='Via G. Carducci, 25', city='L\'Aquila', province='L\'Aquila',
+      CAP=66020, phone_number='3294946261', email='riccardo.navarra@gmail.com', nationality='italiana',
+      age= you.age_calc, cf_calc=you.cf_code_calc)
+
+      session.save(you)
 
       client = MongoClient()
       db = client.easyris
