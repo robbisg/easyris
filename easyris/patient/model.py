@@ -5,6 +5,7 @@ from pymongo import *
 from codicefiscale import build
 from code_comuni import CF_codici_comuni
 
+
 class Patient(Document):
     config_collection_name = 'patients'
 
@@ -29,6 +30,9 @@ class Patient(Document):
     cf_calc = StringField(required=True)
     nationality = StringField(required=True)
 
+    patient_status = EnumField(StringField(),'Attivo', 'Revocato', 'Defunto',required=False)
+    patient_status_note = StringField(required=False)
+
     @property
     def age_calc(self):
      return ((datetime.now() - self.birthdate).days) / 365
@@ -43,6 +47,18 @@ class Patient(Document):
         result2=result.next()
         cf_code=result2['Codice']
         return build(self.last_name, self.first_name, self.birthdate, self.gender, str(cf_code))
+
+    @property
+    def id_calc(self):
+
+        client = MongoClient()
+        db = client.easyris.patients
+
+        id_count=str(db.count()+1).zfill(4)
+        id_calc = (str(datetime.now())).split('-')[0]+(str(datetime.now())).split('-')[1]+id_count
+        return id_calc
+
+
 
 
 # me = Patient(id_patient='1234',first_name='Piero', last_name='Chiacchiaretta',
