@@ -1,10 +1,9 @@
 from mongoalchemy.session import Session
 from mongoalchemy.document import Document, Index
-from mongoalchemy.fields import *
+from mongoalchemy.fields import StringField
 
 class Patient(Document):
     config_collection_name = 'patients'
-
     # Setting the possible values by using fields
     id_patient = StringField()
     last_name = StringField()
@@ -21,6 +20,7 @@ class Patient(Document):
     phone_number = StringField()
     email = StringField()
     note = StringField()
+    
 
 me = Patient(id_patient='1234',first_name='Piero', last_name='Chiacchiaretta',
             birthdate='27/09/1979', birthplace='Pescara', cf_code='CHCPRI79P27G482U',
