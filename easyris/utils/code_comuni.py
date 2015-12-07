@@ -1,7 +1,6 @@
 from mongoalchemy.session import Session
 from mongoalchemy.document import Document, Index
-from mongoalchemy.fields import *
-from pymongo import *
+from mongoalchemy.fields import StringField
 from codicefiscale import build
 
 

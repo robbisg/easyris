@@ -1,81 +1,84 @@
-from mongoalchemy.session import Session
-from mongoalchemy.document import Document, Index
-from mongoalchemy.fields import StringField
-from pymongo import *
+from mongoengine import *
+from pymongo import MongoClient
 from codicefiscale import build
-from code_comuni import CF_codici_comuni
+from easyris.utils.code_comuni import CF_codici_comuni
+from datetime import datetime
 
+GENDER = (('M', 'Male'),
+        ('F', 'Female'))
+STATUS = ('Attivo', 'Revocato', 'Defunto')
 
 class Patient(Document):
-    config_collection_name = 'patients'
+    __collection__ = 'patients'
+    
     # Setting the possible values by using fields
-    id_patient =StringField(required=True)
+    id_patient = StringField(required=True, unique=True)
+    
     last_name = StringField(required=True)
-    gender = EnumField(StringField(), 'M', 'F',required=True)
     first_name = StringField(required=True)
+    
+    gender = StringField(max_length=1, 
+                         required=True, 
+                         choices=GENDER)
+    
     birthdate = DateTimeField(required=True)
     birthplace = StringField(required=True)
-    cf_code = StringField(required=True)
+    
+    codice_fiscale = StringField(required=True)
+    
     last_name_parents =  StringField(required=False)
     name_parents = StringField(required=False)
+    
     address = StringField(required=False)
     city = StringField(required=False)
-    province = StringField(required=False)
-    CAP = IntField()
+    province = StringField(required=False, max_length=2)
+    CAP = StringField(required=True)
     phone_number = StringField(required=True)
     email = StringField(required=False)
     note = StringField(required=False)
     age = IntField()
-    cf_calc = StringField(required=True)
+    #cf_calc = StringField(required=True)
     nationality = StringField(required=True)
 
-    patient_status = EnumField(StringField(),'Attivo', 'Revocato', 'Defunto',required=False)
+    patient_status = StringField(required=False, choices=STATUS)
     patient_status_note = StringField(required=False)
+    
+        
+    def clean(self):        
+        
+        self.compute_age()
+        self.compute_cf()
+        self.compute_id()
+    
+    
+    def compute_age(self):
+        self.age = ((datetime.now() - self.birthdate).days) / 365
 
-    @property
-    def age_calc(self):
-     return ((datetime.now() - self.birthdate).days) / 365
 
-    @property
-    def cf_code_calc(self):
-
+    def compute_cf(self):
         client = MongoClient()
         db = client.easyris
-
-        result=db.get_collection('CF_codici_comuni').find({'Denom_Italiana' :self.birthplace})
-        result2=result.next()
-        cf_code=result2['Codice']
-        return build(self.last_name, self.first_name, self.birthdate, self.gender, str(cf_code))
-
-    @property
-    def id_calc(self):
-
-        client = MongoClient()
-        db = client.easyris.patients
-
-        id_count=str(db.count()+1).zfill(4)
-        id_calc = (str(datetime.now())).split('-')[0]+(str(datetime.now())).split('-')[1]+id_count
-        return id_calc
+        query=db.get_collection('CF_codici_comuni').find({'Denom_Italiana' :self.birthplace})
+        result=query.next()
+        cf_code=result['Codice']
+        self.codice_fiscale = build(self.last_name, 
+                                    self.first_name, 
+                                    self.birthdate, 
+                                    self.gender, 
+                                    str(cf_code))
+        self.province = result['Prov']
 
 
+    def compute_id(self):
+
+        n_collection = Patient.objects.count()           
+        print n_collection
+        id_count=str(n_collection+1).zfill(4)
+        year = str(datetime.now()).split('-')[0]
+        month = str(datetime.now()).split('-')[1]
+        
+        id_calc = year+month+id_count
+        print id_calc
+        self.id_patient = id_calc
 
 
-# me = Patient(id_patient='1234',first_name='Piero', last_name='Chiacchiaretta',
-# birthdate=datetime(year=1979, day=27, month=9), birthplace='AGRIGENTO', cf_code='CHCPRI79P27G482U',
-# gender="M", address='Via Aldo Moro, 114', city='San Giovanni Teatino', province='Chieti',
-# CAP=66020, phone_number='3294946261', email='piero.chiacchiaretta@gmail.com', nationality='italiana')
-#
-#
-# me = Patient(id_patient='1234',first_name='Piero', last_name='Chiacchiaretta',
-# birthdate=datetime(year=1979, day=27, month=9), birthplace='AGRIGENTO', cf_code='CHCPRI79P27G482U',
-# gender="M", address='Via Aldo Moro, 114', city='San Giovanni Teatino', province='Chieti',
-# CAP=66020, phone_number='3294946261', email='piero.chiacchiaretta@gmail.com', nationality='italiana',
-# age= me.age_calc, cf_calc=me.cf_code_calc)
-#
-#
-# # This connections to the DB and starts the session
-# session = Session.connect('easyris')
-# session.clear_collection(Patient) # clear previous runs of this code!
-# # Insert on a session will infer the correct collection and push the object
-# # into the database
-# session.save(me)
