@@ -24,7 +24,7 @@ if [ "${today}X" = "X" ] ;
     date
   fi
 
-apt-get -y install apache2 apache2-mpm-prefork apache2-prefork-dev python-dev
+apt-get -y install apache2 apache2-mpm-prefork apache2-prefork-dev python-dev ipython
 
 apt-get -y install python-pip
 pip install flask
@@ -78,11 +78,20 @@ chmod 755 /etc/init.d/mongod
 #  fi
 
 service mongod start
+if [ -e /etc/rc.local ] ;
+then
+    head -n -2 rc.local > /tmp/rc.local ;
+    cp /tmp/rc.local /etc/rc.local/
+fi
+echo >> /etc/rc.local
+echo service mongod start >>  /etc/rc.local
+echo exit 0  >> /etc/rc.local
+chmod +x /etc/rc.local
 
 pip install mod_wsgi
 pip install pymongo Flask-PyMongo
-pip install MongoAlchemy Flask-MongoAlchemy
-pip install codicefiscale
+#pip install MongoAlchemy Flask-MongoAlchemy
+#pip install codicefiscale
 
 apt-get -y install libapache2-mod-wsgi
 
