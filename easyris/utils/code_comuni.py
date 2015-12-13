@@ -1,11 +1,9 @@
-from mongoalchemy.session import Session
-from mongoalchemy.document import Document, Index
-from mongoalchemy.fields import StringField
+from mongoengine import *
 from codicefiscale import build
 
 
 class CF_codici_comuni(Document):
-    config_collection_name = 'patients'
+    __collection__ = 'cf_codici_comuni'
 
     # Setting the possible values by using fields
     codice = StringField(required=True)

@@ -20,7 +20,7 @@ class TestStringMethods(unittest.TestCase):
                      address='Via Aldo Moro, 114', 
                      city='San Giovanni Teatino', 
                      #province='Chieti',
-                     CAP='66020', 
+                     cap='66020', 
                      phone_number="3294946261", 
                      email='piero.chiacchiaretta@gmail.com', 
                      nationality='italiana')
@@ -35,7 +35,7 @@ class TestStringMethods(unittest.TestCase):
                       address='Via della Liberazione 55', 
                       city='San Benedetto del Tronto', 
                       #province='L\'Aquila',
-                      CAP='63074', 
+                      cap='63074', 
                       phone_number='2404751719', 
                       email='rob.guidotti@gmail.com', 
                       nationality='italiana')

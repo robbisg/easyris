@@ -1,7 +1,7 @@
 from mongoengine import *
 from pymongo import MongoClient
 from codicefiscale import build
-from easyris.utils.code_comuni import CF_codici_comuni
+from utils.code_comuni import CF_codici_comuni
 from datetime import datetime
 
 GENDER = (('M', 'Male'),
@@ -32,12 +32,12 @@ class Patient(Document):
     address = StringField(required=False)
     city = StringField(required=False)
     province = StringField(required=False, max_length=2)
-    CAP = StringField(required=True)
+    cap = StringField(required=True)
     phone_number = StringField(required=True)
     email = StringField(required=False)
     note = StringField(required=False)
     age = IntField()
-    #cf_calc = StringField(required=True)
+
     nationality = StringField(required=True)
 
     patient_status = StringField(required=False, choices=STATUS)
@@ -56,6 +56,7 @@ class Patient(Document):
 
 
     def compute_cf(self):
+        
         client = MongoClient()
         db = client.easyris
         query=db.get_collection('CF_codici_comuni').find({'Denom_Italiana' :self.birthplace})
@@ -80,5 +81,4 @@ class Patient(Document):
         id_calc = year+month+id_count
         print id_calc
         self.id_patient = id_calc
-
 
