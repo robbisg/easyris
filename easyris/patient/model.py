@@ -40,15 +40,21 @@ class Patient(Document):
 
     nationality = StringField(required=True)
 
-    patient_status = StringField(required=False, choices=STATUS)
-    patient_status_note = StringField(required=False)
+    status = StringField(required=True, 
+                                 choices=STATUS, 
+                                 default='Attivo')
+    status_note = StringField(required=False)
     
         
     def clean(self):        
         
+        #TODO: Delete when UI will control that
+        self.birthplace = unicode.upper(self.birthplace)
         self.compute_age()
         self.compute_cf()
-        self.compute_id()
+        self.compute_province()
+        if self.id_patient == None:
+            self.compute_id()
     
     
     def compute_age(self):
@@ -67,18 +73,26 @@ class Patient(Document):
                                     self.birthdate, 
                                     self.gender, 
                                     str(cf_code))
-        self.province = result['Prov']
+        #self.province = result['Prov']
 
 
     def compute_id(self):
 
         n_collection = Patient.objects.count()           
-        print n_collection
+        
         id_count=str(n_collection+1).zfill(4)
         year = str(datetime.now()).split('-')[0]
         month = str(datetime.now()).split('-')[1]
         
         id_calc = year+month+id_count
-        print id_calc
+        
         self.id_patient = id_calc
 
+    
+    def compute_province(self):
+        
+        client = MongoClient()
+        db = client.easyris
+        query=db.get_collection('CF_codici_comuni').find({'Denom_Italiana':self.city})
+        result=query.next()
+        self.province = result['Prov']
