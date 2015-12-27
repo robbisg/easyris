@@ -1,7 +1,9 @@
 from mongoengine import *
 import unittest
-from model import Patient
-from controller import PatientController
+
+from ..model import Patient
+from ..controller import PatientController
+
 from datetime import datetime
 
 class TestPatient(unittest.TestCase):

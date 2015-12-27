@@ -1,8 +1,10 @@
 from mongoengine import *
 from pymongo import MongoClient
 from codicefiscale import build
-from utils.code_comuni import CF_codici_comuni
 from datetime import datetime
+
+#from ..utils.code_comuni import CF_codici_comuni 
+
 
 GENDER = (('M', 'Male'),
         ('F', 'Female'))
@@ -26,8 +28,8 @@ class Patient(Document):
     
     codice_fiscale = StringField(required=True)
     
-    last_name_parents =  StringField(required=False)
-    name_parents = StringField(required=False)
+    name_tutor =  StringField(required=False)
+    surname_tutor = StringField(required=False)
     
     address = StringField(required=False)
     city = StringField(required=False)
@@ -52,7 +54,8 @@ class Patient(Document):
         self.birthplace = unicode.upper(self.birthplace)
         self.compute_age()
         self.compute_cf()
-        self.compute_province()
+        if self.province == None:
+            self.compute_province()
         if self.id_patient == None:
             self.compute_id()
     

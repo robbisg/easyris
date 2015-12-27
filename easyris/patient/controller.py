@@ -8,10 +8,17 @@ connect('easyris', port=27017)
 class PatientController(object):
     
     def __init__(self, *args, **kwargs):
+        # TODO: If no patients??
         self._currentPatient = Patient.objects().first()
-    
+
     
     def add(self, **query):
+        
+        # TODO: Check fields if they're correct!
+        # TODO: Manage birthdate.
+        # TODO: Check sul codice fiscale se esiste il paziente.
+        
+        
         if 'birthdate' in query.keys():
             query['birthdate'] = datetime.strptime(query['birthdate'], 
                                                    "%Y-%m-%dT%H:%M:%S" )
@@ -46,10 +53,11 @@ class PatientController(object):
     def search(self, **query):
         
         # TODO: Check query fields!
+        
         patients = Patient.objects(**query)
-
+        
         if patients.count() == 0:
-            return 'ERR'
+            return None
         else:
             # TODO: Check if patient is "Attivo"
             return patients
@@ -63,5 +71,7 @@ class PatientController(object):
 
     def get_patient(self, id_):
         
-        self._currentPatient = self.search(id_patient=id_).first()
+        self._currentPatient = self.search(id_patient=str(id_)).first()
         return self._currentPatient
+    
+    
