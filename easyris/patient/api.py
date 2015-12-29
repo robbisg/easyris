@@ -27,6 +27,8 @@ def show(id):
 
 @patient.route('/<int:id>/delete', methods=['GET', 'POST'])
 @jsonp
+@crossdomain(origin='*', methods=['POST', 'OPTIONS'], 
+             headers=['X-Requested-With', 'Content-Type', 'Origin'])
 def delete(id):
     if request.method == 'POST':
         query = request.form.to_dict()
@@ -39,8 +41,10 @@ def delete(id):
 
 
 
-@patient.route('/<int:id>/edit', methods=['GET', 'POST'])
+@patient.route('/<int:id>/edit', methods=['POST', 'OPTIONS'])
 @jsonp
+@crossdomain(origin='*', methods=['POST', 'OPTIONS'], 
+             headers=['X-Requested-With', 'Content-Type', 'Origin'])
 def edit(id):
     
     if request.method == 'POST':
@@ -85,39 +89,44 @@ def search():
     curl --data "first_name=Piero" http://localhost:5000/patient/search
     """
     if request.method == 'POST':
-        
-        print request.form
-        print type(request.data)
+
         print request.data
-        
         print request.headers
         
         query = json.loads(request.data)
           
         message = controller.search(**query)
         
+        # TODO: Make the following lines included in some functions
         data = dumps([m.to_mongo() for m in message])
-        
+    
         response = Response(response=data,
                         status=200,
                         mimetype="application/json")
-    #return json.dumps([m.to_json() for m in message])
+    
     print response
     return response
         
 
 
-@patient.route('/insert', methods=['GET', 'POST'])
+@patient.route('/insert', methods=['POST', 'OPTIONS'])
 @jsonp
+@crossdomain(origin='*', methods=['POST', 'OPTIONS'], 
+             headers=['X-Requested-With', 'Content-Type', 'Origin'])
 def insert():
     """
     Test with 
     
-    curl --data "first_name=Roberto&last_name=Ruffini&gender=M&birthplace=PESCARA&
+    curl --data "first_name=Roberto&last_name=Guidotti&gender=M&birthplace=PESCARA&
     address=Via%20Aldo%20Moro%20114&phone_number=3404752345&nationality=italiana&cap=64050
     &birthdate=12/07/1987" http://localhost:5000/patient/insert
     """
     if request.method == 'POST':
-        query = request.form.to_dict()
+        
+        print request.data
+        print request.headers
+        
+        query = json.loads(request.data)
         message = controller.add(**query)
+        print message
         return message

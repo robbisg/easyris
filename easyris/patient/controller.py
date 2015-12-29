@@ -3,12 +3,13 @@ from mongoengine import *
 from datetime import datetime
 
 # TODO: Database name should be explicit?
-connect('easyris', port=27017)
 
+connect('easyris', port=27017)
 class PatientController(object):
     
     def __init__(self, *args, **kwargs):
         # TODO: If no patients??
+        
         self._currentPatient = Patient.objects().first()
 
     
@@ -22,18 +23,19 @@ class PatientController(object):
         if 'birthdate' in query.keys():
             query['birthdate'] = datetime.strptime(query['birthdate'], 
                                                    "%Y-%m-%dT%H:%M:%S" )
+            
+        patient = Patient(**query)
         try:
-            patient = Patient(**query)
             patient.save()
-        except (FieldDoesNotExist, 
-                KeyError,
+        except (FieldDoesNotExist,
+                NotUniqueError,
                 SaveConditionError) as err:
-            return str(err)
+            return 'ERR'
         
         #TODO: Is it useful for the program?
         self._currentPatient = patient
         
-        return "Patient correctly inserted!"
+        return "OK"
     
     
     def update(self, **query):
@@ -44,10 +46,14 @@ class PatientController(object):
             query['birthdate'] = datetime.strptime(query['birthdate'], 
                                                    "%Y-%m-%dT%H:%M:%S" )
         if patient.modify(**query):
-            patient.save()
-            return "Correctly modified"
+            try:
+                patient.save()
+            except NotUniqueError, err:
+                return 'ERR'
+            
+            return "OK"
         
-        return "Error modifying patient!"
+        return "ERR"
     
     
     def search(self, **query):

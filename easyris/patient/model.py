@@ -26,7 +26,7 @@ class Patient(Document):
     birthdate = DateTimeField(required=True)
     birthplace = StringField(required=True)
     
-    codice_fiscale = StringField(required=True)
+    codice_fiscale = StringField(required=True, unique=True)
     
     name_tutor =  StringField(required=False)
     surname_tutor = StringField(required=False)
