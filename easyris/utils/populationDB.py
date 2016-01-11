@@ -7,7 +7,7 @@ conn_check = str(conn.database_names()[0])
 
 if conn_check == 'easyris' :
     print "ok easyris exists. Now drop it "
-    conn.drop_database(conn_check)
+    conn.drop_database("easyris")
 else:
     print "DB not. Now i create it."
 

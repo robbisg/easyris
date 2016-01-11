@@ -3,7 +3,7 @@ from pymongo import MongoClient
 from codicefiscale import build
 from datetime import datetime
 
-#from ..utils.code_comuni import CF_codici_comuni 
+# from ..utils.code_comuni import CF_codici_comuni
 
 
 GENDER = (('M', 'Male'),
