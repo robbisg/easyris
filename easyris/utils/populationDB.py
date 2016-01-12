@@ -4,7 +4,7 @@ import patient_db
 
 conn = connect('easyris')
 conn_check = str(conn.database_names()[0])
-
+#TODO Create DB, Populate DB and drop DB
 if conn_check == 'easyris' :
     print "ok easyris exists. Now drop it "
     conn.drop_database("easyris")
