@@ -16,7 +16,10 @@ controller = PatientController()
 @jsonp
 def show(id):
     message = controller.get_patient(id)
-    print message
+    
+    if message == 'ERR':
+        return "Patient not found"
+    
     data = dumps([m.to_mongo() for m in message])
     response = Response(response=data,
                         status=200,
