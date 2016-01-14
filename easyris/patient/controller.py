@@ -84,6 +84,6 @@ class PatientController(object):
             return 'ERR'
         
         self._currentPatient = patient.first()
-        return self._currentPatient
+        return [self._currentPatient]
     
     
