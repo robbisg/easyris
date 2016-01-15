@@ -17,6 +17,9 @@ controller = PatientController()
 def show(id):
     message = controller.get_patient(id)
     print message
+    if message == 'ERR':
+        return "Patient not found"
+    
     data = dumps([m.to_mongo() for m in message])
     response = Response(response=data,
                         status=200,
@@ -61,19 +64,21 @@ def edit(id):
 def get_patients():
     # TODO: Rimanda nome, cognome, id, cf, telefono
     # TODO: bson or json?
-    query = dict()
-    message = controller.search(**query)
-    
-    if message == None:
-        return Response(response='No patient in database',
-                        status=410)
+    if request.method == 'GET':
+        print request
+        query = dict()
+        message = controller.search(**query)
         
-    data = dumps([m.to_mongo() for m in message])
-    response = Response(response=data,
-                        status=200,
-                        mimetype="application/json")
-    #return json.dumps([m.to_json() for m in message])
-    return response
+        if message == None:
+            return Response(response='No patient in database',
+                            status=410)
+            
+        data = dumps([m.to_mongo() for m in message])
+        response = Response(response=data,
+                            status=200,
+                            mimetype="application/json")
+        #return json.dumps([m.to_json() for m in message])
+        return response
 
 
 @patient.route('/search', methods=['POST', 'OPTIONS'])

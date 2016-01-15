@@ -4,6 +4,7 @@ import unittest
 import tempfile
 import json
 
+@unittest.skip("showing class skipping")
 class EasyRisTest(unittest.TestCase):
     
     def setUp(self):
