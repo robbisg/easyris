@@ -2,6 +2,9 @@ import sys, os
 sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 
 
+__version__ = '0.0.1'
+
+
 class EasyRis(object):
     
     def __init__(self, user):

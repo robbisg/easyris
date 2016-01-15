@@ -5,6 +5,8 @@ from datetime import datetime
 # TODO: Database name should be explicit?
 
 connect('easyris', port=27017)
+
+
 class PatientController(object):
     
     def __init__(self, *args, **kwargs):
@@ -77,7 +79,11 @@ class PatientController(object):
 
     def get_patient(self, id_):
         
-        self._currentPatient = self.search(id_patient=str(id_)).first()
-        return self._currentPatient
+        patient = self.search(id_patient=str(id_))
+        if patient == None:
+            return 'ERR'
+        
+        self._currentPatient = patient.first()
+        return [self._currentPatient]
     
     
