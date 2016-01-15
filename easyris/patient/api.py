@@ -19,8 +19,7 @@ def show(id):
     print message
     if message == 'ERR':
         return "Patient not found"
-    for m in message:
-        print m
+    
     data = dumps([m.to_mongo() for m in message])
     response = Response(response=data,
                         status=200,
