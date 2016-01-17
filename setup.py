@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
 from setuptools.command.install import install
+from easyris.utils import database_setup
 import codecs
 import os
 import re
@@ -25,7 +26,8 @@ def find_version(*file_paths):
 class CustomInstallCommand(install):
     """Customized setuptools install command - prints a friendly greeting."""
     def run(self):
-        print "Hello, developer, how are you? :)"
+        print "You are installing EasyRIS!"
+        database_setup.run()
         install.run(self)
 
 
