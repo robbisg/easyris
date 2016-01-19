@@ -68,7 +68,7 @@ class Patient(Document):
         
         client = MongoClient()
         db = client.easyris
-        query=db.get_collection('CF_codici_comuni').find({'Denom_Italiana' :self.birthplace})
+        query=db.get_collection('city').find({'Denom_Italiana' :self.birthplace})
         result=query.next()
         cf_code=result['Codice']
         self.codice_fiscale = build(self.last_name, 
@@ -96,6 +96,6 @@ class Patient(Document):
         
         client = MongoClient()
         db = client.easyris
-        query=db.get_collection('CF_codici_comuni').find({'Denom_Italiana':self.city})
+        query=db.get_collection('city').find({'Denom_Italiana':self.birthplace})
         result=query.next()
         self.province = result['Prov']

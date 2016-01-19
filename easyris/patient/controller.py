@@ -24,7 +24,7 @@ class PatientController(object):
         
         if 'birthdate' in query.keys():
             query['birthdate'] = datetime.strptime(query['birthdate'], 
-                                                   "%Y-%m-%dT%H:%M:%S" )
+                                                   "%Y-%m-%dT%H:%M:%S.%fZ" )
             
         patient = Patient(**query)
         try:
