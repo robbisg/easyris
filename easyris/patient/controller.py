@@ -67,7 +67,7 @@ class PatientController(object):
         if patients.count() == 0:
             return None
         else:
-            # TODO: Check if patient is "Attivo"
+            # TODO: Check if patient_app is "Attivo"
             return patients
 
     

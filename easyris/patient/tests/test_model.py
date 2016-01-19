@@ -86,19 +86,19 @@ class TestPatientController(unittest.TestCase):
         self.assertNotEqual(query.count(), 0)
         self.assertEqual(controller._currentPatient.first_name, "Roberto")
         
-        patient = query.first()
+        patient_app = query.first()
         
-        self.assertEqual(patient.codice_fiscale, "GDTRRT83E18H769W")
-        self.assertEqual(patient.city, "SAN BENEDETTO DEL TRONTO")
-        self.assertEqual(patient.status, "Attivo")
-        self.assertEqual(patient.age, 32)
+        self.assertEqual(patient_app.codice_fiscale, "GDTRRT83E18H769W")
+        self.assertEqual(patient_app.city, "SAN BENEDETTO DEL TRONTO")
+        self.assertEqual(patient_app.status, "Attivo")
+        self.assertEqual(patient_app.age, 32)
         
         yy = datetime.now().year
         mm = datetime.now().month
         fill_ = str(Patient.objects().count()).zfill(4)
         true_ = str(yy)+str(mm)+fill_
         
-        #self.assertEqual(true_, patient.id_patient)
+        #self.assertEqual(true_, patient_app.id_patient)
         
     @unittest.skip("Issues on id") 
     def test_get(self):

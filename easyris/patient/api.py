@@ -8,7 +8,7 @@ from datetime import datetime
 from controller import PatientController
 from utils.decorators import jsonp, crossdomain
 
-patient = Blueprint('patient', __name__)
+patient_app = Blueprint('patient_app', __name__)
 controller = PatientController()
 
 
