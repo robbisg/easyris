@@ -1,9 +1,9 @@
 from flask import Flask
-from patient.api import patient_app 
+from patient.api import patient
 from flask.ext.cors import CORS
 
 app = Flask(__name__)
-app.register_blueprint(patient_app, url_prefix='/patient')
+app.register_blueprint(patient, url_prefix='/patient')
 CORS(app)
 
 @app.route('/')

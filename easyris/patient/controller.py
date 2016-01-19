@@ -10,8 +10,8 @@ connect('easyris', port=27017)
 class PatientController(object):
     
     def __init__(self, *args, **kwargs):
-        # TODO: If no patients??
         
+        # TODO: If no patients??
         self._currentPatient = Patient.objects().first()
 
     
