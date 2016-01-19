@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
 from setuptools.command.install import install
+from easyris.utils import database_setup
 import codecs
 import os
 import re
@@ -25,25 +26,23 @@ def find_version(*file_paths):
 class CustomInstallCommand(install):
     """Customized setuptools install command - prints a friendly greeting."""
     def run(self):
-        print "Hello, developer, how are you? :)"
+        print "You are installing EasyRIS!"
+        database_setup.run()
         install.run(self)
 
 
 setup(
     name="easyris",
     version=find_version('easyris', '__init__.py'),
-    description="Serve EasyRIS",
-    cmdclass={
-        'install': CustomInstallCommand,
-        'develop': CustomInstallCommand,
-    },
+    description="EasyRIS by Serve",
+
 
     # The project URL.
-    url='https://easyris.com/',
+    url='https://www.ser-ve.it/',
 
     # Author details
-    author='Roberto Guidotti',
-    author_email='rob.guidotti@gmail.com',
+    author='Serve',
+    author_email='info@ser-ve.it',
 
     # Choose your license
     license='MIT',
@@ -96,16 +95,16 @@ setup(
     # need to place data files outside of your packages.
     # see http://docs.python.org/3.4/distutils/setupscript.html#installing-additional-files
     # In this case, 'data_file' will be installed into '<sys.prefix>/my_data'
-    data_files=[('utils/files', glob.glob('utils/files/*.csv'))],
+    
+    # data_files=[('utils/files', glob.glob('utils/files/*.csv'))],
     
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
     # pip to create the appropriate form of executable for the target platform.
-    entry_points={
-        'console_scripts': [
-            'easyrisdbimport=easyris.utils.patient_db:main',
-        ],
+
+    cmdclass={
+        'database': CustomInstallCommand,
+        #'develop': CustomInstallCommand,
     },
-    
     #scripts = ['scripts/patient_db.py']
 )

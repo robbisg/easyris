@@ -1,6 +1,5 @@
-from flask import Flask, render_template, url_for, request, redirect, \
-                jsonify, make_response
-from patient.api import patient 
+from flask import Flask
+from patient.api import patient
 from flask.ext.cors import CORS
 
 app = Flask(__name__)
