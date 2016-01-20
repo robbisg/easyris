@@ -5,7 +5,7 @@ from datetime import datetime
 from easyris.patient.model import Patient
 import os
 
-def main():
+def main(n_loaded=100):
     connect('easyris', port=27017)
     #Patient.drop_collection()
     path = '/'.join(__file__.split('/')[:-1])
@@ -16,7 +16,7 @@ def main():
         for i,row in enumerate(patient_csv):
             if i == 0:
                 keys_ = [str.lower(r_) for r_ in row]
-            elif i<100:
+            elif i < n_loaded:
                 fields_ = dict(zip(keys_, row))
                 fields_['birthplace'] = str.upper(fields_['birthplace'])
                 fields_['city'] = str.upper(fields_['city'])
