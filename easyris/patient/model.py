@@ -11,7 +11,7 @@ GENDER = (('M', 'Male'),
 STATUS = ('Attivo', 'Revocato', 'Defunto')
 
 class Patient(Document):
-    __collection__ = 'patients'
+    __collection__ = 'patient'
     
     # Setting the possible values by using fields
     id_patient = StringField(required=True, unique=True)
