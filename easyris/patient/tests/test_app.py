@@ -4,7 +4,7 @@ import unittest
 import tempfile
 import json
 
-@unittest.skip("showing class skipping")
+#@unittest.skip("showing class skipping")
 class EasyRisTest(unittest.TestCase):
     
     def setUp(self):
@@ -14,13 +14,14 @@ class EasyRisTest(unittest.TestCase):
     def test_search(self):
         
         rv = self.app.post(path='/patient/search', 
-                           data=json.dumps({'first_name':'Roberto'}),
+                           data=json.dumps({'first_name':'Fiorella'}),
                            content_type='application/json')
         print rv.data
         response = json.loads(rv.data)
         patient = response[0]
-        
-        assert 'Roberto' == patient['first_name']
+        print response
+        assert 'Fiorella' == patient['first_name']
+        assert 'Zabbo' == patient['last_name']
     
     def test_add(self):
         
@@ -34,7 +35,7 @@ class EasyRisTest(unittest.TestCase):
                                             'phone_number':'3404752345',
                                             'nationality':'italiana',
                                             'cap':'64050',
-                                            'birthdate':'1983-05-18T00:00:00'}),
+                                            'birthdate':'1983-05-18T00:00:00.0Z'}),
                            content_type='application/json')
         
         print rv

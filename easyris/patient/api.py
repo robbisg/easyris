@@ -99,7 +99,7 @@ def search():
         print request.headers
         
         query = json.loads(request.data)
-          
+        print query
         message = controller.search(**query)
         
         # TODO: Make the following lines included in some functions

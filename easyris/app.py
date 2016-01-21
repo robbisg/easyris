@@ -1,10 +1,11 @@
-from flask import Flask, render_template, url_for, request, redirect, \
-                jsonify, make_response
-from patient.api import patient 
+from flask import Flask
+from utils.api import cities
+from patient.api import patient
 from flask.ext.cors import CORS
 
 app = Flask(__name__)
 app.register_blueprint(patient, url_prefix='/patient')
+app.register_blueprint(cities, url_prefix='/cities')
 CORS(app)
 
 @app.route('/')
