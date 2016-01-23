@@ -7,6 +7,7 @@ from datetime import datetime
 
 from controller import PatientController
 from utils.decorators import jsonp, crossdomain
+from easyris.utils.response import build_response
 
 patient = Blueprint('patient', __name__)
 controller = PatientController()
@@ -19,13 +20,8 @@ def show(id):
     print message
     if message == 'ERR':
         return "Patient not found"
-    
-    data = dumps([m.to_mongo() for m in message])
-    response = Response(response=data,
-                        status=200,
-                        mimetype="application/json")
-    
-    return response
+        
+    return build_response(message)
 
 
 @patient.route('/<int:id>/delete', methods=['GET', 'POST'])
@@ -55,8 +51,7 @@ def edit(id):
         # TODO: Check if they exist?!?!
         message = controller.update(**query)
     return message
-    
-    return  
+
    
         
 @patient.route('/', methods=['GET'])
@@ -73,12 +68,7 @@ def get_patients():
             return Response(response='No patient in database',
                             status=410)
             
-        data = dumps([m.to_mongo() for m in message])
-        response = Response(response=data,
-                            status=200,
-                            mimetype="application/json")
-        #return json.dumps([m.to_json() for m in message])
-        return response
+        return build_response(message)
 
 
 @patient.route('/search', methods=['POST', 'OPTIONS'])
@@ -102,15 +92,7 @@ def search():
           
         message = controller.search(**query)
         
-        # TODO: Make the following lines included in some functions
-        data = dumps([m.to_mongo() for m in message])
-    
-        response = Response(response=data,
-                        status=200,
-                        mimetype="application/json")
-    
-    print response
-    return response
+    return build_response(message)
         
 
 

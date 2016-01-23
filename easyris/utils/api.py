@@ -6,6 +6,7 @@ import json
 
 from controller import CityController
 from utils.decorators import jsonp, crossdomain
+from easyris.utils.response import build_response
 
 cities = Blueprint('cities', __name__)
 controller = CityController()
@@ -15,13 +16,8 @@ controller = CityController()
 @jsonp
 def show_cities():
     message = controller.get_cities()
-    print message
+
     if message == 'ERR':
         return "No cities"
-    
-    data = dumps([m.to_mongo() for m in message])
-    response = Response(response=data,
-                        status=200,
-                        mimetype="application/json")
-    
-    return response
+        
+    return build_response(message)
