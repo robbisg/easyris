@@ -8,15 +8,15 @@ from datetime import datetime
 connect('easyris', port=27017)
 
 
-class PatientController(Document):
+class PatientController(object):
         
-    name = StringField(required=True, default='patient')
+    #name = StringField(required=True, default='patient')
     
     def __init__(self, name='patient', *args, **kwargs):
         
         # TODO: If no patients??
         self._currentPatient = Patient.objects().first()
-        self._name = name
+        self.name = name
         #super(PatientController, self).__init__()
         
     def create(self, **query):
