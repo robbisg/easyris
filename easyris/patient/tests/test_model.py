@@ -67,7 +67,7 @@ class TestPatientController(unittest.TestCase):
     def test_add(self):
 
         controller = PatientController()
-        controller.add(first_name='Roberto', 
+        controller.create(first_name='Roberto', 
                       last_name='Guidotti',
                       birthdate="1983-05-18T13:08:00", 
                       birthplace='SAN BENEDETTO DEL TRONTO', 
@@ -157,7 +157,7 @@ class TestPatientCases(unittest.TestCase):
     def test_add_same_patient(self):
         
         controller = PatientController()
-        res1 = controller.add(first_name='Roberto', 
+        res1 = controller.create(first_name='Roberto', 
                       last_name='Guidotti',
                       birthdate="1983-05-18T13:08:00", 
                       birthplace='SAN BENEDETTO DEL TRONTO', 
@@ -169,7 +169,7 @@ class TestPatientCases(unittest.TestCase):
                       email='rob.guidotti@gmail.com', 
                       nationality='italiana')
         
-        res2 = controller.add(first_name='Roberto', 
+        res2 = controller.create(first_name='Roberto', 
                       last_name='Guidotti',
                       birthdate="1983-05-18T13:08:00", 
                       birthplace='SAN BENEDETTO DEL TRONTO', 
@@ -194,7 +194,7 @@ class TestPatientCases(unittest.TestCase):
         
         controller = PatientController()
         
-        res1 = controller.add(first_name='Andrea', 
+        res1 = controller.create(first_name='Andrea', 
                       last_name='Guidotti',
                       birthdate="1947-12-17T13:08:00", 
                       birthplace='SAN BENEDETTO DEL TRONTO', 
@@ -206,7 +206,7 @@ class TestPatientCases(unittest.TestCase):
                       email='rob.guidotti@gmail.com', 
                       nationality='italiana')
         
-        res2 = controller.add(first_name='Roberto', 
+        res2 = controller.create(first_name='Roberto', 
                       last_name='Guidotti',
                       birthdate="1983-05-18T13:08:00", 
                       birthplace='SAN BENEDETTO DEL TRONTO', 

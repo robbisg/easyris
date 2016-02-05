@@ -16,7 +16,7 @@ controller = CityController()
 @jsonp
 def show_cities():
     message = controller.get_cities()
-
+    
     if message == 'ERR':
         return "No cities"
         

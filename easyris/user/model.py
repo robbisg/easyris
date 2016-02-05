@@ -50,7 +50,6 @@ class User(Document):
         self.password = sha256_crypt.encrypt(self.password)
     
     
-    
     def has_permission(self, action, resource):
         permissions = [role.get_permissions() for role in self.roles]
         permissions = list(itertools.chain(*permissions))

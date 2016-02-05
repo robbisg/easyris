@@ -1,4 +1,5 @@
 from model import Patient
+#from easyris.base.controller import Controller
 from mongoengine import *
 from datetime import datetime
 
@@ -7,15 +8,18 @@ from datetime import datetime
 connect('easyris', port=27017)
 
 
-class PatientController(object):
+class PatientController(Document):
+        
+    name = StringField(required=True, default='patient')
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, name='patient', *args, **kwargs):
         
         # TODO: If no patients??
         self._currentPatient = Patient.objects().first()
-
-    
-    def add(self, **query):
+        self._name = name
+        #super(PatientController, self).__init__()
+        
+    def create(self, **query):
         
         # TODO: Check fields if they're correct!
         # TODO: Manage birthdate.
@@ -58,7 +62,7 @@ class PatientController(object):
         return "ERR"
     
     
-    def search(self, **query):
+    def read(self, **query):
         
         # TODO: Check query fields!
         

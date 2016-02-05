@@ -114,6 +114,6 @@ def insert():
         print request.headers
         
         query = json.loads(request.data)
-        message = controller.add(**query)
+        message = controller.create(**query)
         print message
         return message
