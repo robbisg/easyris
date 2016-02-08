@@ -54,7 +54,7 @@ class Patient(Document):
         self.birthplace = unicode.upper(self.birthplace)
         self.compute_age()
         self.compute_cf()
-        if self.province == None:
+        if self.province == None and self.city != None:
             self.compute_province()
         if self.id_patient == None:
             self.compute_id()
@@ -96,6 +96,7 @@ class Patient(Document):
         
         client = MongoClient()
         db = client.easyris
-        query=db.get_collection('city').find({'Denom_Italiana':self.birthplace})
+        query=db.get_collection('city').find({'Denom_Italiana':self.city})
         result=query.next()
         self.province = result['Prov']
+

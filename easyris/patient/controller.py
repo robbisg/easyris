@@ -50,7 +50,7 @@ class PatientController(object):
         # TODO: Include checks in function??
         if 'birthdate' in query.keys():
             query['birthdate'] = datetime.strptime(query['birthdate'], 
-                                                   "%Y-%m-%dT%H:%M:%S" )
+                                                   "%Y-%m-%dT%H:%M:%S.%fZ" )
         if patient.modify(**query):
             try:
                 patient.save()
