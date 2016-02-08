@@ -40,3 +40,20 @@ def run():
                            --type csv --headerline \
                            --file /var/www/backend/easyris/utils/files/nomenclatura_esami.csv")
 
+    print "Import permission.csv"
+    os.system("mongoimport --db easyris \
+                           --collection permission \
+                           --type csv --headerline \
+                           --file /var/www/backend/easyris/utils/files/permission.csv")
+
+    print "Import role.csv"
+    os.system("mongoimport --db easyris \
+                           --collection role \
+                           --type csv --headerline \
+                           --file /var/www/backend/easyris/utils/files/role.csv")
+
+    print "Import username.csv"
+    os.system("mongoimport --db easyris \
+                           --collection username \
+                           --type csv --headerline \
+                           --file /var/www/backend/easyris/utils/files/username.csv")
