@@ -18,7 +18,7 @@ def run():
     os.system("mongoimport --db easyris \
                            --collection city \
                            --type csv --headerline \
-                           --file /var/www/backend/easyris/utils/files/codicicomuni2015.csv")
+                           --file /usr/share/nginx/www/backend/easyris/utils/files/codicicomuni2015.csv")
     print "Import patient.csv"
     patient_db.main()
 
@@ -26,34 +26,34 @@ def run():
     os.system("mongoimport --db easyris \
                            --collection priority \
                            --type csv --headerline \
-                           --file /var/www/backend/easyris/utils/files/priority_db.csv")
+                           --file /usr/share/nginx/www/backend/easyris/utils/files/priority_db.csv")
 
     print "Import exam_status_db.csv"
     os.system("mongoimport --db easyris \
                            --collection exam_status \
                            --type csv --headerline \
-                           --file /var/www/backend/easyris/utils/files/exam_status_db.csv")
+                           --file /usr/share/nginx/www/backend/easyris/utils/files/exam_status_db.csv")
 
     print "Import nomenclatura_esami.csv"
     os.system("mongoimport --db easyris \
                            --collection typology \
                            --type csv --headerline \
-                           --file /var/www/backend/easyris/utils/files/nomenclatura_esami.csv")
+                           --file /usr/share/nginx/www/backend/easyris/utils/files/nomenclatura_esami.csv")
 
     print "Import permission.csv"
     os.system("mongoimport --db easyris \
                            --collection permission \
                            --type csv --headerline \
-                           --file /var/www/backend/easyris/utils/files/permission.csv")
+                           --file /usr/share/nginx/www/backend/easyris/utils/files/permission.csv")
 
     print "Import role.csv"
     os.system("mongoimport --db easyris \
                            --collection role \
                            --type csv --headerline \
-                           --file /var/www/backend/easyris/utils/files/role.csv")
+                           --file /usr/share/nginx/www/backend/easyris/utils/files/role.csv")
 
     print "Import username.csv"
     os.system("mongoimport --db easyris \
                            --collection username \
                            --type csv --headerline \
-                           --file /var/www/backend/easyris/utils/files/username.csv")
+                           --file /usr/share/nginx/www/backend/easyris/utils/files/username.csv")
