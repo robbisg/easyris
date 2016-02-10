@@ -41,6 +41,8 @@ class User(Document):
     last_name = StringField(required=True)
     
     email = StringField(required=True)
+    telephone_number = StringField(required=True)
+    mobile_number = StringField(required=True)
     
     active = BooleanField(default=True)
     
