@@ -11,7 +11,7 @@ from datetime import datetime
 
 
 class TestExamination(unittest.TestCase):
-    
+
     def setUp(self):
         connect('easyris', port=27017)
         Examination.drop_collection()
@@ -38,6 +38,11 @@ class TestExamination(unittest.TestCase):
                          # examination_note='ok')
                          )
         me.save()
+
+        examination_ins = Examination.objects(medico_richiedente='Pinco Pallo').first()
+        assert examination_ins.data_inserimento == datetime(year=2016, day=02, month=02)
+        # altri controlli
+
 
 if __name__ == '__main__':
     unittest.main()

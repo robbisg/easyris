@@ -1,4 +1,4 @@
-Codice Ministeriale,Codice Regionale,Nota,Descrizione Breve,Descrizione Ministeriale,Tariffa (Euro),Annotazioni,categorie,Modality,Room,DescriptionDevice,Scheduled Station AE Title,Exam name,Distretto Corporeo
+codice_ministeriale,codice_regionale,nota,descrizione_breve,descrizione_ministeriale,tariffa_euro,annotazioni,categorie,modality,room,device_description,scheduled_station_ae_title,exam_name,distretto_corporeo
 88.91.1,RM11,,RM ENCEFALO SENZA MDC,Risonanza magnetica nucleare (rm) del cervello e del tronco encefalico,166.58,verde,RM,MR,RM1.5T,PHILIPS_ACHIEVA_1.5,MR_STORE_EXP,RM ENCEFALO SENZA MDC,TESTA/COLLO
 88.91.2,RM12,,RM ENCEFALO SENZA E CON MDC,Risonanza magnetica nucleare (rm) del cervello e del tronco encefalico  senza e con contrasto,247.5,verde,RM,MR,RM1.5T,PHILIPS_ACHIEVA_1.5,MR_STORE_EXP,RM ENCEFALO SENZA E CON MDC,TESTA/COLLO
 88.91.3,RM13,,RM MASSICCIO FACCIALE SENZA MDC,Risonanza magnetica nucleare (rm) del massiccio facciale [sella turcica  orbite  rocche petrose  articolazioni temporomandibolari],160.1,azzurro,RM,MR,RM1.5T,PHILIPS_ACHIEVA_1.5,MR_STORE_EXP,RM MASSICCIO FACCIALE SENZA MDC,TESTA/COLLO
