@@ -99,3 +99,4 @@ class Patient(Document):
         query=db.get_collection('city').find({'Denom_Italiana':self.city})
         result=query.next()
         self.province = result['Prov']
+
