@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 from setuptools.command.install import install
-from easyris.utils import database_setup
+
 import codecs
 import os
 import re
@@ -8,6 +8,7 @@ import glob
 
 
 here = os.path.abspath(os.path.dirname(__file__))
+
 def find_version(*file_paths):
     # Open in Latin-1 so that we avoid encoding errors.
     # Use codecs.open for Python 2 compatibility
@@ -21,14 +22,6 @@ def find_version(*file_paths):
     if version_match:
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
-
-
-class CustomInstallCommand(install):
-    """Customized setuptools install command - prints a friendly greeting."""
-    def run(self):
-        print "You are installing EasyRIS!"
-        database_setup.run()
-        install.run(self)
 
 
 setup(
@@ -81,7 +74,10 @@ setup(
                         'flask-security', 
                         'flask-mongoengine', 
                         'flask-cors',
-                        #'nibabel'
+                        'numpy',
+                        'flask-script',
+                        'flask-debugtoolbar',
+                        'click'
                         ],
 
     # If there are data files included in your packages that need to be
@@ -103,7 +99,7 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
 
     cmdclass={
-        'database': CustomInstallCommand,
+        #'database': CustomInstallCommand,
         #'develop': CustomInstallCommand,
     },
     #scripts = ['scripts/patient_db.py']

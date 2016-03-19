@@ -9,13 +9,13 @@ from datetime import datetime
 
 # @unittest.skip("showing class skipping")
 
-
+@unittest.skip("Not checked yet")
 class TestExamination(unittest.TestCase):
 
     def setUp(self):
         connect('easyris', port=27017)
         Examination.drop_collection()
-        # patient_db.main(n_loaded=5)
+        # patient_db.run(n_loaded=5)
 
     def test_model(self):
         print "Testing model"
@@ -45,4 +45,4 @@ class TestExamination(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.run()
