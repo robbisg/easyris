@@ -1,90 +1,146 @@
-from flask import Blueprint, jsonify, request, Response
-
+from flask import Blueprint, jsonify, request, Response, g
 from mongoengine import *
 from bson.json_util import dumps
 import json
 from datetime import datetime
 
 from controller import PatientController
-from utils.decorators import jsonp, crossdomain
+from easyris.base.middleware import build_response
+from flask_login import login_required, current_user
+from flask_cors.decorator import cross_origin
+from easyris.base.controller import EasyRisFacade
+from easyris.utils.decorators import has_permission, jsonp, crossdomain
+
 
 patient = Blueprint('patient', __name__)
+
+
+# TODO: Should I start the class in easyris.app??
+system = EasyRisFacade()
 controller = PatientController()
 
 
-@patient.route('/<int:id>', methods=['GET'])
+# TODO: Implement the confirmation of patient data!
+
+@patient.route('/', methods=['GET', 'OPTIONS'])
+@cross_origin(origin=None, 
+             methods=['GET', 'OPTIONS'], 
+             allow_headers=['X-Requested-With', 
+                            'Content-Type', 
+                            'Origin'],
+             supports_credentials=True)
+@login_required
+@has_permission('read', 'patient')
+def get_patients():
+    # TODO: Rimanda nome, cognome, id, cf, telefono
+    # TODO: Log stuff!
+    print request.headers
+    if not g.user.is_anonymous:
+        print 'User:'+g.user.username
+    
+    if request.method == 'GET':
+        
+        query = dict()
+        
+        message = system.do('read', 'patient', **query)
+        
+        if message == None:
+            return Response(response='No patient in database',
+                            status=410)
+        
+        response = build_response(message)
+        print response.headers
+        return response
+
+
+
+@patient.route('/<int:id>', methods=['GET', 'POST', 'OPTIONS'])
 @jsonp
+@cross_origin(origin=None, 
+             methods=['GET', 'POST', 'OPTIONS'], 
+             allow_headers=['X-Requested-With', 
+                            'Content-Type', 
+                            'Origin'],
+             supports_credentials=True)
+@login_required
+@has_permission('read', 'patient')
 def show(id):
-    message = controller.get_patient(id)
-    print message
-    if message == 'ERR':
-        return "Patient not found"
     
-    data = dumps([m.to_mongo() for m in message])
-    response = Response(response=data,
-                        status=200,
-                        mimetype="application/json")
+    if request.method == 'GET':
+        
+        message = system.do('read', 'patient', id=id)
+        #message = controller.get_patient(id)
+        print message
+        if message == 'ERR':
+            return "Patient not found"
+            
+        return build_response(message)
     
-    return response
+    if request.method == 'POST':
+        return message
 
 
-@patient.route('/<int:id>/delete', methods=['GET', 'POST'])
+
+@patient.route('/<int:id>/delete', methods=['POST', 'OPTIONS'])
 @jsonp
-@crossdomain(origin='*', methods=['POST', 'OPTIONS'], 
-             headers=['X-Requested-With', 'Content-Type', 'Origin'])
+@cross_origin(origin=None, 
+             methods=['POST', 'OPTIONS'], 
+             allow_headers=['X-Requested-With', 
+                            'Content-Type', 
+                            'Origin'],
+             supports_credentials=True)
+@login_required
+@has_permission('delete', 'patient')
 def delete(id):
+    
     if request.method == 'POST':
         query = request.form.to_dict()
         # TODO: Check if they exist?!?!
         # TODO: Is it good to extract fields from request?
         status = query['status']
         note = query['note']
-        message = controller.delete(status, note)
+        message = system.do('delete', 
+                            'patient', 
+                            status=status, 
+                            note=note)
+        #message = controller.delete(status, note)
     return message
 
 
 
 @patient.route('/<int:id>/edit', methods=['POST', 'OPTIONS'])
 @jsonp
-@crossdomain(origin='*', methods=['POST', 'OPTIONS'], 
-             headers=['X-Requested-With', 'Content-Type', 'Origin'])
-def edit(id):
+@cross_origin(origin=None, 
+             methods=['POST', 'OPTIONS'], 
+             allow_headers=['X-Requested-With', 
+                            'Content-Type', 
+                            'Origin'],
+             supports_credentials=True)
+@login_required
+@has_permission('update', 'patient')
+def update(id):
     
     if request.method == 'POST':
+        
         query = request.form.to_dict()
-        # TODO: Check if they exist?!?!
-        message = controller.update(**query)
+        query['id'] = id
+        
+        message = system.do('update', 'patient', **query)
+        
     return message
-    
-    return  
-   
-        
-@patient.route('/', methods=['GET'])
-@jsonp
-def get_patients():
-    # TODO: Rimanda nome, cognome, id, cf, telefono
-    # TODO: bson or json?
-    if request.method == 'GET':
-        print request
-        query = dict()
-        message = controller.search(**query)
-        
-        if message == None:
-            return Response(response='No patient in database',
-                            status=410)
-            
-        data = dumps([m.to_mongo() for m in message])
-        response = Response(response=data,
-                            status=200,
-                            mimetype="application/json")
-        #return json.dumps([m.to_json() for m in message])
-        return response
 
+   
 
 @patient.route('/search', methods=['POST', 'OPTIONS'])
 @jsonp
-@crossdomain(origin='*', methods=['POST', 'OPTIONS'], 
-             headers=['X-Requested-With', 'Content-Type', 'Origin'])
+@cross_origin(origin=None, 
+             methods=['POST', 'OPTIONS'], 
+             allow_headers=['X-Requested-With', 
+                            'Content-Type', 
+                            'Origin'],
+             supports_credentials=True)
+@login_required
+@has_permission('read', 'patient')
 def search():
     """
     Test with 
@@ -100,24 +156,22 @@ def search():
         
         query = json.loads(request.data)
         print query
-        message = controller.search(**query)
+        message = system.do('read', 'patient', **query)
         
-        # TODO: Make the following lines included in some functions
-        data = dumps([m.to_mongo() for m in message])
-    
-        response = Response(response=data,
-                        status=200,
-                        mimetype="application/json")
-    
-    print response
-    return response
+    return build_response(message)
         
 
 
 @patient.route('/insert', methods=['POST', 'OPTIONS'])
 @jsonp
-@crossdomain(origin='*', methods=['POST', 'OPTIONS'], 
-             headers=['X-Requested-With', 'Content-Type', 'Origin'])
+@cross_origin(origin=None, 
+             methods=['POST', 'OPTIONS'], 
+             allow_headers=['X-Requested-With', 
+                            'Content-Type', 
+                            'Origin'],
+             supports_credentials=True)
+@login_required
+@has_permission('create', 'patient')
 def insert():
     """
     Test with 
@@ -126,12 +180,15 @@ def insert():
     address=Via%20Aldo%20Moro%20114&phone_number=3404752345&nationality=italiana&cap=64050
     &birthdate=12/07/1987" http://localhost:5000/patient/insert
     """
+    
     if request.method == 'POST':
         
         print request.data
         print request.headers
         
         query = json.loads(request.data)
-        message = controller.add(**query)
+        
+        message = system.do('create', 'patient', **query)
+        #message = controller.add(**query)
         print message
         return message

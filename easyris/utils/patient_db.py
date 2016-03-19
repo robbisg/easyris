@@ -5,9 +5,27 @@ from datetime import datetime
 from easyris.patient.model import Patient
 import os
 
-def main(n_loaded=100):
-    connect('easyris', port=27017)
-    #Patient.drop_collection()
+
+def run(database, port, n_loaded=100):
+    
+    client = connect(database, port=port)
+    db = client.get_database(database)
+
+    if 'city' not in db.collection_names():
+        # We imported the short version
+        # We think that we are testing the app!
+        from easyris.utils.database_setup import import_csv
+        path = os.path.dirname(os.path.realpath(__file__))
+        # Import city
+        print os.path.join(path, "files/codicicomuni_test.csv")
+        print '------------'
+        print '------------'
+        print '------------'
+        import_csv(database, 
+                   'city', 
+                   os.path.join(path, "files/codicicomuni_test.csv"))
+
+        
     path = '/'.join(__file__.split('/')[:-1])
     print path
     filepath = os.path.join(path, 'files/db_test_population.csv')
@@ -29,5 +47,3 @@ def main(n_loaded=100):
 
                 patient_.save()
 
-if __name__ == '__main__':
-    main()

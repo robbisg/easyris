@@ -1,71 +1,62 @@
 from mongoengine import connect
 import os
 import patient_db
+import user_db
 
 
-def run():
-    conn = connect('easyris')
+def import_csv(database, collection, filepath):
+    
+    filename = filepath.split("/")[-1]
+    
+    print("Importing %s" %(filename))
+    command = "mongoimport --db %s \
+                           --collection %s \
+                           --type csv --headerline \
+                           --file %s > /dev/null " %(database, collection, filepath)
+                           
+    os.system(command)
+
+
+def run(db_name='easyris', port=27017):
+    
+    conn = connect(db_name, port=port)
     conn_check = str(conn.database_names()[0])
     
-    if conn_check == 'easyris':
+    if conn_check == db_name:
         print "Database found. Deleting it!"
-        conn.drop_database("easyris")
+        conn.drop_database(db_name)
     else:
         print "Database not found..."
 
     print " ---- Database population ---"
-    print "Import codicicomuni2015.csv"
-    os.system("mongoimport --db easyris \
-                           --collection city \
-                           --type csv --headerline \
-                           --file easyris/utils/files/codicicomuni2015.csv")
+    path = os.path.dirname(os.path.realpath(__file__))
+    # Import city
+    import_csv(db_name, 'city', os.path.join(path, "files/codicicomuni2015.csv"))
+
     print "Import patient.csv"
-    patient_db.main()
+    patient_db.run(db_name, port)
 
-    print "Import priority_db.csv"
-    os.system("mongoimport --db easyris \
-                           --collection priority \
-                           --type csv --headerline \
-                           --file easyris/utils/files/priority_db.csv")
+    # Import priority_db.csv
+    import_csv(db_name, 'priority', os.path.join(path, "files/priority_db.csv"))
 
-    print "Import exam_status_db.csv"
-    os.system("mongoimport --db easyris \
-                           --collection exam_status \
-                           --type csv --headerline \
-                           --file easyris/utils/files/exam_status_db.csv")
+    # Import exam_status_db.csv
+    # TODO: This should be modified!
+    import_csv(db_name, 'exam_status',os.path.join(path, "files/exam_status_b.csv"))
 
-    print "Import nomenclatura_esami.csv"
-    os.system("mongoimport --db easyris \
-                           --collection typology \
-                           --type csv --headerline \
-                           --file easyris/utils/files/nomenclatura_esami.csv")
+    # Import nomenclatura_esami.csv
+    import_csv(db_name, 'typology', os.path.join(path, "files/nomenclatura_esami.csv"))
 
-    print "Import permission.csv"
-    os.system("mongoimport --db easyris \
-                           --collection permission \
-                           --type csv --headerline \
-                           --file easyris/utils/files/permission.csv")
+    print "Populating users, permissions and roles."
+    user_db.run(db_name, port)
 
-    print "Import role.csv"
-    os.system("mongoimport --db easyris \
-                           --collection role \
-                           --type csv --headerline \
-                           --file easyris/utils/files/role.csv")
+    # Import report_status.csv
+    import_csv(db_name, 'report_status', os.path.join(path, "files/report_status.csv"))
 
-    print "Import username.csv"
-    os.system("mongoimport --db easyris \
-                           --collection username \
-                           --type csv --headerline \
-                           --file easyris/utils/files/username.csv")
+    # Import report.csv
+    import_csv(db_name, 'report', os.path.join(path, "files/report.csv"))
 
-    print "Import report_status.csv"
-    os.system("mongoimport --db easyris \
-                           --collection report_status \
-                           --type csv --headerline \
-                           --file easyris/utils/files/report_status.csv")
 
-    print "Import report.csv"
-    os.system("mongoimport --db easyris \
-                           --collection report \
-                           --type csv --headerline \
-                           --file easyris/utils/files/report.csv")
+
+
+
+

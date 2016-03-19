@@ -1,5 +1,6 @@
 from functools import wraps, update_wrapper
-from flask import make_response, redirect, request, current_app
+from flask import make_response, redirect, request,\
+                 current_app, Response, g
 from datetime import timedelta
 
 
@@ -25,13 +26,14 @@ def crossdomain(origin=None, methods=None, headers=None,
 
     def decorator(f):
         def wrapped_function(*args, **kwargs):
+            #print request.headers
             if automatic_options and request.method == 'OPTIONS':
                 resp = current_app.make_default_options_response()
             else:
                 resp = make_response(f(*args, **kwargs))
             if not attach_to_all and request.method != 'OPTIONS':
                 return resp
-
+            
             h = resp.headers
 
             h['Access-Control-Allow-Origin'] = origin
@@ -39,6 +41,7 @@ def crossdomain(origin=None, methods=None, headers=None,
             h['Access-Control-Max-Age'] = str(max_age)
             if headers is not None:
                 h['Access-Control-Allow-Headers'] = headers
+            print resp.headers
             return resp
 
         f.provide_automatic_options = False
@@ -57,3 +60,19 @@ def jsonp(f):
         else:
             return f(*args, **kwargs)
     return decorated_function
+
+
+def has_permission(action, resource):
+
+    def decorator(func):
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            #print g.user.username
+            if g.user.has_permission(action, resource):
+                return func(*args, **kwargs)
+            else:
+                response = "%s cannot %s %s !!!" % (g.user.username, action, resource)
+                return Response(response=response, 
+                            status=401) 
+        return wrapped
+    return decorator
