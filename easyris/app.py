@@ -17,6 +17,17 @@ from flask.templating import render_template_string
 
 from mongoengine import connect
 
+#import cryptography
+#from OpenSSL import crypto
+#from OpenSSL import SSL
+#import os
+#context = SSL.SSLContext(SSL.PROTOCOL_TLSv1_2)
+#context.load_cert_chain('/etc/webserver-ssl/webserver.crt','/etc/webserver-ssl/webserver.key')
+#cer = os.path.join(os.path.dirname(__file__), '/etc/webserver-ssl/webserver.crt')
+#key = os.path.join(os.path.dirname(__file__), '/etc/webserver-ssl/webserver.key')
+ 
+
+
 # TODO: Move all the configuration in a function
 # TODO: as mentioned in Application factories section
 
@@ -62,8 +73,12 @@ def load_user(userid):
 
 if __name__ == '__main__':
     connect('easyris')
+    
     app.run(host='0.0.0.0', 
             port=5000, 
             debug=True,
-            threaded=True)
+            threaded=True,
+		    ssl_context=('/etc/webserver-ssl/webserver.crt', '/etc/webserver-ssl/webserver.key')
+		  )
+    
     toolbar.init_app(app)
