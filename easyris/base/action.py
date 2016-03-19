@@ -1,5 +1,6 @@
 
 class Action(object):
+    
     def __init__(self, name):
         self.name = name
         
@@ -12,25 +13,25 @@ class Action(object):
         return response
     
 
-class Create(object):
+class Create(Action):
     
     def __init__(self, name='create'):
         super(Create, self).__init__(name)
         
 
-class Read(object):
+class Read(Action):
     
     def __init__(self, name='read'):
         super(Read, self).__init__(name)
         
 
-class Update(object):
+class Update(Action):
     
     def __init__(self, name='update'):
         super(Update, self).__init__(name)
         
 
-class Delete(object):
+class Delete(Action):
     
     def __init__(self, name='delete'):
         super(Delete, self).__init__(name)

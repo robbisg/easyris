@@ -1,35 +1,69 @@
-from flask import Flask
-from utils.api import cities
-from patient.api import patient
-from flask.ext.cors import CORS
+from flask import Flask, Blueprint, jsonify, request, Response, \
+                    session, g, url_for
+from flask.ext.cors import CORS, cross_origin
 from flask.ext.login import LoginManager, login_user, logout_user, \
      login_required, current_user
-from easyris import EasyRis
+from flask_debugtoolbar import DebugToolbarExtension
 
-app = Flask(__name__)
+from easyris import EasyRis
+from easyris.utils.api import cities
+from easyris.base.middleware import build_response
+from easyris.patient.api import patient
+from easyris.user.api import login_
+from easyris.utils.decorators import crossdomain, jsonp
+
+import json
+from flask.templating import render_template_string
+
+from mongoengine import connect
+
+# TODO: Move all the configuration in a function
+# TODO: as mentioned in Application factories section
+
+#app = Flask(__name__)
+app = EasyRis(__name__)
+app.config['SESSION_COOKIE_HTTPONLY'] = False
+# This is to prevent bad url in frontend
+app.url_map.strict_slashes = False
 
 # Register blueprint from other modules
 app.register_blueprint(patient, url_prefix='/patient')
 app.register_blueprint(cities, url_prefix='/cities')
+app.register_blueprint(login_, url_prefix='')
 
-CORS(app)
-# Login manager extensions
-login_manager = LoginManager(app)
 
-system = EasyRis()
+login_manager = LoginManager()
+login_manager.init_app(app)
 
+app.debug = True
+
+# TODO: Keep it in the database??
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+
+toolbar = DebugToolbarExtension(app)
 
 @app.route('/')
-def entry():
-    return "Hello EasyRIS!"
-'''
+def entry(): 
+    return render_template_string('<html><body></body></html>')
+
+
+@app.before_request
+def before_request():
+    g.user = current_user
+
+
 @login_manager.user_loader
-def load_user(user_id):
-    return User.get(user_id)
-'''
+def load_user(userid):
+    # Return an instance of the User model
+    return app.get_user(userid)
+
+
+
+
 if __name__ == '__main__':
-    #app.debug = True
+    connect('easyris')
     app.run(host='0.0.0.0', 
             port=5000, 
             debug=True,
             threaded=True)
+    toolbar.init_app(app)

@@ -23,7 +23,7 @@ class ActionMapper(Mapper):
     
     _map = {
             'create': Create,
-            'read': Read,
+            'read':   Read,
             'update': Update,
             'delete': Delete,
             }

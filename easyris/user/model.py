@@ -2,9 +2,8 @@ from mongoengine import *
 from pymongo import MongoClient
 from datetime import datetime
 from passlib.hash import sha256_crypt
-from timeit import itertools
-
-connect('easyris', port=27017)
+from flask_login import UserMixin
+import itertools
 
 
 class Permission(Document):
@@ -16,7 +15,7 @@ class Permission(Document):
 
 class Role(Document):
     
-    role_name = StringField(required=True)
+    role_name = StringField(required=True, unique=True)
     permissions = ListField(ReferenceField(Permission))
     
         
@@ -28,7 +27,7 @@ class Role(Document):
 
 
 
-class User(Document):
+class User(Document, UserMixin):
     
     __collection__ = 'user'
     
@@ -40,6 +39,7 @@ class User(Document):
     first_name = StringField(required=True)
     last_name = StringField(required=True)
     
+    # TODO: Check email formatting (frontend?)
     email = StringField(required=True)
     telephone_number = StringField(required=True)
     mobile_number = StringField(required=True)
@@ -55,9 +55,17 @@ class User(Document):
     def has_permission(self, action, resource):
         permissions = [role.get_permissions() for role in self.roles]
         permissions = list(itertools.chain(*permissions))
-        print permissions
+        # print permissions
         for p in permissions:
             if p.action == action and p.resource == resource:
                 return True
         return False
-               
+           
+    def check_password(self, password):
+
+        if sha256_crypt.verify(password, self.password):
+            return True
+        return False 
+      
+    def get_id(self):
+        return unicode(self.id)

@@ -1,32 +1,47 @@
 import sys, os
-from easyris.base.factory import ControllerMapper, ActionMapper
+from flask import Flask
+from easyris.user.controller import PermissionController
+from mongoengine import connect
+
 
 sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
-
-
 __version__ = '0.0.1'
 
 
-class EasyRis(object):
+class EasyRis(Flask):
     ## Should be a Singleton??
     
-    def __init__(self):
-        self.currentUser = None
-    
-    def do(self, action_name, resource_name, **kwargs):
-        # action_name is a string
-        # resource_name is a string
+    def __init__(self, import_name, static_path=None, static_url_path=None, 
+        static_folder='static', template_folder='templates', 
+        instance_path=None, instance_relative_config=False):
         
-        # Check if someone is logged
+        # TODO: Migrate to flask-mongoengine?
+        print 'I\'m here!'
+        #connect('easyris', port=27017)
         
-        if self.currentUser.has_permission(action_name, resource_name):
-            controller = ControllerMapper.get_mapped(resource_name)
-            action = ActionMapper.get_mapped(action_name)
-            return action.execute(controller, **kwargs)
-        else:
-            return 'Permission denied!'
+        Flask.__init__(self, 
+                       import_name, 
+                       static_path=static_path, 
+                       static_url_path=static_url_path, 
+                       static_folder=static_folder, 
+                       template_folder=template_folder, 
+                       instance_path=instance_path, 
+                       instance_relative_config=instance_relative_config)
             
-    
-    def login(self, user, password):
+    @staticmethod
+    def login(user, password):
         
-        self.currentUser = user
+        controller = PermissionController()
+        logged_user = controller.login(user, password)
+
+        if logged_user != None:
+            #g.user = logged_user
+            return True, logged_user
+        return False, None
+        
+    
+    def get_user(self, id_user):
+        controller = PermissionController()
+        return controller.load_user(id_user)
+        
+        
