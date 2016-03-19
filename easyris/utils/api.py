@@ -6,7 +6,7 @@ import json
 
 from controller import CityController
 from utils.decorators import jsonp, crossdomain
-from easyris.utils.response import build_response
+from easyris.base.middleware import build_response
 
 cities = Blueprint('cities', __name__)
 controller = CityController()
@@ -14,7 +14,13 @@ controller = CityController()
 
 @cities.route('/', methods=['GET'])
 @jsonp
+@crossdomain(origin='*', 
+             methods=['GET'], 
+             headers=['X-Requested-With', 
+                      'Content-Type', 
+                      'Origin'])
 def show_cities():
+    
     message = controller.get_cities()
     
     if message == 'ERR':
