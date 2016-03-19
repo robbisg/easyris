@@ -3,7 +3,7 @@ from pymongo import MongoClient
 from codicefiscale import build
 from datetime import datetime
 
-# from ..utils.code_comuni import CF_codici_comuni
+from easyris.utils.code_comuni import City
 
 
 GENDER = (('M', 'Male'),
@@ -65,12 +65,9 @@ class Patient(Document):
 
 
     def compute_cf(self):
-        
-        client = MongoClient()
-        db = client.easyris
-        query=db.get_collection('city').find({'Denom_Italiana' :self.birthplace})
-        result=query.next()
-        cf_code=result['Codice']
+               
+        city = City.objects(Denom_Italiana=self.birthplace).first()
+        cf_code = city.Codice
         self.codice_fiscale = build(self.last_name, 
                                     self.first_name, 
                                     self.birthdate, 
@@ -94,9 +91,6 @@ class Patient(Document):
     
     def compute_province(self):
         
-        client = MongoClient()
-        db = client.easyris
-        query=db.get_collection('city').find({'Denom_Italiana':self.city})
-        result=query.next()
-        self.province = result['Prov']
+        city = City.objects(Denom_Italiana=self.birthplace).first()
+        self.province = city.Prov
 

@@ -1,30 +1,30 @@
-import os
-import easyris.app as easyris
 import unittest
-import tempfile
 import json
+from mongoengine import connect
+from easyris.utils import patient_db, user_db
+from easyris.tests.test import EasyRisUnitTest
+import easyris.app as easyris
 
 #@unittest.skip("showing class skipping")
-class EasyRisTest(unittest.TestCase):
+class EasyRisTest(EasyRisUnitTest):
     
-    def setUp(self):
-        self.app = easyris.app.test_client()
-        
-        
+            
     def test_search(self):
         
+        self.login('mcaulo', 'massimo')
         rv = self.app.post(path='/patient/search', 
                            data=json.dumps({'first_name':'Fiorella'}),
                            content_type='application/json')
-        print rv.data
+
         response = json.loads(rv.data)
         patient = response[0]
-        print response
+
         assert 'Fiorella' == patient['first_name']
         assert 'Zabbo' == patient['last_name']
     
     def test_add(self):
         
+        self.login('gaetano', 'gaetano')
         rv = self.app.post(path='/patient/insert', 
                            data=json.dumps({'first_name':'Roberto',
                                             'last_name':'Guidotti',
@@ -38,9 +38,8 @@ class EasyRisTest(unittest.TestCase):
                                             'birthdate':'1983-05-18T00:00:00.0Z'}),
                            content_type='application/json')
         
-        print rv
-        
+
         assert rv.data == "OK"
         
 if __name__ == '__main__':
-    unittest.main()
+    unittest.run()
