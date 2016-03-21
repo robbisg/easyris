@@ -77,9 +77,9 @@ setup(
                         'numpy',
                         'flask-script',
                         'flask-debugtoolbar',
-			'pyopenssl',
-			'libffi-dev',
-			'cryptography'
+			            'pyopenssl',
+			            'libffi-dev',
+			            'cryptography',
                         'click'
                         ],
 
