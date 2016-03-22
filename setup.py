@@ -78,7 +78,7 @@ setup(
                         'flask-script',
                         'flask-debugtoolbar',
 			            'pyopenssl',
-			            'libffi-dev',
+			            #'libffi-dev',
 			            'cryptography',
                         'click'
                         ],
