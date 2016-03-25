@@ -27,7 +27,6 @@ from mongoengine import connect
 #key = os.path.join(os.path.dirname(__file__), '/etc/webserver-ssl/webserver.key')
  
 
-
 # TODO: Move all the configuration in a function
 # TODO: as mentioned in Application factories section
 
@@ -55,6 +54,10 @@ toolbar = DebugToolbarExtension(app)
 
 @app.route('/')
 def entry(): 
+    return 'Flask is up!'
+
+@app.route('/debug')
+def debug():
     return render_template_string('<html><body></body></html>')
 
 

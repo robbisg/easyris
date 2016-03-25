@@ -53,6 +53,12 @@ def login():
         return response
 
 @login_.route('/logout', methods=['GET'])
+@cross_origin(origin=None, 
+             methods=['POST', 'OPTIONS'], 
+             allow_headers=['X-Requested-With', 
+                      'Content-Type', 
+                      'Origin'],
+              supports_credentials=True)
 @login_required
 def logout():
     logout_user()
