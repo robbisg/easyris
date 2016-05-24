@@ -16,7 +16,6 @@ class EasyRis(Flask):
         instance_path=None, instance_relative_config=False):
         
         # TODO: Migrate to flask-mongoengine?
-        print 'I\'m here!'
         #connect('easyris', port=27017)
         
         Flask.__init__(self, 

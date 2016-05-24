@@ -6,7 +6,7 @@ import json
 from flask_cors import cross_origin
 from controller import CityController
 from utils.decorators import jsonp
-from easyris.base.middleware import build_response
+from easyris.base.message.utils import build_response
 
 cities = Blueprint('cities', __name__)
 controller = CityController()

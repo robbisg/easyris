@@ -5,7 +5,7 @@ import json
 from datetime import datetime
 
 from controller import PatientController
-from easyris.base.middleware import build_response
+from easyris.base.message.utils import build_response, message_to_http
 from flask_login import login_required, current_user
 from flask_cors.decorator import cross_origin
 from easyris.base.controller import EasyRisFacade
@@ -42,14 +42,14 @@ def get_patients():
         
         query = dict()
         
-        message = system.do('read', 'patient', **query)
+        message = system.do('read', 
+                            'patient', 
+                            user=g.user.username,
+                            **query)
+
         
-        if message == None:
-            return Response(response='No patient in database',
-                            status=410)
-        
-        response = build_response(message)
-        print response.headers
+        response = message_to_http(message)
+
         return response
 
 
@@ -67,16 +67,18 @@ def get_patients():
 def show(id):
     
     if request.method == 'GET':
+                
+        message = system.do('read', 
+                            'patient', 
+                            user=g.user.username, 
+                            id_patient=id)
         
-        message = system.do('read', 'patient', id=id)
-        #message = controller.get_patient(id)
-        print message
-        if message == 'ERR':
-            return "Patient not found"
-            
-        return build_response(message)
+        
+        response = message_to_http(message)        
+        return response
     
     if request.method == 'POST':
+        # What is this??
         return message
 
 
@@ -100,12 +102,15 @@ def delete(id):
         status = query['status']
         note = query['note']
         message = system.do('delete', 
-                            'patient', 
+                            'patient',
+                            user=g.user.username,
                             status=status, 
                             note=note)
-        #message = controller.delete(status, note)
-    return message
 
+        response = message_to_http(message)
+        
+    return response
+    
 
 
 @patient.route('/<int:id>/edit', methods=['POST', 'OPTIONS'])
@@ -124,10 +129,15 @@ def update(id):
         
         query = request.form.to_dict()
         query['id'] = id
+
+        message = system.do('update', 
+                            'patient', 
+                            user=g.user.username,
+                            **query)
         
-        message = system.do('update', 'patient', **query)
+        response = message_to_http(message)
         
-    return message
+    return response
 
    
 
@@ -155,10 +165,15 @@ def search():
         print request.headers
         
         query = json.loads(request.data)
-        print query
-        message = system.do('read', 'patient', **query)
+
+        message = system.do('read', 
+                            'patient', 
+                            user=g.user.username,
+                            **query)
         
-    return build_response(message)
+        response = message_to_http(message)
+        
+    return response
         
 
 
@@ -187,8 +202,14 @@ def insert():
         print request.headers
         
         query = json.loads(request.data)
+
+        message = system.do('create', 
+                            'patient', 
+                            user=g.user.username,
+                            **query)
         
-        message = system.do('create', 'patient', **query)
-        #message = controller.add(**query)
         print message
-        return message
+        response = message_to_http(message)
+        
+        return response
+    
