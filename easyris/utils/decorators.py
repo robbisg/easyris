@@ -71,6 +71,7 @@ def has_permission(action, resource):
             if g.user.has_permission(action, resource):
                 return func(*args, **kwargs)
             else:
+                # TODO: This should be stored in db and message should be sent!
                 response = "%s cannot %s %s !!!" % (g.user.username, action, resource)
                 return Response(response=response, 
                             status=401) 

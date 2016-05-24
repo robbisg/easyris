@@ -3,10 +3,10 @@ from flask import Blueprint, jsonify, request, Response
 from mongoengine import *
 from bson.json_util import dumps
 import json
-
+from flask_cors import cross_origin
 from controller import CityController
-from utils.decorators import jsonp, crossdomain
-from easyris.base.middleware import build_response
+from utils.decorators import jsonp
+from easyris.base.message.utils import build_response
 
 cities = Blueprint('cities', __name__)
 controller = CityController()
@@ -14,11 +14,12 @@ controller = CityController()
 
 @cities.route('/', methods=['GET'])
 @jsonp
-@crossdomain(origin='*', 
-             methods=['GET'], 
-             headers=['X-Requested-With', 
-                      'Content-Type', 
-                      'Origin'])
+@cross_origin(origin=None, 
+             methods=['GET', 'OPTIONS'], 
+             allow_headers=['X-Requested-With', 
+                            'Content-Type', 
+                            'Origin'],
+             supports_credentials=True)
 def show_cities():
     
     message = controller.get_cities()

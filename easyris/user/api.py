@@ -1,5 +1,5 @@
 from easyris import EasyRis
-from easyris.base.middleware import build_response
+from easyris.base.message.utils import build_response
 from flask.ext.cors import CORS, cross_origin
 from flask.ext.login import LoginManager, login_user, logout_user, \
      login_required, current_user
@@ -20,8 +20,8 @@ def user():
 @cross_origin(origin=None, 
              methods=['POST', 'OPTIONS'], 
              allow_headers=['X-Requested-With', 
-                      'Content-Type', 
-                      'Origin'],
+                            'Content-Type', 
+                            'Origin'],
               supports_credentials=True)
 def login():
 
@@ -37,12 +37,13 @@ def login():
         username = query['username']
         password = query['password']
         
+        # TODO: I dislike it!
         is_authenticated, user = EasyRis.login(username, password)
         
         if is_authenticated:
             login_user(user)
             g.user = user
-            print user.roles
+
             response = build_response([user])
         else:
             response = Response(response='NO!',
@@ -53,6 +54,12 @@ def login():
         return response
 
 @login_.route('/logout', methods=['GET'])
+@cross_origin(origin=None, 
+             methods=['POST', 'OPTIONS'], 
+             allow_headers=['X-Requested-With', 
+                      'Content-Type', 
+                      'Origin'],
+              supports_credentials=True)
 @login_required
 def logout():
     logout_user()

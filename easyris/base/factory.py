@@ -14,9 +14,10 @@ class Mapper(object):
 class ControllerMapper(Mapper):
     
     _map = {
-            'patient': PatientController}
+            'patient': PatientController
+            }
        
-       
+    # TODO: Method to add/remove controllers   
        
 
 class ActionMapper(Mapper):
@@ -28,3 +29,4 @@ class ActionMapper(Mapper):
             'delete': Delete,
             }
     
+    # TODO: Method to add/remove actions

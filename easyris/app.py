@@ -7,25 +7,15 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 from easyris import EasyRis
 from easyris.utils.api import cities
-from easyris.base.middleware import build_response
+from easyris.base.message.utils import build_response
 from easyris.patient.api import patient
 from easyris.user.api import login_
 from easyris.utils.decorators import crossdomain, jsonp
-
+from datetime import datetime, timedelta
 import json
 from flask.templating import render_template_string
 
 from mongoengine import connect
-
-#import cryptography
-#from OpenSSL import crypto
-#from OpenSSL import SSL
-#import os
-#context = SSL.SSLContext(SSL.PROTOCOL_TLSv1_2)
-#context.load_cert_chain('/etc/webserver-ssl/webserver.crt','/etc/webserver-ssl/webserver.key')
-#cer = os.path.join(os.path.dirname(__file__), '/etc/webserver-ssl/webserver.crt')
-#key = os.path.join(os.path.dirname(__file__), '/etc/webserver-ssl/webserver.key')
- 
 
 
 # TODO: Move all the configuration in a function
@@ -34,6 +24,7 @@ from mongoengine import connect
 #app = Flask(__name__)
 app = EasyRis(__name__)
 app.config['SESSION_COOKIE_HTTPONLY'] = False
+
 # This is to prevent bad url in frontend
 app.url_map.strict_slashes = False
 
@@ -47,7 +38,8 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 app.debug = True
-
+# TODO: Decide about session duration
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
 # TODO: Keep it in the database??
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
@@ -55,6 +47,10 @@ toolbar = DebugToolbarExtension(app)
 
 @app.route('/')
 def entry(): 
+    return 'Flask is up!'
+
+@app.route('/debug')
+def debug():
     return render_template_string('<html><body></body></html>')
 
 
@@ -72,6 +68,8 @@ def load_user(userid):
 
 
 if __name__ == '__main__':
+    
+    # TODO: Secure connection???
     connect('easyris')
     
     app.run(host='0.0.0.0', 

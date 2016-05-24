@@ -37,7 +37,7 @@ class EasyRisUnitTest(unittest.TestCase):
         self.client.drop_database('test_easyris')
 
 
-@unittest.skip("To be checked!")
+
 class EasyRisTest(unittest.TestCase):
     
     def setUp(self):
@@ -45,7 +45,7 @@ class EasyRisTest(unittest.TestCase):
         
     def test_home(self):
         rv = self.app.get('/')
-        assert 'Hello EasyRIS!' == rv.data
+        assert 'Flask is up!' == rv.data
 
         
 if __name__ == '__main__':
