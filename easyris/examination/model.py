@@ -1,6 +1,7 @@
-from mongoengine import *
-# from easyris.user.model import User
+from mongoengine import Document, StringField, ReferenceField, DateTimeField
+from easyris.user.model import User
 from easyris.patient.model import Patient
+from easyris.examination.status import NewExaminationStatus
 
 
 class Priority(Document):
@@ -9,35 +10,9 @@ class Priority(Document):
     priority_name = StringField(required=True)
 
 
-class PriorityEmbedded(EmbeddedDocument):
-    __collection__ = 'priority'
-
-    priority_name = StringField(required=True)
-
-
-class ExamStatus(Document):
-    __collection__ = 'exam_status'
-
-    exam_status_name = StringField(required=True)
-
-
-class ExamStatusEmbedded(EmbeddedDocument):
-    __collection__ = 'exam_status'
-
-    exam_status_name = StringField(required=True)
-
 
 class Typology(Document):
-    __collection__ = 'typology'
-
-    descrizione_ministeriale = StringField(required=True)
-    modality = StringField(required=True)
-    room = StringField(required=True)
-    exam_name = StringField(required=True)
-    distretto_corporeo = StringField(required=True)
-
-
-class TypologyEmbedded(EmbeddedDocument):
+    # Tabella di esami ministeriali
     __collection__ = 'typology'
 
     codice_ministeriale = StringField(required=False)
@@ -48,12 +23,12 @@ class TypologyEmbedded(EmbeddedDocument):
     tariffa_euro = StringField(required=False)
     annotazioni = StringField(required=False)
     categorie = StringField(required=False)
-    modality = StringField(required=True)
-    room = StringField(required=True)
-    scheduled_station_ae_title = StringField(required=False)
-    device_description = StringField(required=False)
-    exam_name = StringField(required=True)
-    distretto_corporeo = StringField(required=True)
+    modality = StringField(required=True) # MR, TAC, ECO
+    room = StringField(required=True) # Stanza fisica dove sta il device
+    scheduled_station_ae_title = StringField(required=False) # Campo PACS
+    device_description = StringField(required=False) # Descrizione scanner/device
+    examination_name = StringField(required=True)
+    distretto_corporeo = StringField(required=True) # Testa/collo baby one two three
 
 
 class Examination(Document):
@@ -63,15 +38,29 @@ class Examination(Document):
     medico_richiedente = StringField(required=True)
     data_inserimento = DateTimeField(required=True)
 
-    id_priority = EmbeddedDocumentField(PriorityEmbedded)
-    id_exam_status = EmbeddedDocumentField(ExamStatusEmbedded)
-    id_typology = EmbeddedDocumentField(TypologyEmbedded)
-
-    # id_creator = ReferenceField(User)
-    # id_technician = ReferenceField(User)
-    #TODO create Report class and db
-    # id_report = StringField(ReferenceField(Report))
-    # accession_number = StringField(required=True)
-    #TODO per adesso lasciamo il CodiceEsenzione come stringa appena Massimo ci da la tabella dei codici lo convertiamo in id
-    # codice_esenzione = StringField(required=True)
-    # examination_note = StringField(required=True)
+    id_priority = ReferenceField(Priority)
+    
+    status_name = StringField(required=True, default='NEW')
+    id_typology = ReferenceField(Typology)
+    
+    # TODO: Check role?
+    id_creator = ReferenceField(User)
+    id_technician = ReferenceField(User)
+        
+    # Accession number raggruppa esami che vanno fatti insieme
+    accession_number = StringField(required=True)
+    # TODO:per adesso lasciamo il CodiceEsenzione 
+    # come stringa appena Massimo ci da la tabella 
+    # dei codici lo convertiamo in id
+    codice_esenzione = StringField()
+    examination_note = StringField()
+    
+    
+    def set_accession_number(self):
+        # TODO: Accession number must depend on
+        # device, date, patient and body part
+        # TODO: Query su Examination per vedere se ci sono esami con
+        # device, data, pazienti e body part uguali e mettere lo stesso num.
+        return
+    
+        
