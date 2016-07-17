@@ -64,7 +64,7 @@ class Message(object):
             json_[f] = getattr(self.header, f)
         
         json_['data'] = self.data.as_pymongo()
-        return dumps(json_)
+        return dumps([json_])
     
     def to_db(self):
         # TODO: Implement it!

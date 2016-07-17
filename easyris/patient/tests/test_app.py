@@ -18,9 +18,9 @@ class EasyRisTest(EasyRisUnitTest):
 
         response = json.loads(rv.data)
 
-        patient = response['data'][0]
+        patient = response[0]['data'][0]
         
-        assert response['user'] == 'mcaulo'
+        assert response[0]['user'] == 'mcaulo'
         assert 'Fiorella' == patient['first_name']
         assert 'Zabbo' == patient['last_name']
     
@@ -41,8 +41,8 @@ class EasyRisTest(EasyRisUnitTest):
                            content_type='application/json')
         response = json.loads(rv.data)
         print response
-        assert response['user'] == 'gaetano'
-        assert response['code'] == 100
+        assert response[0]['user'] == 'gaetano'
+        assert response[0]['code'] == 100
         
 if __name__ == '__main__':
     unittest.run()

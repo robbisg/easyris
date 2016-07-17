@@ -69,3 +69,6 @@ class User(Document, UserMixin):
       
     def get_id(self):
         return unicode(self.id)
+       
+    
+    

@@ -17,7 +17,7 @@ def import_csv(database, collection, filepath):
     os.system(command)
 
 
-def run(db_name='easyris', port=27017):
+def run(db_name='easyris', port=27017, **kwargs):
     
     conn = connect(db_name, port=port)
     conn_check = str(conn.database_names()[0])
@@ -34,14 +34,18 @@ def run(db_name='easyris', port=27017):
     import_csv(db_name, 'city', os.path.join(path, "files/codicicomuni2015.csv"))
 
     print "Import patient.csv"
-    patient_db.run(db_name, port)
+    if 'n_loaded' in kwargs.keys():
+        n_loaded = kwargs['n_loaded']
+    else:
+        n_loaded = 100
+    patient_db.run(db_name, port, n_loaded=n_loaded)
 
     # Import priority_db.csv
     import_csv(db_name, 'priority', os.path.join(path, "files/priority_db.csv"))
 
     # Import exam_status_db.csv
     # TODO: This should be modified!
-    import_csv(db_name, 'exam_status',os.path.join(path, "files/exam_status_b.csv"))
+    #import_csv(db_name, 'examination_status',os.path.join(path, "files/exam_status_db.csv"))
 
     # Import nomenclatura_esami.csv
     import_csv(db_name, 'typology', os.path.join(path, "files/nomenclatura_esami.csv"))
@@ -53,7 +57,7 @@ def run(db_name='easyris', port=27017):
     import_csv(db_name, 'report_status', os.path.join(path, "files/report_status.csv"))
 
     # Import report.csv
-    import_csv(db_name, 'report', os.path.join(path, "files/report.csv"))
+    #import_csv(db_name, 'report', os.path.join(path, "files/report.csv"))
 
 
 

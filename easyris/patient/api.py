@@ -47,13 +47,13 @@ def get_patients():
                             user=g.user.username,
                             **query)
 
-        
+
         response = message_to_http(message)
 
         return response
 
 
-
+#TODO: Is correct to have int as id??
 @patient.route('/<int:id>', methods=['GET', 'POST', 'OPTIONS'])
 @jsonp
 @cross_origin(origin=None, 
