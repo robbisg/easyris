@@ -7,22 +7,17 @@ from easyris.examination.model import Examination
 class ReportStatus(Document):
     __collection__ = 'report_status'
 
-    report_status = StringField(required=True)
+    status = StringField(required=True)
 
-
-class ReportStatusEmbedded(EmbeddedDocument):
-    __collection__ = 'report_status'
-
-    report_status = StringField(required=True)
 
 
 class Report(Document):
     __collection__ = 'report'
 
     id_patient = ReferenceField(Patient)
-    id_examination = EmbeddedDocumentField(Examination)
+    id_examination = ReferenceField(Examination)
     report_text = StringField(required=True)
-    id_report_status = EmbeddedDocumentField(ReportStatusEmbedded)
+    id_status = ReferenceField(ReportStatus)
     # doctor_list = ReferenceField(User)
     
 

@@ -4,7 +4,7 @@ from flask_cors.decorator import cross_origin
 from flask_login import login_required, current_user
 from easyris.utils.decorators import has_permission, jsonp, crossdomain
 from easyris.base.message.utils import build_response, message_to_http
-
+import json
 
 examination = Blueprint('examination', __name__)
 
@@ -13,7 +13,6 @@ examination = Blueprint('examination', __name__)
 system = EasyRisFacade()
 
 
-# TODO: Implement the confirmation of patient data!
 
 @examination.route('/', methods=['GET', 'OPTIONS'])
 @cross_origin(origin=None,
@@ -25,6 +24,7 @@ system = EasyRisFacade()
 @login_required
 @has_permission('read', 'examination')
 def get_examinations():
+    
     # TODO: Log stuff!
     print request.headers
     if not g.user.is_anonymous:
@@ -86,8 +86,7 @@ def delete(id):
 
     if request.method == 'POST':
         query = request.form.to_dict()
-        # TODO: Check if they exist?!?!
-        # TODO: Is it good to extract fields from request?
+
         status = query['status']
         note = query['note']
         message = system.do('delete',
@@ -139,10 +138,6 @@ def update(id):
 def search():
     """
     Test with
-    curl -H "Content-Type: application/json"
-    -X POST -d '{"first_name":"Tecla"}'
-    http://localhost:5000/patient/search
-    curl --data "first_name=Piero" http://localhost:5000/patient/search
     """
     if request.method == 'POST':
 
@@ -173,10 +168,6 @@ def search():
 def insert():
     """
     Test with
-
-    curl --data "first_name=Roberto&last_name=Guidotti&gender=M&birthplace=PESCARA&
-    address=Via%20Aldo%20Moro%20114&phone_number=3404752345&nationality=italiana&cap=64050
-    &birthdate=12/07/1987" http://localhost:5000/patient/insert
     """
 
     if request.method == 'POST':
@@ -195,3 +186,4 @@ def insert():
         response = message_to_http(message)
 
         return response
+

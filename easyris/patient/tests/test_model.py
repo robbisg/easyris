@@ -69,7 +69,7 @@ class TestPatientController(unittest.TestCase):
 
         message = self.controller.read(first_name='Tecla')
         
-        self.controller.get_patient(message.data[0].id_patient)
+        self.controller._get_patient(message.data[0].id_patient)
         
         patient = self.controller._currentPatient
         
@@ -82,7 +82,7 @@ class TestPatientController(unittest.TestCase):
     def test_update(self):
 
         message = self.controller.read(first_name='Tecla')
-        self.controller.get_patient(message.data[0].id_patient)
+        self.controller._get_patient(message.data[0].id_patient)
         
         
         self.controller.update(first_name='Andrea',
@@ -100,7 +100,7 @@ class TestPatientController(unittest.TestCase):
     def test_delete(self):
         
         message = self.controller.read(first_name='Tecla')
-        self.controller.get_patient(message.data[0].id_patient)
+        self.controller._get_patient(message.data[0].id_patient)
         
         self.controller.delete(status='Revocato',
                                note="Problemi con il medico curante!")
@@ -200,7 +200,7 @@ class TestPatientCases(unittest.TestCase):
                                        last_name='Guidotti')
         
         id_ = message.data[0].id_patient
-        _ = self.controller.get_patient(id_)
+        _ = self.controller._get_patient(id_)
         
         message3 = self.controller.update(first_name='Roberto', 
                                           last_name='Guidotti',

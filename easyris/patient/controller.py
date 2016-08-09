@@ -3,7 +3,7 @@ from model import Patient
 from mongoengine import *
 from datetime import datetime
 from easyris.base.message.message import Message
-from easyris.base.message.patient import PatientCorrectHeader, \
+from easyris.patient.message import PatientCorrectHeader, \
                                         PatientErrorHeader, \
                                         PatientNoRecordHeader
 from numpy.f2py.crackfortran import get_usedict
@@ -45,13 +45,12 @@ class PatientController(object):
             
             return message
         
-        # TODO: Is it useful for the program?
-        self._currentPatient = patient
         
         # TODO: To be improved!
-        patient = self.get_patient(patient.id_patient)
+        patient = self._get_patient(patient.id_patient)
+        self._currentPatient = patient.first()
         
-        message = Message(PatientCorrectHeader(),
+        message = Message(PatientCorrectHeader(message='Patient correctly created!'),
                               data=patient)
         return message
     
@@ -63,7 +62,7 @@ class PatientController(object):
         if self._currentPatient == None:
             # Get the id from query
             if 'id_patient' in query.keys():
-                _ = self.get_patient(query['id_patient'])
+                _ = self._get_patient(query['id_patient'])
             
         
         patient = self._currentPatient
@@ -86,7 +85,7 @@ class PatientController(object):
                                                      user=self.user)) 
             return message
         
-        patient = self.get_patient(patient.id_patient)
+        patient = self._get_patient(patient.id_patient)
         # Everything ok!!!
         message = Message(PatientCorrectHeader(),
                           data=patient)
@@ -100,6 +99,9 @@ class PatientController(object):
         if 'id_patient' in query.keys():
             query['id_patient'] = str(query['id_patient'])
         
+        # return only present patients!
+        query['status'] = 'Attivo'
+        
         patients = Patient.objects(**query)
         print patients
         
@@ -109,8 +111,6 @@ class PatientController(object):
                               data=patients)
             return message
         
-        
-        # TODO: Check if patient_app is "Attivo"
         message = Message(PatientCorrectHeader(),
                           data=patients)
         return message
@@ -123,8 +123,8 @@ class PatientController(object):
         
 
 
-    def get_patient(self, id_):
-
+    def _get_patient(self, id_):
+        """Deprecated"""
         patient = Patient.objects(id_patient=str(id_))
         
         #TODO: Is there a more elegant way to deal with that?
