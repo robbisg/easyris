@@ -1,7 +1,7 @@
-from mongoengine import Document, StringField, ReferenceField, DateTimeField
+from mongoengine import Document, StringField, ReferenceField, DateTimeField, EmbeddedDocumentField
 from easyris.user.model import User
 from easyris.patient.model import Patient
-from easyris.examination.status import NewExaminationStatus
+from easyris.examination.status import NewExaminationStatus, ExaminationStatus
 
 
 class Priority(Document):
@@ -34,17 +34,19 @@ class Typology(Document):
 class Examination(Document):
     __collection__ = 'examination'
 
-    id_patient = ReferenceField(Patient)
+    id_patient = ReferenceField(Patient, required=True)
     medico_richiedente = StringField(required=True)
     data_inserimento = DateTimeField(required=True)
-
-    id_priority = ReferenceField(Priority)
     
+    id_priority = ReferenceField(Priority, required=True)
+    
+    
+    status = EmbeddedDocumentField(ExaminationStatus, default=NewExaminationStatus())
     status_name = StringField(required=True, default='NEW')
-    id_typology = ReferenceField(Typology)
+    id_typology = ReferenceField(Typology, required=True)
     
     # TODO: Check role?
-    id_creator = ReferenceField(User)
+    id_creator = ReferenceField(User, required=True)
     id_technician = ReferenceField(User)
         
     # Accession number raggruppa esami che vanno fatti insieme
@@ -63,4 +65,9 @@ class Examination(Document):
         # device, data, pazienti e body part uguali e mettere lo stesso num.
         return
     
-        
+    
+
+            
+            
+            
+            
