@@ -6,7 +6,8 @@ from easyris.base.message.message import Message
 from easyris.patient.message import PatientCorrectHeader, \
                                         PatientErrorHeader, \
                                         PatientNoRecordHeader
-from numpy.f2py.crackfortran import get_usedict
+from easyris.utils import parse_date
+import json
 
 # TODO: Database name should be explicit?
 
@@ -28,7 +29,6 @@ class PatientController(object):
     def create(self, **query):
         
         # TODO: Check fields if they're correct!
-        # TODO: Check sul codice fiscale se esiste il paziente.
         
         if 'birthdate' in query.keys():
             query['birthdate'] = datetime.strptime(query['birthdate'], 
@@ -45,8 +45,6 @@ class PatientController(object):
             
             return message
         
-        
-        # TODO: To be improved!
         patient = self._get_patient(patient.id_patient)
         self._currentPatient = patient.first()
         
@@ -62,15 +60,19 @@ class PatientController(object):
         if self._currentPatient == None:
             # Get the id from query
             if 'id_patient' in query.keys():
-                _ = self._get_patient(query['id_patient'])
-            
+                _ = self._get_patient(str(query['id_patient']))
+        
+        
         
         patient = self._currentPatient
+        #query['birthdate'] = query['birthdate']['$date']
+        print query['birthdate']
         
-        # TODO: Include checks in function??
         if 'birthdate' in query.keys():
-            query['birthdate'] = datetime.strptime(query['birthdate'], 
-                                                   "%Y-%m-%dT%H:%M:%S.%fZ" )
+            query['birthdate'] = parse_date(query['birthdate'])
+        
+        if '_id' in query.keys():
+            _ = query.pop('_id')
         
         # Try to modify
         if not patient.modify(**query):
@@ -86,8 +88,9 @@ class PatientController(object):
             return message
         
         patient = self._get_patient(patient.id_patient)
+        
         # Everything ok!!!
-        message = Message(PatientCorrectHeader(),
+        message = Message(PatientCorrectHeader(message='Patient correctly modified!'),
                           data=patient)
         return message
     

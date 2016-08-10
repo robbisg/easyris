@@ -71,7 +71,7 @@ def show(id):
         message = system.do('read', 
                             'patient', 
                             user=g.user.username, 
-                            id_patient=id)
+                            id_patient=str(id))
         
         
         response = message_to_http(message)        
@@ -96,7 +96,8 @@ def show(id):
 def delete(id):
     
     if request.method == 'POST':
-        query = request.form.to_dict()
+        query = json.loads(request.data)
+        print query
         # TODO: Check if they exist?!?!
         # TODO: Is it good to extract fields from request?
         status = query['status']
@@ -126,10 +127,9 @@ def delete(id):
 def update(id):
     
     if request.method == 'POST':
-        
-        query = request.form.to_dict()
-        query['id'] = id
 
+        query = json.loads(request.data)
+        print query
         message = system.do('update', 
                             'patient', 
                             user=g.user.username,
