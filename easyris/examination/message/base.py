@@ -11,6 +11,17 @@ class ExaminationErrorHeader(MessageHeader):
                  **kwargs):
         MessageHeader.__init__(self, code, message, user, **kwargs)
         
+
+
+class ExaminationNoRecordHeader(MessageHeader):
+    
+    
+    def __init__(self, 
+                 code=201, 
+                 message='No Examination in database', 
+                 user=None, 
+                 **kwargs):
+        MessageHeader.__init__(self, code, message, user, **kwargs)
         
 
 class ExaminationCorrectHeader(MessageHeader):

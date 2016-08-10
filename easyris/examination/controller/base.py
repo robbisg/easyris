@@ -5,6 +5,7 @@ from easyris.base.message.message import Message
 from easyris.base.message.error import NotFoundHeader
 from datetime import datetime
 from mongoengine import *
+from easyris.examination.message.base import ExaminationNoRecordHeader
 
 
 class ExaminationController(object):
@@ -17,12 +18,12 @@ class ExaminationController(object):
     
     def _get_examination(self, id_examination):
         """Deprecated"""
-        examination = Examination.objects(id=str(id_examination)).first()
+        examination = Examination.objects(id=str(id_examination))
         
         if examination == None:
             return 'ERR'
         
-        self._currentPatient = examination
+        self._currentPatient = examination.first()
         return examination
     
     
@@ -102,9 +103,28 @@ class ExaminationController(object):
 
     def read(self, **query):
         
-        self._currentExamination = Examination.objects(**query)
+        if 'data_inserimento' in query.keys():
+            query['data_inserimento'] = datetime.strptime(query['data_inserimento'], 
+                                                   "%Y-%m-%dT%H:%M:%S.%fZ" )        
+        if 'id_patient' in query.keys():
+            query['id_patient'] = str(query['id_patient'])
+            
+        examination = Examination.objects(**query)
         
-        return
+        
+        
+        if examination.count() == 0:
+            message = Message(ExaminationNoRecordHeader(),
+                              data=examination)
+            return message
+        
+        
+        
+        
+        message = Message(ExaminationCorrectHeader(),
+                          data=examination)
+        return message
+        
     
     def update(self, **query):
         return
@@ -113,25 +133,25 @@ class ExaminationController(object):
         return
     
     def start(self):
-        self._currentExamination.status.start()
+        self._currentExamination.status.start(self._currentExamination)
         return
     
     def go(self):
-        self._currentExamination.status.go()
+        self._currentExamination.status.go(self._currentExamination)
         return
     
     def stop(self):
-        self._currentExamination.status.stop()
+        self._currentExamination.status.stop(self._currentExamination)
         return
     
     def pause(self):
-        self._currentExamination.status.pause()
+        self._currentExamination.status.pause(self._currentExamination)
         return
     
     def finish(self):
-        self._currentExamination.status.finish()
+        self._currentExamination.status.finish(self._currentExamination)
         return 
     
     def eject(self):
-        self._currentExamination.status.eject()
+        self._currentExamination.status.eject(self._currentExamination)
         return
