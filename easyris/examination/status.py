@@ -1,128 +1,130 @@
+from mongoengine.document import EmbeddedDocument
 
 
-class ExaminationStatusMixin(object):
+class ExaminationStatus(EmbeddedDocument):
     
-    def __init__(self, examination, name='basic'):
+    meta = {'allow_inheritance': True}
+    
+    def __init__(self, name='basic', *args, **values):
         self.name = name
-        self.examination = examination
-        print ' ****** '+self.name
+        EmbeddedDocument.__init__(self, *args, **values)
         
     
-    def modify(self):
-        if not self.examination.modify(status_name=self.examination.status.name):
+    def _modify(self, examination, status):
+        
+        if not examination.modify(status=status, status_name=status.name):
             #message = Message(PatientErrorHeader(message='Error in modifying'))
             print 'Error'
         
         # Try to save
         try:
-            self.examination.save()
+            examination.save()
         except ValueError, err:
             print 'Value Error!'
     
     
     def _not_enabled(self):
-        self.examination.status = self
         return
     
-    def start(self):
+    def start(self, examination):
         self._not_enabled()
         return
     
-    def go(self):
+    def go(self, examination):
         self._not_enabled()
         return
     
-    def stop(self):
+    def stop(self, examination):
         self._not_enabled()
         return
     
-    def pause(self):
+    def pause(self, examination):
         self._not_enabled()
         return
     
-    def finish(self):
+    def finish(self, examination):
         self._not_enabled()
         return 
     
-    def eject(self):
+    def eject(self, examination):
         self._not_enabled()
         return
     
 
-class NewExaminationStatus(ExaminationStatusMixin):
+class NewExaminationStatus(ExaminationStatus):
     
-    def __init__(self, examination, name='new'):
-        return ExaminationStatusMixin.__init__(self, examination, name=name)
+    def __init__(self, name='new', *args, **values):
+        ExaminationStatus.__init__(self, name=name, *args, **values)
     
-    def start(self):
-        self.examination.status = ScheduledExaminationStatus(self.examination)
-        self.modify()
+    def start(self, examination):
+        status = ScheduledExaminationStatus()
+        self._modify(examination, status)
         return 
     
 
-class ScheduledExaminationStatus(ExaminationStatusMixin):
+class ScheduledExaminationStatus(ExaminationStatus):
     
-    def __init__(self, examination, name='scheduled'):
-        return ExaminationStatusMixin.__init__(self, examination, name=name)
+    def __init__(self, name='scheduled', *args, **values):
+        ExaminationStatus.__init__(self, name=name, *args, **values)
     
     
-    def go(self):
-        self.examination.status = RunningExaminationStatus(self.examination)
-        self.modify()
+    def go(self, examination):
+        status = RunningExaminationStatus()
+        self._modify(examination, status)
         return
     
     
-class RunningExaminationStatus(ExaminationStatusMixin):
+class RunningExaminationStatus(ExaminationStatus):
     
-    def __init__(self, examination, name='running'):
-        return ExaminationStatusMixin.__init__(self, examination, name=name)
+    def __init__(self, name='running', *args, **values):
+        ExaminationStatus.__init__(self, name=name, *args, **values)
     
     
-    def finish(self):
-        self.examination.status = CompletedExaminationStatus(self.examination)
-        self.modify()
+    def finish(self, examination):
+        status = CompletedExaminationStatus()
+        self._modify(examination, status)
         return 
     
-    def stop(self):
-        self.examination.status = ReScheduledExaminationStatus(self.examination)
-        self.modify()
+    def stop(self, examination):
+        status = ReScheduledExaminationStatus()
+        self._modify(examination, status)
         return
     
-    def pause(self):
-        self.examination.status = IncompletedExaminationStatus(self.examination)
-        self.modify()
+    def pause(self, examination):
+        status = IncompletedExaminationStatus()
+        self._modify(examination, status)
         return 
     
     
 class ReScheduledExaminationStatus(ScheduledExaminationStatus):
     
-    def __init__(self, examination, name='rescheduled'):
-        return ScheduledExaminationStatus.__init__(self, examination, name=name)
+    def __init__(self, name='rescheduled', *args, **values):
+        ScheduledExaminationStatus.__init__(self, name=name, *args, **values)
     
 
-class CompletedExaminationStatus(ExaminationStatusMixin):
+class CompletedExaminationStatus(ExaminationStatus):
     
-    def __init__(self, examination, name='completed'):
-        return ExaminationStatusMixin.__init__(self, examination, name=name)
+    def __init__(self, name='completed', *args, **values):
+        ExaminationStatus.__init__(self, name=name, *args, **values)
     
-    def eject(self):
-        self.examination.status = ReportedExaminationStatus(self.examination)
-        self.modify()
+    def eject(self, examination):
+        status = ReportedExaminationStatus()
+        self._modify(examination, status)
         return
         
         
-class IncompletedExaminationStatus(ExaminationStatusMixin):
+class IncompletedExaminationStatus(ExaminationStatus):
     
-    def __init__(self, examination, name='incomplete'):
-        return ExaminationStatusMixin.__init__(self, examination, name=name)
+    def __init__(self, name='incomplete', *args, **values):
+        ExaminationStatus.__init__(self, name=name, *args, **values)
     
-    def start(self):
-        self.examination.status = ReScheduledExaminationStatus(self.examination)
-        self.modify()
+    def start(self, examination):
+        status = ReScheduledExaminationStatus()
+        self._modify(examination, status)
         return
     
     
-class ReportedExaminationStatus(ExaminationStatusMixin):
+class ReportedExaminationStatus(ExaminationStatus):
     
-    def __init__(self, examination, name='reported'):
-        return ExaminationStatusMixin.__init__(self, examination, name=name)
+    def __init__(self, name='reported', *args, **values):
+        ExaminationStatus.__init__(self, name=name, *args, **values)

@@ -69,6 +69,15 @@ class User(Document, UserMixin):
       
     def get_id(self):
         return unicode(self.id)
+    
+    
+    def has_role(self, rolename):
+        for role in self.roles:
+            if role.role_name == rolename:
+                return True
+        
+        return False
+        
        
     
     

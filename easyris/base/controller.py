@@ -20,12 +20,14 @@ class EasyRisFacade(object):
         """
         # Get controller and action class
         # TODO: Check if they're mapped
-        controller_class = ControllerMapper.get_mapped(resource_name)
-        action_class = ActionMapper.get_mapped(action_name)
+        controller = ControllerMapper.get_mapped(resource_name)
+        action = ActionMapper.get_mapped(action_name)
         
         # We instantiate the classes
+        '''
         controller = controller_class()
         action = action_class()
+        '''
         
         user = 'None'
 
@@ -38,5 +40,7 @@ class EasyRisFacade(object):
         message.set_user(user)
         print message
         return message
-        
-# TODO: define a general controller?
+   
+    
+    
+    

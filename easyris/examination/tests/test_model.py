@@ -27,7 +27,7 @@ class TestExamination(unittest.TestCase):
     
     def test_model(self):
         print "---- Testing Examination ----"
-        patient1 = Patient.objects(id_patient="2016020001").first()
+        patient1 = Patient.objects(first_name="Tecla").first()
         user1 = User.objects(username='gaetano').first()
         user2 = User.objects(username='daniele').first()
         
@@ -48,38 +48,37 @@ class TestExamination(unittest.TestCase):
                          codice_esenzione='67577568',
                          examination_note='ok'
                          )
+        
         print '----------------------'
         examination.save()
+        assert examination.status.name == 'new'
         
         print '------ Object saved -----------'
-        examination.status = NewExaminationStatus(examination)
-        examination.status.start()
+        examination.status.start(examination)
         assert examination.status_name == 'scheduled'
-        examination.status.go()
-        examination.status.pause()
+        examination.status.go(examination)
+        examination.status.pause(examination)
         assert examination.status_name == 'incomplete'
         
-        examination.status.start()
-        examination.status.go()
+        examination.status.start(examination)
+        examination.status.go(examination)
         assert examination.status_name == 'running'
         
-        examination.status.eject()
-        examination.status.stop()
+        examination.status.eject(examination)
+        examination.status.stop(examination)
         assert examination.status_name == 'rescheduled'
         
-        examination.status.start()
+        examination.status.start(examination)
         assert examination.status_name == 'rescheduled'
         
-        examination.status.go()
-        examination.status.finish()
+        examination.status.go(examination)
+        examination.status.finish(examination)
         assert examination.status_name == 'completed'
         
-        examination.status.eject()
+        examination.status.eject(examination)
         assert examination.status_name == 'reported'
         
         
-
-
 
 if __name__ == '__main__':
     unittest.run()

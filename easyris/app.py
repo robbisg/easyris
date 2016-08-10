@@ -10,6 +10,7 @@ from easyris.utils.api import cities
 from easyris.base.message.utils import build_response
 from easyris.patient.api import patient
 from easyris.user.api import login_
+from easyris.examination.api.typology import typology
 from easyris.utils.decorators import crossdomain, jsonp
 from datetime import datetime, timedelta
 import json
@@ -31,6 +32,7 @@ app.url_map.strict_slashes = False
 # Register blueprint from other modules
 app.register_blueprint(patient, url_prefix='/patient')
 app.register_blueprint(cities, url_prefix='/cities')
+app.register_blueprint(typology, url_prefix='/typology')
 app.register_blueprint(login_, url_prefix='')
 
 

@@ -3,10 +3,11 @@ from model import Patient
 from mongoengine import *
 from datetime import datetime
 from easyris.base.message.message import Message
-from easyris.base.message.patient import PatientCorrectHeader, \
+from easyris.patient.message import PatientCorrectHeader, \
                                         PatientErrorHeader, \
                                         PatientNoRecordHeader
-from numpy.f2py.crackfortran import get_usedict
+from easyris.utils import parse_date
+import json
 
 # TODO: Database name should be explicit?
 
@@ -28,7 +29,6 @@ class PatientController(object):
     def create(self, **query):
         
         # TODO: Check fields if they're correct!
-        # TODO: Check sul codice fiscale se esiste il paziente.
         
         if 'birthdate' in query.keys():
             query['birthdate'] = datetime.strptime(query['birthdate'], 
@@ -45,13 +45,10 @@ class PatientController(object):
             
             return message
         
-        # TODO: Is it useful for the program?
-        self._currentPatient = patient
+        patient = self._get_patient(patient.id_patient)
+        self._currentPatient = patient.first()
         
-        # TODO: To be improved!
-        patient = self.get_patient(patient.id_patient)
-        
-        message = Message(PatientCorrectHeader(),
+        message = Message(PatientCorrectHeader(message='Patient correctly created!'),
                               data=patient)
         return message
     
@@ -63,15 +60,19 @@ class PatientController(object):
         if self._currentPatient == None:
             # Get the id from query
             if 'id_patient' in query.keys():
-                _ = self.get_patient(query['id_patient'])
-            
+                _ = self._get_patient(str(query['id_patient']))
+        
+        
         
         patient = self._currentPatient
+        #query['birthdate'] = query['birthdate']['$date']
+        print query['birthdate']
         
-        # TODO: Include checks in function??
         if 'birthdate' in query.keys():
-            query['birthdate'] = datetime.strptime(query['birthdate'], 
-                                                   "%Y-%m-%dT%H:%M:%S.%fZ" )
+            query['birthdate'] = parse_date(query['birthdate'])
+        
+        if '_id' in query.keys():
+            _ = query.pop('_id')
         
         # Try to modify
         if not patient.modify(**query):
@@ -86,9 +87,10 @@ class PatientController(object):
                                                      user=self.user)) 
             return message
         
-        patient = self.get_patient(patient.id_patient)
+        patient = self._get_patient(patient.id_patient)
+        
         # Everything ok!!!
-        message = Message(PatientCorrectHeader(),
+        message = Message(PatientCorrectHeader(message='Patient correctly modified!'),
                           data=patient)
         return message
     
@@ -100,6 +102,9 @@ class PatientController(object):
         if 'id_patient' in query.keys():
             query['id_patient'] = str(query['id_patient'])
         
+        # return only present patients!
+        query['status'] = 'Attivo'
+        
         patients = Patient.objects(**query)
         print patients
         
@@ -109,8 +114,6 @@ class PatientController(object):
                               data=patients)
             return message
         
-        
-        # TODO: Check if patient_app is "Attivo"
         message = Message(PatientCorrectHeader(),
                           data=patients)
         return message
@@ -123,8 +126,8 @@ class PatientController(object):
         
 
 
-    def get_patient(self, id_):
-
+    def _get_patient(self, id_):
+        """Deprecated"""
         patient = Patient.objects(id_patient=str(id_))
         
         #TODO: Is there a more elegant way to deal with that?
