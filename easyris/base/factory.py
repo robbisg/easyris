@@ -1,5 +1,5 @@
 from easyris.patient.controller import PatientController
-from easyris.base.action import Create, Read, Update, Delete
+from easyris.base.action import action_factory
 from easyris.base.action.examination import *
 from easyris.examination.controller import ExaminationController, TypologyController
 
@@ -25,6 +25,7 @@ class ControllerMapper(Mapper):
 
 class ActionMapper(Mapper):
     
+    '''
     _map = {
             'create': Create,
             'read':   Read,
@@ -37,5 +38,8 @@ class ActionMapper(Mapper):
             'finish': Finish,
             'eject': Eject,
             }
+    '''
     
-    # TODO: Method to add/remove actions
+    @classmethod
+    def get_mapped(cls, name):
+        return action_factory(name)
