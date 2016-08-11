@@ -18,3 +18,4 @@ easyris.egg*
 .idea/Copy of workspace (conflict from 02-04-2016 at 18h26).xml
 .idea/uiDesigner.xml
 .idea/inspectionProfiles/Project_Default.xml
+*.orig
