@@ -66,11 +66,11 @@ class PatientController(object):
         
         patient = self._currentPatient
         #query['birthdate'] = query['birthdate']['$date']
-        print query['birthdate']
         
         if 'birthdate' in query.keys():
             query['birthdate'] = parse_date(query['birthdate'])
-        
+            print query['birthdate']
+            
         if '_id' in query.keys():
             _ = query.pop('_id')
         
@@ -137,5 +137,4 @@ class PatientController(object):
         self._currentPatient = patient.first()
         return patient
     
-
     
