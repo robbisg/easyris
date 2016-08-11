@@ -30,6 +30,10 @@ class Action(object):
         return response
     
 
+def action_factory(name):
+    return Action(name)
+
+
 class Create(Action):
     
     def __init__(self, name='create'):
@@ -53,6 +57,4 @@ class Delete(Action):
     def __init__(self, name='delete'):
         super(Delete, self).__init__(name)
         
-        
-        
-    
+

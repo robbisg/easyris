@@ -63,7 +63,9 @@ class Message(object):
         for f in self.header._field:
             json_[f] = getattr(self.header, f)
         
-        json_['data'] = self.data.as_pymongo()
+        if self.data != None:
+            json_['data'] = self.data.as_pymongo()
+            
         return dumps([json_])
     
     def to_db(self):

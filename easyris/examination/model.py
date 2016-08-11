@@ -1,7 +1,15 @@
 from mongoengine import Document, StringField, ReferenceField, DateTimeField, EmbeddedDocumentField
+from bson.son import SON
+from mongoengine.base.common import get_document, ALLOW_INHERITANCE
+from mongoengine.queryset import QuerySet
+from mongoengine import signals
+from mongoengine.common import _import_class
 from easyris.user.model import User
 from easyris.patient.model import Patient
 from easyris.examination.status import NewExaminationStatus, ExaminationStatus
+from easyris.base import EasyRisDocument, EasyRisQuerySet
+
+
 
 
 class Priority(Document):
@@ -31,7 +39,10 @@ class Typology(Document):
     distretto_corporeo = StringField(required=True) # Testa/collo baby one two three
 
 
-class Examination(Document):
+class Examination(EasyRisDocument):
+    
+    meta = {'queryset_class': EasyRisQuerySet}
+    
     __collection__ = 'examination'
 
     id_patient = ReferenceField(Patient, required=True)
@@ -66,8 +77,20 @@ class Examination(Document):
         return
     
     
+    
+    def _get_subfields(self, document):
+                
+        fields_ = {
+                   'patient': ['first_name', 'last_name', 'id_patient'],
+                   'typology': ['examination_name', 'room', 'distretto_corporeo'],
+                   'priority': ['priority_name'],
+                   'user':['username']
+                   }
+        
+        return document.to_mongo(fields=fields_[document.__collection__])
+    
+    
+            
 
-            
-            
-            
+
             

@@ -23,7 +23,7 @@ class ExaminationController(object):
         if examination == None:
             return 'ERR'
         
-        self._currentPatient = examination.first()
+        self._currentExamination = examination.first()
         return examination
     
     
@@ -41,6 +41,16 @@ class ExaminationController(object):
                 query[k_] = kwargs[k_]
                 
         return query
+    
+    
+    def _get_patient(self, id):
+        pt_controller = PatientController()
+        pt_message = pt_controller.read(id_patient=id)
+        
+        if pt_message.header.code == 101:
+            return pt_message
+        
+        return pt_message.data[0]
     
     
     def create(self, **query):
@@ -105,13 +115,16 @@ class ExaminationController(object):
         
         if 'data_inserimento' in query.keys():
             query['data_inserimento'] = datetime.strptime(query['data_inserimento'], 
-                                                   "%Y-%m-%dT%H:%M:%S.%fZ" )        
+                                                   "%Y-%m-%dT%H:%M:%S.%fZ" )
+                   
         if 'id_patient' in query.keys():
-            query['id_patient'] = str(query['id_patient'])
+            query['id_patient'] = self._get_patient(str(query['id_patient']))
             
+            
+        if 'id_examination' in query.keys():
+            query['id'] = query.pop('id_examination')
+        
         examination = Examination.objects(**query)
-        
-        
         
         if examination.count() == 0:
             message = Message(ExaminationNoRecordHeader(),
@@ -119,39 +132,71 @@ class ExaminationController(object):
             return message
         
         
-        
-        
         message = Message(ExaminationCorrectHeader(),
                           data=examination)
         return message
         
     
-    def update(self, **query):
+    def update(self, **query):    
+        
         return
     
-    def delete(self, **query):
+    def delete(self, **query):       
+        
         return
     
-    def start(self):
-        self._currentExamination.status.start(self._currentExamination)
-        return
     
-    def go(self):
-        self._currentExamination.status.go(self._currentExamination)
-        return
+    def _pre_event(self, id_):
+        qs_examination = self._get_examination(id_)
+        examination = qs_examination.first()
+        
+        return qs_examination, examination
     
-    def stop(self):
-        self._currentExamination.status.stop(self._currentExamination)
-        return
     
-    def pause(self):
-        self._currentExamination.status.pause(self._currentExamination)
-        return
+    def _event_message(self, examination, qs):
+        
+        message_ = 'Examination is now %s' %(examination.status_name)
+        return Message(ExaminationCorrectHeader(message=message_),
+                       data=qs)
     
-    def finish(self):
-        self._currentExamination.status.finish(self._currentExamination)
-        return 
     
-    def eject(self):
-        self._currentExamination.status.eject(self._currentExamination)
-        return
+    def start(self, **query):
+        id_ = query['id']
+        qs, examination = self._pre_event(id_)
+        examination.status.start(examination)
+        return self._event_message(examination, qs)
+    
+    
+    def go(self, **query):
+        id_ = query['id']
+        qs, examination = self._pre_event(id_)
+        examination.status.go(examination)
+        return self._event_message(examination, qs)
+    
+    
+    def stop(self, **query):
+        id_ = query['id']
+        qs, examination = self._pre_event(id_)
+        examination.status.stop(examination)
+        return self._event_message(examination, qs)
+    
+    
+    def pause(self, **query):
+        id_ = query['id']
+        qs, examination = self._pre_event(id_)
+        examination.status.pause(examination)
+        return self._event_message(examination, qs)
+    
+    
+    def finish(self, **query):
+        id_ = query['id']
+        qs, examination = self._pre_event(id_)
+        examination.status.finish(examination)
+        return self._event_message(examination, qs)
+    
+    
+    def eject(self, **query):
+        id_ = query['id']
+        qs, examination = self._pre_event(id_)
+        examination.status.eject(examination)
+        return self._event_message(examination, qs)
