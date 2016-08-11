@@ -151,7 +151,7 @@ def search():
         print request.headers
 
         query = json.loads(request.data)
-
+        
         message = system.do('read',
                             'examination',
                             user=g.user.username,
@@ -206,7 +206,6 @@ def show_patient_examinations(id):
                             user=g.user.username,
                             **query)
 
-        print message
         response = message_to_http(message)
 
         return response
@@ -253,7 +252,7 @@ def go(id):
         print request.data
         print request.headers
         
-        response = state_funcion('start', id)
+        response = state_funcion('go', id)
 
         return response
 

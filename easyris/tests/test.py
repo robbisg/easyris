@@ -3,7 +3,7 @@ import easyris.app as easyris
 import unittest
 import json
 from mongoengine import connect
-from easyris.utils import patient_db, user_db
+from easyris.utils import database_setup
 
 
 class EasyRisUnitTest(unittest.TestCase):
@@ -29,8 +29,7 @@ class EasyRisUnitTest(unittest.TestCase):
         
         self.client = connect(database, port=port)
         self.app = easyris.app.test_client(use_cookies=True)
-        patient_db.run(database, port=port, n_loaded=5)
-        user_db.run(database, port)
+        database_setup.run(database, port, n_loaded=5)
         
         
     def tearDown(self):

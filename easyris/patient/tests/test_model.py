@@ -3,7 +3,7 @@ import unittest
 
 from ..model import Patient
 from ..controller import PatientController
-from ...utils import patient_db, user_db
+from ...utils import patient_db, user_db, database_setup
 
 from datetime import datetime
 
@@ -17,8 +17,7 @@ class TestPatientController(unittest.TestCase):
         port = 27017
         
         self.client = connect(database, port=port)
-        patient_db.run(database, port=port, n_loaded=5)
-        user_db.run(database, port)
+        database_setup.run(database, port, n_loaded=5)
         self.controller = PatientController()
         
         

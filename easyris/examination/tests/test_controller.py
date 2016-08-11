@@ -22,11 +22,12 @@ class TestExaminationController(unittest.TestCase):
         database_setup.run(database, port, n_loaded=5)
         self.controller = ExaminationController()
         
+        
     def tearDown(self):
         self.client.drop_database('test_easyris')
         return
     
-    
+
     def test_create(self):
         
         user = User.objects(username='gaetano').first()
@@ -51,5 +52,64 @@ class TestExaminationController(unittest.TestCase):
         self.assertEqual(message.header.code, 200)
     
     
+    #@unittest.skip("Not checked yet")
+    def test_read(self):
+        
+        query = dict()
+        query['medico_richiedente'] = 'Mauro Caffarini'
+        message = self.controller.read(**query)
+        examination = message.data.first()
+        
+        assert examination['codice_esenzione'] == '67577568'
+        
     
-       
+    
+    @unittest.skip("Not checked yet")
+    def test_update(self):
+        return
+
+
+    @unittest.skip("Not checked yet")
+    def test_delete(self):       
+        return
+    
+    #@unittest.skip("Not checked yet")
+    def test_status(self):
+        
+        query = dict()
+        query['medico_richiedente'] = 'Mauro Caffarini'
+        message = self.controller.read(**query)
+        examination = message.data.first()
+        
+        m = self.controller.start(id=str(examination.id))
+        examination = m.data.first()
+        assert examination.status_name == 'scheduled'
+        
+        m = self.controller.go(id=str(examination.id))
+        examination = m.data.first()
+        assert examination.status_name == 'running'
+        
+        m = self.controller.stop(id=str(examination.id))
+        examination = m.data.first()
+        assert examination.status_name == 'rescheduled'
+        
+        m = self.controller.go(id=str(examination.id))
+        examination = m.data.first()
+        m = self.controller.pause(id=str(examination.id))
+        examination = m.data.first()
+        assert examination.status_name == 'incomplete'
+        m = self.controller.stop(id=str(examination.id))
+        examination = m.data.first()
+        assert examination.status_name == 'incomplete'
+                                 
+        m = self.controller.start(id=str(examination.id))
+        examination = m.data.first()
+        m = self.controller.go(id=str(examination.id))
+        examination = m.data.first()
+        m = self.controller.finish(id=str(examination.id))
+        examination = m.data.first()
+        assert examination.status_name == 'completed'
+        
+        m = self.controller.eject(id=str(examination.id))
+        examination = m.data.first()
+        assert examination.status_name == 'reported'

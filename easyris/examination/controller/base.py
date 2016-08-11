@@ -149,7 +149,6 @@ class ExaminationController(object):
     def _pre_event(self, id_):
         qs_examination = self._get_examination(id_)
         examination = qs_examination.first()
-        
         return qs_examination, examination
     
     
