@@ -8,11 +8,15 @@ def run(database, port):
     client = connect(database, port=port)
     
     actions = ['create', 'read', 'update', 'delete']
+
+    actions_examination_status = ['start','go','stop','pause','finish','eject']
+    actions_report_status = ['close', 'save', 'print', 'open']
     resources = ['patient', 
                  'examination', 
-                 'report', 
-                 'examination_state', 
-                 'report_state']
+                 'report',
+                 'examination_status',
+                 'report_status'
+                ]
     
     permission_ = itertools.product(resources, actions)
     Permission.drop_collection()
@@ -20,11 +24,26 @@ def run(database, port):
     for it in permission_:
         p = Permission(it[1], it[0])
         p.save()
-        permission_list.append(p)    
+        permission_list.append(p)
         
+        
+    ex_status_permission = itertools.product(['examination'], actions_examination_status)
+    for it in ex_status_permission:
+        p = Permission(it[1], it[0])
+        p.save()
+        permission_list.append(p)
+    
+    
+    report_status_permission = itertools.product(['report'], actions_report_status)
+    for it in report_status_permission:
+        p = Permission(it[1], it[0])
+        p.save()
+        permission_list.append(p)
+    
+    
     permission_dict = {'accettazione':np.array([1, 2, 3, 5, 6, 13, 14, 18])-1,
-                       'tecnico': np.array([2, 6, 7, 8, 14, 15, 16, 18])-1,
-                       'medico': np.array([2, 6, 9, 10, 11, 14, 17, 18, 19])-1,
+                       'tecnico': np.array([2, 6, 7, 8, 14, 15, 16, 18, 21, 22, 23, 24, 25])-1,
+                       'medico': np.array([2, 6, 9, 10, 11, 14, 17, 18, 19, 26, 27, 28, 29, 30])-1,
                        'amministrazione': np.array([2, 6, 10, 14, 18])-1,
                        'admin':np.array([1,2,3,4,5,6,7,8,13,14,15,16,17,18,19,20])-1
                        }

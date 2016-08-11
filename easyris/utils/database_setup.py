@@ -2,6 +2,7 @@ from mongoengine import connect
 import os
 import patient_db
 import user_db
+from easyris.utils import examination_db
 
 
 def import_csv(database, collection, filepath):
@@ -43,18 +44,16 @@ def run(db_name='easyris', port=27017, **kwargs):
     # Import priority_db.csv
     import_csv(db_name, 'priority', os.path.join(path, "files/priority_db.csv"))
 
-    # Import exam_status_db.csv
-    # TODO: This should be modified!
-    #import_csv(db_name, 'examination_status',os.path.join(path, "files/exam_status_db.csv"))
-
     # Import nomenclatura_esami.csv
     import_csv(db_name, 'typology', os.path.join(path, "files/nomenclatura_esami.csv"))
 
     print "Populating users, permissions and roles."
     user_db.run(db_name, port)
-
+    
+    print "Creating dummy examinations."
+    examination_db.run(db_name, port, n_loaded=n_loaded)
     # Import report_status.csv
-    import_csv(db_name, 'report_status', os.path.join(path, "files/report_status.csv"))
+    #import_csv(db_name, 'report_status', os.path.join(path, "files/report_status.csv"))
 
     # Import report.csv
     #import_csv(db_name, 'report', os.path.join(path, "files/report.csv"))
