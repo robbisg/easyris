@@ -52,7 +52,3 @@ class Delete(Action):
     
     def __init__(self, name='delete'):
         super(Delete, self).__init__(name)
-        
-        
-        
-    
