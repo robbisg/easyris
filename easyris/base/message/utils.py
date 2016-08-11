@@ -26,3 +26,5 @@ def build_http_response(message):
     
     if not isinstance(message, Message):
         message = Message(1, "Bad Message Compose")
+        
+        

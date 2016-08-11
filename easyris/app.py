@@ -17,6 +17,7 @@ import json
 from flask.templating import render_template_string
 
 from mongoengine import connect
+from easyris.examination.api.base import examination
 
 
 # TODO: Move all the configuration in a function
@@ -33,6 +34,7 @@ app.url_map.strict_slashes = False
 app.register_blueprint(patient, url_prefix='/patient')
 app.register_blueprint(cities, url_prefix='/cities')
 app.register_blueprint(typology, url_prefix='/typology')
+app.register_blueprint(examination, url_prefix='/examination')
 app.register_blueprint(login_, url_prefix='')
 
 
