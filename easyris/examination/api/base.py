@@ -180,8 +180,20 @@ def insert():
 
         print request.data
         print request.headers
+        
+        query = json.loads(request.data)
+        
+        query['id_creator'] = g.user.username
+        
+        message = system.do('create',
+                            'examination',
+                            user=g.user.username,
+                            **query)
 
-        return not_implemented(g.user.username)
+        response = message_to_http(message)
+        
+        
+        return response
 
 
 @examination.route('/patient/<int:id>', methods=['GET', 'OPTIONS'])

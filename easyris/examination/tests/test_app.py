@@ -74,6 +74,56 @@ class ExaminationAPITest(EasyRisUnitTest):
         self.login('mcaulo', 'massimo')
         examination = post_status('eject', id_examination)
         assert examination['status_name'] == 'reported'
+        
+    def test_create(self):
+        
+        self.login('gaetano', 'gaetano')
+        rv = self.app.post(path='/examination/insert', 
+                           data=json.dumps({"exams":[{"priority":"ALTA",
+                                                      "modality":"MR",
+                                                      "sala":"RM1.5T",
+                                                      "distretto":"TORACE",
+                                                      "nome":"RM TORACE SENZA MDC",
+                                                      "selected":True},
+                                                     {"priority":"ROUTINE",
+                                                      "modality":"MR",
+                                                      "sala":"RM1.5T",
+                                                      "distretto":"ADDOME",
+                                                      "nome":"RM SCROTO SENZA MDC",
+                                                      "selected":True},
+                                                     {"priority":"BASSA",
+                                                      "modality":"MR",
+                                                      "sala":"RM1.5T",
+                                                      "distretto":"ESTREMITA/ARTICOLAZIONI",
+                                                      "nome":"RM GOMITO E AVAMBRACCIO SENZA MDC",
+                                                      "selected":True}],
+                                            "id_patient":"2016080001",
+                                            "data_inserimento":"2016-08-11T17:25:38.117Z",
+                                            "medico_richiedente":"frisco frasco",
+                                            "accession_number":"40404040"
+                                            }),
+                           content_type='application/json')
+        
+        response = json.loads(rv.data)
+        assert response[0]['message'] == 'Examination created correctly'
+        
+        
+        rv = self.app.post(path='/examination/search', 
+                           data=json.dumps({'id_patient':'2016080001',
+                                            "medico_richiedente":"frisco frasco"}),
+                           content_type='application/json')
+        response = json.loads(rv.data)
+        
+        print response[0]['data']
+        
+        examination = response[0]['data']
+        
+        assert len(examination) == 3
+        assert examination[0]['id_typology']['distretto_corporeo'] == "TORACE"
+        assert examination[1]['id_typology']['distretto_corporeo'] == "ADDOME"
+        assert examination[2]['id_typology']['distretto_corporeo'] == "ESTREMITA/ARTICOLAZIONI"        
+        
+        
 
 
 if __name__ == '__main__':
