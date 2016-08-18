@@ -1,11 +1,13 @@
-from easyris.examination.model import *
-from easyris.examination.message import *
+from easyris.examination.model import Typology, Examination, Priority
+from easyris.examination.message import ExaminationCorrectHeader, ExaminationErrorHeader, ExaminationNoRecordHeader
+from easyris.examination.status import NewExaminationStatus
 from easyris.patient.controller import PatientController
 from easyris.base.message.message import Message
 from easyris.base.message.error import NotFoundHeader
+from easyris.user.model import User
 from datetime import datetime
+from easyris.utils import parse_date
 from mongoengine import *
-from easyris.examination.message.base import ExaminationNoRecordHeader
 
 
 class ExaminationController(object):
@@ -55,6 +57,8 @@ class ExaminationController(object):
     
     def create(self, **query):
         
+        print query
+        
         pt_controller = PatientController()
         pt_message = pt_controller.read(id_patient=query['id_patient'])
         
@@ -65,48 +69,49 @@ class ExaminationController(object):
         print pt_message.data[0].first_name
         
         if 'data_inserimento' in query.keys():
-            query['data_inserimento'] = datetime.strptime(query['data_inserimento'], 
-                                                            "%Y-%m-%dT%H:%M:%S.%fZ" )
+            query['data_inserimento'] = parse_date(query['data_inserimento'])
+
+        query['id_creator'] = User.objects(username=query['id_creator']).first()
         
-        technician = User.objects(id=query['id_technician']).first()
-        creator = self.user
+        list_examination = query.pop('exams')
         
-        typology = Typology.objects(id=query['id_typology']).first()
         
-        # Priority name instead of code
-        priority = Priority.objects(priority_name=query['id_priority']).first()
-        
-        query = self._check_fields(query,
+        for i, exam_ in enumerate(list_examination):
+            
+            typology = Typology.objects(examination_name=exam_['nome']).first()
+            priority = Priority.objects(priority_name=exam_['priority']).first()
+            query = self._check_fields(query,
                                    id_priority=priority,
                                    id_typology=typology,
-                                   id_technician=technician,
                                    )
-        print query
-        
-        
-        if not isinstance(query, dict):
-            # It is a message!
-            return query
-            
-        query['id_creator'] = creator
-        examination = Examination(**query)
-        
-        try:
-            examination.save()
-        except (FieldDoesNotExist,
-                NotUniqueError,
-                SaveConditionError) as err:
-            
-            message = Message(ExaminationErrorHeader(message=err.message))
-            return message
+            print query
 
-
-        examination = self._get_examination(examination.id)
-        examination.status = NewExaminationStatus(examination)
+            if not isinstance(query, dict):
+                # It is a message!
+                return query
+            
+            examination = Examination(**query)
         
-        self._currentExamination = examination
+            try:
+                examination.save()
+            except (FieldDoesNotExist,
+                    NotUniqueError,
+                    SaveConditionError) as err:
+                
+                txt_message = "On %s examination: %s" % (str(i+1), err.message)
+                
+                message = Message(ExaminationErrorHeader(message=txt_message))
+                return message
+            
+            
+            examination = self._get_examination(examination.id)
+            examination.status = NewExaminationStatus(examination)
+        
+        # TODO: Return the list of created examinations
         message = Message(ExaminationCorrectHeader(message='Examination created correctly'),
                               data=examination)
+        
+        self._currentExamination = examination
         
         return message
 
