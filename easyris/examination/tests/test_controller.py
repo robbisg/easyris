@@ -9,6 +9,8 @@ from easyris.user.model import User
 from datetime import datetime
 from ...utils import patient_db, user_db, database_setup
 from easyris.examination.status import NewExaminationStatus
+from easyris.tests import _get_current_patient_id
+
 
 #@unittest.skip("Not checked yet")
 class TestExaminationController(unittest.TestCase):
@@ -36,13 +38,18 @@ class TestExaminationController(unittest.TestCase):
         
         priority = Priority.objects(priority_name='ROUTINE').first()
         technician = User.objects(username='daniele').first()
-        typology = Typology.objects(codice_regionale='RM11').first()
+        #typology = Typology.objects(codice_regionale='RM11').first()
         
-        
+        query['id_creator'] = str(user.username)
         query['id_priority'] = str(priority.priority_name) # Routine
         query['id_technician'] = str(technician.id) # Daniele-Tecnico
-        query['id_typology'] = str(typology.id) # RM Encefalo senza mdc
-        query['id_patient'] = "2016080001"
+        query['exams'] =  [{"priority":"ALTA",
+                            "modality":"MR",
+                            "sala":"RM1.5T",
+                            "distretto":"TORACE",
+                            "nome":"RM TORACE SENZA MDC",
+                            "selected":True}]# RM Encefalo senza mdc
+        query['id_patient'] = _get_current_patient_id()
         query['medico_richiedente'] = 'Mauro Caffarini'
         query['accession_number'] = '11111111'
         query['data_inserimento'] = "1983-05-18T13:08:00.0Z"

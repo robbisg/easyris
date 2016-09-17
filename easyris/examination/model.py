@@ -50,10 +50,9 @@ class Examination(EasyRisDocument):
     data_inserimento = DateTimeField(required=True)
     
     id_priority = ReferenceField(Priority, required=True)
-    
-    
+
     status = EmbeddedDocumentField(ExaminationStatus, default=NewExaminationStatus())
-    status_name = StringField(required=True, default='NEW')
+    status_name = StringField(required=True, default='new')
     id_typology = ReferenceField(Typology, required=True)
     
     # TODO: Check role?
@@ -92,5 +91,10 @@ class Examination(EasyRisDocument):
     
             
 
-
+class ExaminationTemplate(EasyRisDocument):
+    
+    id_examination = ReferenceField(Examination)
+    template = StringField()
+    
+    
             

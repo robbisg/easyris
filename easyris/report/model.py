@@ -1,24 +1,17 @@
 from mongoengine import *
-# from easyris.user.model import User
-from easyris.patient.model import Patient
+from easyris.user.model import User
 from easyris.examination.model import Examination
-
-
-class ReportStatus(Document):
-    __collection__ = 'report_status'
-
-    status = StringField(required=True)
-
+from easyris.report.status import OpenReportStatus, ReportStatus
 
 
 class Report(Document):
     __collection__ = 'report'
 
-    id_patient = ReferenceField(Patient)
-    id_examination = ReferenceField(Examination)
+    id_examination = ListField(ReferenceField(Examination))
     report_text = StringField(required=True)
-    id_status = ReferenceField(ReportStatus)
-    # doctor_list = ReferenceField(User)
+    status = EmbeddedDocumentField(ReportStatus, default=OpenReportStatus())
+    status_name = StringField(required=True, default='open')
+    doctor_list = ListField(ReferenceField(User))
+    closed = BooleanField(default=False)
+    #suspension_password
     
-
-

@@ -17,7 +17,6 @@ def run(database, port, n_loaded=50):
     patient_list = Patient.objects()
     
     user1 = User.objects(username='gaetano').first()
-    user2 = User.objects(username='daniele').first()
     
     
     for _ in range(n_loaded):
@@ -39,7 +38,7 @@ def run(database, port, n_loaded=50):
                          id_priority=priority,
                          id_typology=typology,
                          id_creator=user1,
-                         id_technician=user2,
+                         #id_technician=user2,
                          accession_number='12345665',
                          codice_esenzione='67577568',
                          examination_note='ok'

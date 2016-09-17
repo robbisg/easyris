@@ -18,12 +18,12 @@ class PatientController(object):
         
     #name = StringField(required=True, default='patient')
     
-    def __init__(self, name='patient', *args, **kwargs):
+    def __init__(self, name='patient', user=None, **kwargs):
         
         # TODO: If no patients??
         self._currentPatient = None
         self.name = name
-        self.user = None
+        self.user = user
         #super(PatientController, self).__init__()
         
     def create(self, **query):

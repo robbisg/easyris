@@ -8,7 +8,7 @@ class Mapper(object):
     
     @classmethod
     def get_mapped(cls, name):
-        return cls._map[name]()
+        return cls._map[name]
 
 
 

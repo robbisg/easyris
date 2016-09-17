@@ -26,7 +26,6 @@ def state_funcion(name, id):
                         user=g.user.username,
                         **query)
 
-    print message
     response = message_to_http(message)
 
     return response
@@ -185,6 +184,8 @@ def insert():
         
         query['id_creator'] = g.user.username
         
+        print 'exams' + str(query['exams'])
+        
         message = system.do('create',
                             'examination',
                             user=g.user.username,
@@ -237,9 +238,6 @@ def show_patient_examinations(id):
 def start(id):
     
     if request.method == 'POST':
-
-        print request.data
-        print request.headers
         
         response = state_funcion('start', id)
 
@@ -260,9 +258,6 @@ def start(id):
 def go(id):
     
     if request.method == 'POST':
-
-        print request.data
-        print request.headers
         
         response = state_funcion('go', id)
 
@@ -282,9 +277,6 @@ def go(id):
 def stop(id):
     
     if request.method == 'POST':
-
-        print request.data
-        print request.headers
         
         response = state_funcion('stop', id)
 
@@ -303,9 +295,6 @@ def stop(id):
 @has_permission('pause', 'examination')
 def pause(id):
     if request.method == 'POST':
-
-        print request.data
-        print request.headers
         
         response = state_funcion('pause', id)
 
@@ -324,9 +313,6 @@ def pause(id):
 @has_permission('finish', 'examination')
 def finish(id):
     if request.method == 'POST':
-
-        print request.data
-        print request.headers
         
         response = state_funcion('finish', id)
 
@@ -346,9 +332,6 @@ def finish(id):
 @has_permission('eject', 'examination')
 def eject(id):
     if request.method == 'POST':
-
-        print request.data
-        print request.headers
         
         response = state_funcion('eject', id)
 
