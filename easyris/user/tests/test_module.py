@@ -10,9 +10,10 @@ class AuthenticationTest(EasyRisUnitTest):
         rv = self.login('mcaulo', 'massimo')
 
         data = json.loads(rv.data)
-        
+        print data
         # TODO: Change assertion with messages implemented
         assert data[0]['username'] == 'mcaulo'
+        assert data[0]['roles'][0]['role_name'] == 'medico'
 
         rv = self.logout()
         

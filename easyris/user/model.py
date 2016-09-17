@@ -1,12 +1,16 @@
 from mongoengine import *
+from mongoengine.dereference import DeReference
 from pymongo import MongoClient
 from datetime import datetime
 from passlib.hash import sha256_crypt
 from flask_login import UserMixin
 import itertools
+from easyris.base import EasyRisDocument, EasyRisQuerySet
 
 
 class Permission(Document):
+    
+    __collection__ = 'permission'
     
     action = StringField(required=True)
     resource = StringField(required=True)
@@ -14,6 +18,8 @@ class Permission(Document):
     
 
 class Role(Document):
+    
+    __collection__ = 'role'
     
     role_name = StringField(required=True, unique=True)
     permissions = ListField(ReferenceField(Permission))
@@ -27,7 +33,9 @@ class Role(Document):
 
 
 
-class User(Document, UserMixin):
+class User(EasyRisDocument, UserMixin):
+    
+    meta = {'queryset_class': EasyRisQuerySet}
     
     __collection__ = 'user'
     
@@ -79,5 +87,17 @@ class User(Document, UserMixin):
         return False
         
        
+    def _get_subfields(self, document):
+                
+        fields_ = {
+                   'role': ['role_name']
+                   }
+        
+        dereference = DeReference()
+        document = dereference(document)
+        
+        return [d.to_mongo(fields=fields_[d.__collection__]) for d in document]
+        
+        #return document.to_mongo(fields=fields_[document.__collection__])
     
     

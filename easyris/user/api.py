@@ -50,7 +50,7 @@ def login():
                         status=200,
                         #mimetype="application/json"
                         )
-                
+        print response
         return response
 
 @login_.route('/logout', methods=['GET'])

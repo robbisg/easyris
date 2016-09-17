@@ -4,12 +4,14 @@ from mongoengine.base.common import get_document, ALLOW_INHERITANCE
 from mongoengine.queryset import QuerySet
 from mongoengine import signals
 from mongoengine.common import _import_class
+from mongoengine.fields import ListField
 
 
 
 class EasyRisQuerySet(QuerySet):
 
     def as_pymongo(self):
+        
         return [e._to_easyris() for e in self.all()]
 
 
@@ -28,6 +30,7 @@ class EasyRisDocument(Document):
         return
     
     
+    
     def _to_easyris(self, use_db_field=True, fields=None):
         """
         Return as SON data ready for use with MongoDB.
@@ -39,18 +42,20 @@ class EasyRisDocument(Document):
         data["_id"] = None
         data['_cls'] = self._class_name
         EmbeddedDocumentField = _import_class("EmbeddedDocumentField")
+        ListField = _import_class("ListField")
         ReferenceField = _import_class("ReferenceField")
         Document = _import_class("Document")
         # only root fields ['test1.a', 'test2'] => ['test1', 'test2']
         root_fields = set([f.split('.')[0] for f in fields])
     
         for field_name in self:
+            
             if root_fields and field_name not in root_fields:
                 continue
-    
+
             value = self._data.get(field_name, None)
             field = self._fields.get(field_name)
-    
+
             if field is None and self._dynamic:
                 field = self._dynamic_fields.get(field_name)
     
@@ -68,8 +73,11 @@ class EasyRisDocument(Document):
                 
                 if isinstance(field, ReferenceField):
                     value = self._get_subfields(self[field_name])
+                    
+                elif isinstance(field, ListField):
+                    
+                    value = self._get_subfields(value)
                 else:
-                
                     value = field.to_mongo(value, 
                                            #use_db_field=use_db_field,
                                            #fields=embedded_fields
