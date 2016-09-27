@@ -87,5 +87,17 @@ def run(database, port):
                  email='danielepetrucci@unich.it')
     
     user3.save()
+    
+    role_amministrazione = Role.objects(role_name='amministrazione').first()
+    user4 = User(username='michetti', 
+                 password='michetti', 
+                 roles=[role_amministrazione],
+                 first_name='Carlo',
+                 last_name='Michetti',
+                 telephone_number='3289876543',
+                 mobile_number='3212345678',
+                 email='c.michetti@unich.it')
+    
+    user4.save()    
 
 
