@@ -1,6 +1,9 @@
 from easyris.base.message.message import Message
 from flask import Response
 from bson.json_util import dumps
+import logging
+
+logger = logging.getLogger('easyris_logger')
 
 
 def message_to_http(message):
@@ -8,6 +11,9 @@ def message_to_http(message):
     response = Response(response=message.to_json(),
                         status=200,
                         mimetype="application/json")
+    
+    logger.info("User "+str(message.header.user)+"\n"+message.header.message)
+    
     return response
 
 

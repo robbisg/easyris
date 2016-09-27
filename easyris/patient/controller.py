@@ -7,16 +7,14 @@ from easyris.patient.message import PatientCorrectHeader, \
                                         PatientErrorHeader, \
                                         PatientNoRecordHeader
 from easyris.utils import parse_date
-import json
+import logging
 
-# TODO: Database name should be explicit?
 
-#connect('easyris', port=27017)
+logger = logging.getLogger('easyris_logger')
 
 
 class PatientController(object):
         
-    #name = StringField(required=True, default='patient')
     
     def __init__(self, name='patient', user=None, **kwargs):
         
@@ -42,6 +40,7 @@ class PatientController(object):
                 SaveConditionError) as err:
             
             message = Message(PatientErrorHeader(message=err.message))
+            logger.error(err.message)
             
             return message
         
@@ -50,26 +49,24 @@ class PatientController(object):
         
         message = Message(PatientCorrectHeader(message='Patient correctly created!'),
                               data=patient)
+        
+        logger.info(message.header.message)
         return message
     
     
     def update(self, **query):
         
         # Check if a patient has been selected
-        print self._currentPatient
         if self._currentPatient == None:
             # Get the id from query
             if 'id_patient' in query.keys():
                 _ = self._get_patient(str(query['id_patient']))
         
-        
-        
         patient = self._currentPatient
-        #query['birthdate'] = query['birthdate']['$date']
         
         if 'birthdate' in query.keys():
             query['birthdate'] = parse_date(query['birthdate'])
-            print query['birthdate']
+            logger.debug(query['birthdate'])
             
         if '_id' in query.keys():
             _ = query.pop('_id')
@@ -77,6 +74,7 @@ class PatientController(object):
         # Try to modify
         if not patient.modify(**query):
             message = Message(PatientErrorHeader(message='Error in modifying'))
+            logger.error(message.header.message)
             return message
         
         # Try to save
@@ -85,6 +83,7 @@ class PatientController(object):
         except NotUniqueError, err:
             message = Message(PatientErrorHeader(message=err.message, 
                                                      user=self.user)) 
+            logger.error(message.header.message)
             return message
         
         patient = self._get_patient(patient.id_patient)
@@ -92,6 +91,7 @@ class PatientController(object):
         # Everything ok!!!
         message = Message(PatientCorrectHeader(message='Patient correctly modified!'),
                           data=patient)
+        logger.info(message.header.message)
         return message
     
     
@@ -106,25 +106,26 @@ class PatientController(object):
         query['status'] = 'Attivo'
         
         patients = Patient.objects(**query)
-        print patients
+        #logger.debug(patients)
         
         # Patient list empty
         if patients.count() == 0:
             message = Message(PatientNoRecordHeader(),
                               data=patients)
+            logger.error(message.header.message)
             return message
         
         message = Message(PatientCorrectHeader(),
                           data=patients)
+        
+        logger.info(message.header.message)
         return message
 
-    
     
     def delete(self, status, note):
         # TODO: Is it useful?? Yes for me!
         return self.update(status=status, status_note=note)
         
-
 
     def _get_patient(self, id_):
         """Deprecated"""
@@ -132,6 +133,7 @@ class PatientController(object):
         
         #TODO: Is there a more elegant way to deal with that?
         if patient == None:
+            logger.error('No Patient in the database')
             return 'ERR'
         
         self._currentPatient = patient.first()

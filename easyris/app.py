@@ -19,6 +19,8 @@ from flask.templating import render_template_string
 from mongoengine import connect
 from easyris.examination.api.base import examination
 
+import logging
+import logging.handlers
 
 # TODO: Move all the configuration in a function
 # TODO: as mentioned in Application factories section
@@ -26,6 +28,7 @@ from easyris.examination.api.base import examination
 #app = Flask(__name__)
 app = EasyRis(__name__)
 app.config['SESSION_COOKIE_HTTPONLY'] = False
+app.config['LOGGED_USERS'] = []
 
 # This is to prevent bad url in frontend
 app.url_map.strict_slashes = False
@@ -60,6 +63,7 @@ def debug():
 
 @app.before_request
 def before_request():
+    #app.logger.debug(request.header)
     g.user = current_user
 
 
@@ -69,12 +73,43 @@ def load_user(userid):
     return app.get_user(userid)
 
 
+def enable_logging():
+    logger = logging.getLogger('easyris_logger')
+    logger.setLevel(logging.DEBUG)
+    # create file handler which logs even debug messages
+    fh = logging.handlers.RotatingFileHandler('/home/vagrant/easyris.log')
+    fh.setLevel(logging.DEBUG)
+    # create console handler with a higher log level
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter('----------\n'+
+                                  '%(asctime)s - '+
+                                  '%(levelname)s - '+ 
+                                  '[%(pathname)s:'+
+                                  '%(lineno)s] - '+
+                                  '%(name)s - :\n'+
+                                  '%(message)s')
+    
+    
+    ch.setFormatter(formatter)
+    fh.setFormatter(formatter)
+    # add the handlers to logger
+    logger.addHandler(ch)
+    logger.addHandler(fh)
+    
+    return fh
+
 
 
 if __name__ == '__main__':
     
     # TODO: Secure connection???
     connect('easyris')
+    
+    handler = enable_logging()
+    
+    app.logger.addHandler(handler)
     
     app.run(host='0.0.0.0', 
             port=5000, 
