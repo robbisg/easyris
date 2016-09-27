@@ -8,6 +8,7 @@ from easyris.user.model import User
 from easyris.patient.model import Patient
 from easyris.examination.status import NewExaminationStatus, ExaminationStatus
 from easyris.base import EasyRisDocument, EasyRisQuerySet
+from numpy.random.mtrand import randint
 
 
 
@@ -68,12 +69,45 @@ class Examination(EasyRisDocument):
     examination_note = StringField()
     
     
-    def set_accession_number(self):
-        # TODO: Accession number must depend on
-        # device, date, patient and body part
-        # TODO: Query su Examination per vedere se ci sono esami con
-        # device, data, pazienti e body part uguali e mettere lo stesso num.
-        return
+    def clean(self):
+        self.accession_number = self.set_accession_number(date=self.data_inserimento,
+                                                          patient=self.id_patient,
+                                                          room=self.id_typology.room,
+                                                          body_part=self.id_typology.distretto_corporeo)
+    
+    
+    
+    def set_accession_number(self, date, patient, room, body_part):
+
+        klass = self.__class__
+        current_patient_ex = klass.objects(id_patient=self.id_patient.id)
+        if len(current_patient_ex) == 0:
+            return self._get_accession_number(date)
+        
+        today_examinations = current_patient_ex.filter(data_inserimento=date)
+        if len(today_examinations) == 0:
+            return self._get_accession_number(date)
+        
+        typology = Typology.objects(room=room,
+                                    distretto_corporeo=body_part)
+        
+        for t in typology:
+            typology_examination = today_examinations.filter(id_typology=t.id)
+            if len(typology_examination) > 0:
+                print typology_examination[0].accession_number
+                return typology_examination[0].accession_number
+            
+        return self._get_accession_number(date)
+    
+    
+    def _get_accession_number(self, date):
+        import numpy as np
+        now_ = str(date)
+        year = str(now_).split('-')[0]
+        month = str(now_).split('-')[1]
+        day = str(now_)[8:10]
+        random_num = str(np.random.randint(1000000, 1999999))[1:]
+        return year+month+day+random_num
     
     
     
@@ -92,6 +126,9 @@ class Examination(EasyRisDocument):
             
 
 class ExaminationTemplate(EasyRisDocument):
+    """
+    This should be used only for report template
+    """
     
     id_examination = ReferenceField(Examination)
     template = StringField()

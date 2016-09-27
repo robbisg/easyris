@@ -121,8 +121,9 @@ class ExaminationController(object):
     def read(self, **query):
         
         if 'data_inserimento' in query.keys():
-            query['data_inserimento'] = datetime.strptime(query['data_inserimento'], 
-                                                   "%Y-%m-%dT%H:%M:%S.%fZ" )
+            if isinstance(query['data_inserimento'], str):
+                query['data_inserimento'] = datetime.strptime(query['data_inserimento'], 
+                                                              "%Y-%m-%dT%H:%M:%S.%fZ" )
                    
         if 'id_patient' in query.keys():
             query['id_patient'] = self._get_patient(str(query['id_patient']))

@@ -7,6 +7,7 @@ from easyris.base.message.utils import build_response, message_to_http
 from easyris.base.message import message_factory
 from easyris.base.message.error import NotImplementedApiHeader
 import json
+from flask.globals import current_app
 
 examination = Blueprint('examination', __name__)
 
@@ -54,10 +55,9 @@ def not_implemented(username):
 @has_permission('read', 'examination')
 def get_examinations():
     
-    # TODO: Log stuff!
-    print request.headers
+    
     if not g.user.is_anonymous:
-        print 'User:'+g.user.username
+        current_app.logger.info('User:'+g.user.username)
 
     if request.method == 'GET':
 
@@ -72,6 +72,44 @@ def get_examinations():
         response = message_to_http(message)
 
         return response
+
+
+
+@examination.route('/today', methods=['GET', 'OPTIONS'])
+@cross_origin(origin=None,
+              methods=['GET', 'OPTIONS'],
+              allow_headers=['X-Requested-With',
+                             'Content-Type',
+                             'Origin'],
+              supports_credentials=True)
+@login_required
+@has_permission('read', 'examination')
+def get_today_examinations():
+    
+    from datetime import datetime
+    
+    current_app.logger.debug(request.header)
+
+    if request.method == 'GET':
+
+        query = dict()
+        
+        now = datetime.now()
+        query['data_inserimento'] = datetime(day=now.day,
+                                             month=now.month,
+                                             year=now.year)
+        
+        message = system.do('read',
+                            'examination',
+                            user=g.user.username,
+                            **query)
+
+
+        response = message_to_http(message)
+
+        return response
+
+
 
 @examination.route('/<string:id>', methods=['GET', 'POST', 'OPTIONS'])
 @jsonp

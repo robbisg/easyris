@@ -71,12 +71,12 @@ class TestExaminationController(unittest.TestCase):
         
     
     
-    @unittest.skip("Not checked yet")
+    @unittest.skip("Not implemented yet")
     def test_update(self):
         return
 
 
-    @unittest.skip("Not checked yet")
+    @unittest.skip("Not implemented yet")
     def test_delete(self):       
         return
     

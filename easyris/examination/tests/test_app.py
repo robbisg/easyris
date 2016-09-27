@@ -118,7 +118,7 @@ class ExaminationAPITest(EasyRisUnitTest):
                                             "id_patient":_get_current_patient_id(),
                                             "data_inserimento":"2016-08-11T17:25:38.117Z",
                                             "medico_richiedente":"frisco frasco",
-                                            "accession_number":"40404040"
+                                            #"accession_number":"40404040"
                                             }),
                            content_type='application/json')
         
