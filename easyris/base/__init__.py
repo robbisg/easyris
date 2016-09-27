@@ -8,6 +8,7 @@ from mongoengine.fields import ListField
 
 
 
+
 class EasyRisQuerySet(QuerySet):
 
     def as_pymongo(self):
@@ -78,6 +79,7 @@ class EasyRisDocument(Document):
                     
                     value = self._get_subfields(value)
                 else:
+                    
                     value = field.to_mongo(value, 
                                            #use_db_field=use_db_field,
                                            #fields=embedded_fields

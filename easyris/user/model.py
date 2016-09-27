@@ -1,4 +1,6 @@
-from mongoengine import *
+from mongoengine import Document, StringField, ReferenceField, \
+                    ListField, BooleanField
+from mongoengine.queryset import QuerySet
 from mongoengine.dereference import DeReference
 from pymongo import MongoClient
 from datetime import datetime
@@ -6,6 +8,17 @@ from passlib.hash import sha256_crypt
 from flask_login import UserMixin
 import itertools
 from easyris.base import EasyRisDocument, EasyRisQuerySet
+
+
+class UserEasyrisQuerySet(QuerySet):
+    """
+    This is specifically used to avoid the inclusion
+    of password in the message sent to the frontend
+    """
+    def as_pymongo(self):
+        fields = User._fields.keys()
+        fields.remove('password')
+        return [e._to_easyris(fields=fields) for e in self.all()]
 
 
 class Permission(Document):
@@ -35,7 +48,7 @@ class Role(Document):
 
 class User(EasyRisDocument, UserMixin):
     
-    meta = {'queryset_class': EasyRisQuerySet}
+    meta = {'queryset_class': UserEasyrisQuerySet}
     
     __collection__ = 'user'
     
@@ -99,5 +112,4 @@ class User(EasyRisDocument, UserMixin):
         return [d.to_mongo(fields=fields_[d.__collection__]) for d in document]
         
         #return document.to_mongo(fields=fields_[document.__collection__])
-    
     
