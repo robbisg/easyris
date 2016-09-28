@@ -16,9 +16,7 @@ def run(database, port, n_loaded=50):
     typology_list = Typology.objects()
     patient_list = Patient.objects()
     
-    user1 = User.objects(username='gaetano').first()
-    user2 = User.objects(username='daniele').first()
-    
+    user1 = User.objects(username='gaetano').first()  
     
     for _ in range(n_loaded):
         
@@ -30,19 +28,28 @@ def run(database, port, n_loaded=50):
         patient = patient_list[ip]
         typology = typology_list[it]
         priority = priority_list[ipr]
+        
+        if random.randint(1, 10) > 5:
+            now = datetime.now()
+            date_ = datetime(year=now.year,
+                             month=now.month,
+                             day=now.day)
+        else:
+            date_ = datetime(year=2016,
+                             month=02,
+                             day=02)
     
         examination = Examination(id_patient=patient,
                          medico_richiedente='Mauro Caffarini',
-                         data_inserimento=datetime(year=2016, 
-                                                   day=02, 
-                                                   month=02),
+                         data_inserimento=date_,
                          id_priority=priority,
                          id_typology=typology,
                          id_creator=user1,
-                         id_technician=user2,
-                         accession_number='12345665',
+                         #id_technician=user2,
+                         #accession_number='12345665',
                          codice_esenzione='67577568',
                          examination_note='ok'
                          )
         
         examination.save()
+        

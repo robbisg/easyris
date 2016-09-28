@@ -2,13 +2,14 @@ import unittest
 import json
 from mongoengine import connect
 from easyris.utils import patient_db, user_db
+from easyris.tests import _get_current_patient_id
 from easyris.tests.test import EasyRisUnitTest
 import easyris.app as easyris
 
 #@unittest.skip("showing class skipping")
 class ExaminationAPITest(EasyRisUnitTest):
     
-    
+    #@unittest.skip("skipping")
     def test_search(self):
         
         self.login('daniele', 'daniele')
@@ -23,6 +24,22 @@ class ExaminationAPITest(EasyRisUnitTest):
         
         assert response[0]['user'] == 'daniele'
         assert examination['codice_esenzione'] == '67577568'
+        
+    @unittest.skip("Not yet implemented")
+    def test_data(self):
+        self.login('daniele', 'daniele')
+        rv = self.app.post(path='/examination/search', 
+                           data=json.dumps({'data_inserimento':'16/0'}),
+                           content_type='application/json')
+
+        response = json.loads(rv.data)
+
+        examination = response[0]['data'][0]
+        #print examination
+        
+        assert response[0]['user'] == 'daniele'
+        assert examination['codice_esenzione'] == '67577568'
+        
         
     
     #@unittest.skip("showing class skipping")
@@ -75,6 +92,7 @@ class ExaminationAPITest(EasyRisUnitTest):
         examination = post_status('eject', id_examination)
         assert examination['status_name'] == 'reported'
         
+    #@unittest.skip("No reasons")
     def test_create(self):
         
         self.login('gaetano', 'gaetano')
@@ -97,19 +115,20 @@ class ExaminationAPITest(EasyRisUnitTest):
                                                       "distretto":"ESTREMITA/ARTICOLAZIONI",
                                                       "nome":"RM GOMITO E AVAMBRACCIO SENZA MDC",
                                                       "selected":True}],
-                                            "id_patient":"2016080001",
+                                            "id_patient":_get_current_patient_id(),
                                             "data_inserimento":"2016-08-11T17:25:38.117Z",
                                             "medico_richiedente":"frisco frasco",
-                                            "accession_number":"40404040"
+                                            #"accession_number":"40404040"
                                             }),
                            content_type='application/json')
         
         response = json.loads(rv.data)
+        print response
         assert response[0]['message'] == 'Examination created correctly'
         
         
         rv = self.app.post(path='/examination/search', 
-                           data=json.dumps({'id_patient':'2016080001',
+                           data=json.dumps({'id_patient':_get_current_patient_id(),
                                             "medico_richiedente":"frisco frasco"}),
                            content_type='application/json')
         response = json.loads(rv.data)

@@ -57,6 +57,7 @@ class Message(object):
         self.data = data
         self.to_db()
 
+
     def to_json(self):
         json_ = dict()
         
@@ -72,6 +73,7 @@ class Message(object):
         # TODO: Implement it!
         # TODO: Asynchronous celery task to mongo
         return None
+    
     
     def set_user(self, user):
         self.header.set_user(user)

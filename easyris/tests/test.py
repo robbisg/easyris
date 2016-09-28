@@ -4,6 +4,7 @@ import unittest
 import json
 from mongoengine import connect
 from easyris.utils import database_setup
+from datetime import datetime
 
 
 class EasyRisUnitTest(unittest.TestCase):
@@ -34,6 +35,8 @@ class EasyRisUnitTest(unittest.TestCase):
         
     def tearDown(self):
         self.client.drop_database('test_easyris')
+        pass
+        
 
 
 

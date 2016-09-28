@@ -2,13 +2,14 @@ from easyris.patient.controller import PatientController
 from easyris.base.action import action_factory
 from easyris.base.action.examination import *
 from easyris.examination.controller import ExaminationController, TypologyController
+from easyris.user.controller import PermissionController
 
 class Mapper(object):
     _map = dict()
     
     @classmethod
     def get_mapped(cls, name):
-        return cls._map[name]()
+        return cls._map[name]
 
 
 
@@ -18,6 +19,7 @@ class ControllerMapper(Mapper):
             'patient': PatientController,
             'examination': ExaminationController,
             'typology': TypologyController,
+            'user': PermissionController
             }
        
     # TODO: Method to add/remove controllers   

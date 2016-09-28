@@ -6,7 +6,7 @@ from easyris.base.message import MessageHeader, Message
 # TODO: Is it a factory?
 class TypologyController(object):
     
-    def __init__(self, name='typology'):
+    def __init__(self, name='typology', **kwargs):
         self.name = name
     
     

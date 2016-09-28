@@ -1,8 +1,13 @@
-from easyris.base.factory import ControllerMapper, ActionMapper
+from easyris.base.factory import ControllerMapper
+from easyris.base.action import action_factory
+import logging
+
+logger = logging.getLogger('easyris_logger')
+
 
 class EasyRisFacade(object):
     """Basic class that manage controller and actions"""
-        
+
     def do(self, action_name, resource_name, **kwargs):
         """Method used to perform an action on the controllers,
         it should be noted that resource and action should be mapped
@@ -18,29 +23,27 @@ class EasyRisFacade(object):
         message : the controller output of that action
         
         """
-        # Get controller and action class
-        # TODO: Check if they're mapped
-        controller = ControllerMapper.get_mapped(resource_name)
-        action = ActionMapper.get_mapped(action_name)
-        
-        # We instantiate the classes
-        '''
-        controller = controller_class()
-        action = action_class()
-        '''
-        
-        user = 'None'
+
+        user = None
 
         if 'user' in kwargs.keys():
             user = kwargs.pop('user')
+
+        # Get controller and action class
+        # TODO: Check if they're mapped
+        controller_class = ControllerMapper.get_mapped(resource_name)
+        #action_class = ActionMapper.get_mapped(action_name)
+
+        # We instantiate the classes
+        controller = controller_class(user=user)
+        logger.debug(controller.user)
+        action = action_factory(action_name)
 
         # Message from controller
         message = action.execute(controller, **kwargs)
         # Attach user to the message
         message.set_user(user)
-        print message
-        return message
-   
-    
+
+        return message   
     
     

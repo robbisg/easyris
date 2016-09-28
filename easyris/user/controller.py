@@ -1,23 +1,52 @@
 from easyris.user.model import User
+from easyris.base.message import Message
+from easyris.user.message import UserLoggedHeader, \
+    UserNotAuthenticatedHeader, UserNotFoundHeader
+import logging
+
+logger = logging.getLogger('easyris_logger')
 
 class PermissionController(object):
     
-    def login(self, user, password):
+    def __init__(self, name='permission', user=None):
+        self.name = name
+        self.user = user
+        return
+    
+    
+    def login(self, username=None, password=None):
         
-        logged_user = User.objects(username=user).first()
+        message_data = {'is_authenticated':False,
+                        'user':None,
+                        'qs':None}
         
-        if len(logged_user) == 0:
+        qs = User.objects(username=username)
+        logged_user = qs.first()
+        
+        if len(qs) == 0:
             # No user with this username
-            print 'No user with this username'
-            return None
-        
+            message = Message(UserNotFoundHeader(), 
+                              data=message_data)
+            logger.debug(message.header.message)
+            return message
+
+
         if logged_user.check_password(password):
-            return logged_user
+            message_data['user'] = logged_user
+            message_data['is_authenticated'] = True
+            message_data['qs'] = qs
+            message = Message(UserLoggedHeader(), 
+                              data=message_data)
+            logger.debug(message.header.message)
+        else:
+            message = Message(UserNotAuthenticatedHeader(), 
+                              data=message_data)
+            logger.debug(message.header.message)
         
-        return None
+        return message
+        
     
     def load_user(self, id_):
-        
         return User.objects(id=id_).first()
         
             

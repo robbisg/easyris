@@ -1,5 +1,6 @@
 from easyris.examination.model import Typology, Examination, Priority
-from easyris.examination.message import ExaminationCorrectHeader, ExaminationErrorHeader, ExaminationNoRecordHeader
+from easyris.examination.message import ExaminationCorrectHeader, ExaminationErrorHeader, \
+                                        ExaminationNoRecordHeader
 from easyris.examination.status import NewExaminationStatus
 from easyris.patient.controller import PatientController
 from easyris.base.message.message import Message
@@ -12,10 +13,10 @@ from mongoengine import *
 
 class ExaminationController(object):
     
-    def __init__(self, name='examination'):
+    def __init__(self, name='examination', user=None):
         self._currentExamination = None
         self.name = name
-        self.user = None
+        self.user = user
         return
     
     def _get_examination(self, id_examination):
@@ -57,7 +58,6 @@ class ExaminationController(object):
     
     def create(self, **query):
         
-        print query
         
         pt_controller = PatientController()
         pt_message = pt_controller.read(id_patient=query['id_patient'])
@@ -75,6 +75,9 @@ class ExaminationController(object):
         
         list_examination = query.pop('exams')
         
+        if len(list_examination) == 0:
+            return Message(ExaminationErrorHeader(message='No Examination in Request'))
+        
         
         for i, exam_ in enumerate(list_examination):
             
@@ -84,7 +87,6 @@ class ExaminationController(object):
                                    id_priority=priority,
                                    id_typology=typology,
                                    )
-            print query
 
             if not isinstance(query, dict):
                 # It is a message!
@@ -119,8 +121,9 @@ class ExaminationController(object):
     def read(self, **query):
         
         if 'data_inserimento' in query.keys():
-            query['data_inserimento'] = datetime.strptime(query['data_inserimento'], 
-                                                   "%Y-%m-%dT%H:%M:%S.%fZ" )
+            if isinstance(query['data_inserimento'], str):
+                query['data_inserimento'] = datetime.strptime(query['data_inserimento'], 
+                                                              "%Y-%m-%dT%H:%M:%S.%fZ" )
                    
         if 'id_patient' in query.keys():
             query['id_patient'] = self._get_patient(str(query['id_patient']))
@@ -142,11 +145,12 @@ class ExaminationController(object):
         return message
         
     
-    def update(self, **query):    
+    def update(self, **query):
+        # TODO: Check if examinatin
         
         return
     
-    def delete(self, **query):       
+    def delete(self, **query):   
         
         return
     
@@ -155,6 +159,26 @@ class ExaminationController(object):
         qs_examination = self._get_examination(id_)
         examination = qs_examination.first()
         return qs_examination, examination
+    
+    
+    def _update_technician(self, user, examination):
+        
+        query = dict()
+        query['id_technician'] = User.objects(username=user).first()
+        
+        if not examination.modify(**query):
+            message = Message(ExaminationErrorHeader(message='Error in modifying'))
+            return message
+        
+        # Try to save
+        try:
+            examination.save()
+        except NotUniqueError, err:
+            message = Message(ExaminationErrorHeader(message=err.message, 
+                                                     user=self.user)) 
+            return message
+        
+    
     
     
     def _event_message(self, examination, qs):
@@ -193,8 +217,10 @@ class ExaminationController(object):
     
     
     def finish(self, **query):
+        
         id_ = query['id']
         qs, examination = self._pre_event(id_)
+        self._update_technician(self.user, examination)
         examination.status.finish(examination)
         return self._event_message(examination, qs)
     

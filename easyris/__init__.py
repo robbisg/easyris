@@ -29,7 +29,9 @@ class EasyRis(Flask):
             
     @staticmethod
     def login(user, password):
-        
+        """
+        Deprecated
+        """
         controller = PermissionController()
         logged_user = controller.login(user, password)
 
@@ -40,6 +42,7 @@ class EasyRis(Flask):
         
     
     def get_user(self, id_user):
+        # This seems good! :)
         controller = PermissionController()
         return controller.load_user(id_user)
         

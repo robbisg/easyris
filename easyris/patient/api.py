@@ -1,19 +1,15 @@
-from flask import Blueprint, jsonify, request, Response, g
-from mongoengine import *
-from bson.json_util import dumps
+from flask import Blueprint, request, g
 import json
-from datetime import datetime
-
-from controller import PatientController
-from easyris.base.message.utils import build_response, message_to_http
-from flask_login import login_required, current_user
-from flask_cors.decorator import cross_origin
+import logging
+from easyris.patient.controller import PatientController
+from easyris.base.message.utils import message_to_http
 from easyris.base.controller import EasyRisFacade
-from easyris.utils.decorators import has_permission, jsonp, crossdomain
-
+from easyris.utils.decorators import has_permission, jsonp
+from flask_login import login_required
+from flask_cors.decorator import cross_origin
 
 patient = Blueprint('patient', __name__)
-
+logger = logging.getLogger("easyris_logger")
 
 # TODO: Should I start the class in easyris.app??
 system = EasyRisFacade()
@@ -21,7 +17,6 @@ controller = PatientController()
 
 
 # TODO: Implement the confirmation of patient data!
-
 @patient.route('/', methods=['GET', 'OPTIONS'])
 @cross_origin(origin=None, 
              methods=['GET', 'OPTIONS'], 
@@ -34,9 +29,7 @@ controller = PatientController()
 def get_patients():
     # TODO: Rimanda nome, cognome, id, cf, telefono
     # TODO: Log stuff!
-    print request.headers
-    if not g.user.is_anonymous:
-        print 'User:'+g.user.username
+    logger.debug(request.headers)
     
     if request.method == 'GET':
         
@@ -47,9 +40,8 @@ def get_patients():
                             user=g.user.username,
                             **query)
 
-
         response = message_to_http(message)
-
+        
         return response
 
 
@@ -97,7 +89,7 @@ def delete(id):
     
     if request.method == 'POST':
         query = json.loads(request.data)
-        print query
+        logger.debug(query)
         # TODO: Check if they exist?!?!
         # TODO: Is it good to extract fields from request?
         status = query['status']
@@ -129,7 +121,7 @@ def update(id):
     if request.method == 'POST':
 
         query = json.loads(request.data)
-        print query
+        logger.debug(query)
         message = system.do('update', 
                             'patient', 
                             user=g.user.username,
@@ -161,8 +153,8 @@ def search():
     """
     if request.method == 'POST':
 
-        print request.data
-        print request.headers
+        logger.debug(request.data)
+        logger.debug(request.headers)
         
         query = json.loads(request.data)
 
@@ -198,8 +190,8 @@ def insert():
     
     if request.method == 'POST':
         
-        print request.data
-        print request.headers
+        logger.debug(request.data)
+        logger.debug(request.headers)
         
         query = json.loads(request.data)
 
@@ -208,7 +200,9 @@ def insert():
                             user=g.user.username,
                             **query)
         
-        print message
+        
+        
+        
         response = message_to_http(message)
         
         return response
