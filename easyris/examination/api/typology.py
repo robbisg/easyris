@@ -1,13 +1,17 @@
-from flask import Blueprint, jsonify, request, Response, g
+from flask import Blueprint, request, g
 from easyris.base.controller import EasyRisFacade
 from flask_cors.decorator import cross_origin
-from flask_login import login_required, current_user
-from easyris.utils.decorators import has_permission, jsonp, crossdomain
-from easyris.base.message.utils import build_response, message_to_http
+from flask_login import login_required
+from easyris.utils.decorators import has_permission
+from easyris.base.message.utils import message_to_http
 
 
 typology = Blueprint('typology', __name__)
 system = EasyRisFacade()
+
+import logging
+logger = logging.getLogger("easyris_logger")
+
 
 @typology.route('/', methods=['GET', 'OPTIONS'])
 @cross_origin(origin=None,
@@ -20,9 +24,9 @@ system = EasyRisFacade()
 @has_permission('read', 'patient') # Who is?
 def get_typology():
     # TODO: Log stuff!
-    print request.headers
+    logger.debug(request.headers)
     if not g.user.is_anonymous:
-        print 'User:'+g.user.username
+        logger.debug('User:'+g.user.username)
 
     if request.method == 'GET':
 
