@@ -1,5 +1,4 @@
-from flask import Flask, Blueprint, jsonify, request, Response, \
-                    session, g, url_for
+from flask import g
 from flask.ext.cors import CORS, cross_origin
 from flask.ext.login import LoginManager, login_user, logout_user, \
      login_required, current_user
@@ -7,21 +6,16 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 from easyris import EasyRis
 from easyris.utils.api import cities
-from easyris.base.message.utils import build_response
 from easyris.patient.api import patient
 from easyris.user.api import login_
 from easyris.examination.api.typology import typology
-from easyris.utils.decorators import crossdomain, jsonp
-from datetime import datetime, timedelta
-import json
+from datetime import timedelta
 from flask.templating import render_template_string
 
 from mongoengine import connect
 from easyris.examination.api.base import examination
 
-import logging
-import logging.handlers
-
+import flask
 # TODO: Move all the configuration in a function
 # TODO: as mentioned in Application factories section
 
@@ -53,7 +47,7 @@ app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 toolbar = DebugToolbarExtension(app)
 
 @app.route('/')
-def entry(): 
+def entry():
     return 'Flask is up!'
 
 @app.route('/debug')
@@ -74,6 +68,8 @@ def load_user(userid):
 
 
 def enable_logging():
+    import logging
+    import logging.handlers
     logger = logging.getLogger('easyris_logger')
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages

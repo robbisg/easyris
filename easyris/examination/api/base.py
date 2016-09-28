@@ -8,13 +8,14 @@ from easyris.base.message import message_factory
 from easyris.base.message.error import NotImplementedApiHeader
 import json
 from flask.globals import current_app
+import logging
+
+logger = logging.getLogger("easyris_logger")
 
 examination = Blueprint('examination', __name__)
 
-
 # TODO: Should I start the class in easyris.app??
 system = EasyRisFacade()
-
 
 
 def state_funcion(name, id):
@@ -43,7 +44,6 @@ def not_implemented(username):
 
     
 
-
 @examination.route('/', methods=['GET', 'OPTIONS'])
 @cross_origin(origin=None,
               methods=['GET', 'OPTIONS'],
@@ -57,7 +57,7 @@ def get_examinations():
     
     
     if not g.user.is_anonymous:
-        current_app.logger.info('User:'+g.user.username)
+        logger.info('User:'+g.user.username)
 
     if request.method == 'GET':
 
@@ -88,7 +88,7 @@ def get_today_examinations():
     
     from datetime import datetime
     
-    current_app.logger.debug(request.header)
+    logger.debug(request.header)
 
     if request.method == 'GET':
 
@@ -184,8 +184,8 @@ def search():
     """
     if request.method == 'POST':
 
-        print request.data
-        print request.headers
+        logger.debug(request.data)
+        logger.debug(request.headers)
 
         query = json.loads(request.data)
         
@@ -215,14 +215,14 @@ def insert():
 
     if request.method == 'POST':
 
-        print request.data
-        print request.headers
+        logger.debug(request.data)
+        logger.debug(request.headers)
         
         query = json.loads(request.data)
         
         query['id_creator'] = g.user.username
         
-        print 'exams' + str(query['exams'])
+        logger.debug('Examination list: ' + str(query['exams']))
         
         message = system.do('create',
                             'examination',

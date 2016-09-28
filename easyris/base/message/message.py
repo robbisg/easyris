@@ -49,7 +49,6 @@ class Message(object):
         
         if not isinstance(header, MessageHeader):
             header = BadClassMessageHeader(user='system')
-            print 'oh'
             data = None
         
         self.header = header
