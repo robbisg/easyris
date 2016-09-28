@@ -4,10 +4,16 @@ from easyris.base.message import MessageHeader, Message
 
 # TODO: Is it possible to use a single controller
 # TODO: Is it a factory?
+
+import logging
+logger = logging.getLogger("easyris_logger")
+
+
 class TypologyController(object):
     
-    def __init__(self, name='typology', **kwargs):
+    def __init__(self, name='typology', user=None, **kwargs):
         self.name = name
+        self.user = user
     
     
     def read(self, **query):
@@ -20,6 +26,8 @@ class TypologyController(object):
                                    user=None)
             message = Message(header,
                               data=typology)
+            
+            logger.error(message.header.message)
             return message
         
         header = MessageHeader(310, 
@@ -27,4 +35,5 @@ class TypologyController(object):
                                user=None)
         message = Message(header,
                           data=typology)
+        logger.debug(message.header.message)
         return message
