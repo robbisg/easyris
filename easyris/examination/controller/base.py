@@ -9,7 +9,9 @@ from easyris.user.model import User
 from datetime import datetime
 from easyris.utils import parse_date
 from mongoengine import *
+import logging
 
+logger = logging.getLogger('easyris_logger')
 
 class ExaminationController(object):
     
@@ -24,6 +26,7 @@ class ExaminationController(object):
         examination = Examination.objects(id=str(id_examination))
         
         if examination == None:
+            logger.error("No examination in the database")
             return 'ERR'
         
         self._currentExamination = examination.first()
@@ -34,12 +37,16 @@ class ExaminationController(object):
         
         for k_ in kwargs.keys():
             if kwargs[k_] == None:
-                return Message(NotFoundHeader(name=k_))
+                msg = Message(NotFoundHeader(name=k_))
+                logger.error(msg.header.message)
+                return msg
             else:
                 if k_ == 'id_technician':
                     if not kwargs[k_].has_role('tecnico'):
                         # TODO: Ad-hoc header
-                        return Message(NotFoundHeader(name=k_))
+                        msg = Message(NotFoundHeader(name=k_))
+                        logger.error(msg.header.message)
+                        return msg
                     
                 query[k_] = kwargs[k_]
                 
@@ -51,13 +58,13 @@ class ExaminationController(object):
         pt_message = pt_controller.read(id_patient=id)
         
         if pt_message.header.code == 101:
+            logger.error(pt_message.header.message)
             return pt_message
         
         return pt_message.data[0]
     
     
     def create(self, **query):
-        
         
         pt_controller = PatientController()
         pt_message = pt_controller.read(id_patient=query['id_patient'])
@@ -66,7 +73,7 @@ class ExaminationController(object):
             return pt_message
         
         query['id_patient'] = pt_message.data[0]
-        print pt_message.data[0].first_name
+        logger.debug(pt_message.data[0].first_name)
         
         if 'data_inserimento' in query.keys():
             query['data_inserimento'] = parse_date(query['data_inserimento'])
@@ -76,8 +83,11 @@ class ExaminationController(object):
         list_examination = query.pop('exams')
         
         if len(list_examination) == 0:
-            return Message(ExaminationErrorHeader(message='No Examination in Request'))
+            message = Message(ExaminationErrorHeader(message='No Examination in Request'))
+            logger.error(message.header.message)
+            return message
         
+        examination = None
         
         for i, exam_ in enumerate(list_examination):
             
@@ -92,6 +102,14 @@ class ExaminationController(object):
                 # It is a message!
                 return query
             
+            qs = Examination.objects(**query)
+            
+            logger.debug(query)
+            logger.debug("No. of examinations: "+str(len(qs)))
+            
+            if len(qs) != 0:
+                continue
+            
             examination = Examination(**query)
         
             try:
@@ -101,17 +119,24 @@ class ExaminationController(object):
                     SaveConditionError) as err:
                 
                 txt_message = "On %s examination: %s" % (str(i+1), err.message)
-                
+                logger.error(txt_message)
                 message = Message(ExaminationErrorHeader(message=txt_message))
                 return message
             
-            
+            logger.debug("Examination created: "+str(examination.data_inserimento))
             examination = self._get_examination(examination.id)
             examination.status = NewExaminationStatus(examination)
         
         # TODO: Return the list of created examinations
-        message = Message(ExaminationCorrectHeader(message='Examination created correctly'),
-                              data=examination)
+        
+        if examination == None:
+            message = "Examination already stored"
+            examination = qs
+        else:
+            message = 'Examination created correctly'
+        
+        message = Message(ExaminationCorrectHeader(message=message),
+                          data=examination)
         
         self._currentExamination = examination
         
@@ -121,16 +146,19 @@ class ExaminationController(object):
     def read(self, **query):
         
         if 'data_inserimento' in query.keys():
-            if isinstance(query['data_inserimento'], str):
+            if isinstance(query['data_inserimento'], unicode):
                 query['data_inserimento'] = datetime.strptime(query['data_inserimento'], 
                                                               "%Y-%m-%dT%H:%M:%S.%fZ" )
-                   
+                
         if 'id_patient' in query.keys():
             query['id_patient'] = self._get_patient(str(query['id_patient']))
             
             
         if 'id_examination' in query.keys():
             query['id'] = query.pop('id_examination')
+        
+        
+        logger.debug(query)
         
         examination = Examination.objects(**query)
         
@@ -168,6 +196,7 @@ class ExaminationController(object):
         
         if not examination.modify(**query):
             message = Message(ExaminationErrorHeader(message='Error in modifying'))
+            logger.error(message.header.message)
             return message
         
         # Try to save
@@ -176,6 +205,7 @@ class ExaminationController(object):
         except NotUniqueError, err:
             message = Message(ExaminationErrorHeader(message=err.message, 
                                                      user=self.user)) 
+            logger.error(message.header.message)
             return message
         
     
@@ -184,6 +214,7 @@ class ExaminationController(object):
     def _event_message(self, examination, qs):
         
         message_ = 'Examination is now %s' %(examination.status_name)
+        logger.debug(message_)
         return Message(ExaminationCorrectHeader(message=message_),
                        data=qs)
     
@@ -217,7 +248,6 @@ class ExaminationController(object):
     
     
     def finish(self, **query):
-        
         id_ = query['id']
         qs, examination = self._pre_event(id_)
         self._update_technician(self.user, examination)

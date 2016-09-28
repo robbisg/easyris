@@ -1,5 +1,6 @@
 import unittest
 import json
+from datetime import datetime
 from mongoengine import connect
 from easyris.utils import patient_db, user_db
 from easyris.tests import _get_current_patient_id
@@ -24,7 +25,27 @@ class ExaminationAPITest(EasyRisUnitTest):
         
         assert response[0]['user'] == 'daniele'
         assert examination['codice_esenzione'] == '67577568'
+    
+    
+    def test_search_date(self):
         
+        now = datetime.now()
+        data_ = "%s-%s-%sT00:00:00.000Z" % (now.year, now.month, now.day)
+        self.login('daniele', 'daniele')
+        rv = self.app.post(path='/examination/search', 
+                           data=json.dumps({'data_inserimento':data_}),
+                           content_type='application/json')
+
+        response = json.loads(rv.data)
+
+        examination = response[0]['data'][0]
+        
+        now_ = datetime.strptime(data_,"%Y-%m-%dT%H:%M:%S.%fZ" )
+        milliseconds_ = (now_ - datetime.utcfromtimestamp(0)).total_seconds() * 1000
+        
+        assert examination['data_inserimento']['$date'] == int(milliseconds_)     
+    
+    
     @unittest.skip("Not yet implemented")
     def test_data(self):
         self.login('daniele', 'daniele')
@@ -35,7 +56,6 @@ class ExaminationAPITest(EasyRisUnitTest):
         response = json.loads(rv.data)
 
         examination = response[0]['data'][0]
-        #print examination
         
         assert response[0]['user'] == 'daniele'
         assert examination['codice_esenzione'] == '67577568'
@@ -59,7 +79,6 @@ class ExaminationAPITest(EasyRisUnitTest):
                            content_type='application/json')
             response = json.loads(rv.data)
             examination = response[0]['data'][0]
-            print examination
             return examination
         
         ####### Now testing status api ########
@@ -141,9 +160,90 @@ class ExaminationAPITest(EasyRisUnitTest):
         assert examination[0]['id_typology']['distretto_corporeo'] == "TORACE"
         assert examination[1]['id_typology']['distretto_corporeo'] == "ADDOME"
         assert examination[2]['id_typology']['distretto_corporeo'] == "ESTREMITA/ARTICOLAZIONI"        
+    
+        
+    #@unittest.skip("Not yet implemented")  
+    def test_typology(self):
+        self.login('gaetano', 'gaetano')
+        rv = self.app.get(path='/typology')
+        data = json.loads(rv.data)
+        assert data[0]['code'] == 310
+    
+      
+    #@unittest.skip("Not yet implemented")   
+    def test_create_same_examination(self):
+        self.login('gaetano', 'gaetano')
+        rv = self.app.post(path='/examination/insert', 
+                           data=json.dumps({"exams":[{"priority":"ALTA",
+                                                      "modality":"MR",
+                                                      "sala":"RM1.5T",
+                                                      "distretto":"TORACE",
+                                                      "nome":"RM TORACE SENZA MDC",
+                                                      "selected":True},
+                                                     {"priority":"ALTA",
+                                                      "modality":"MR",
+                                                      "sala":"RM1.5T",
+                                                      "distretto":"TORACE",
+                                                      "nome":"RM TORACE SENZA MDC",
+                                                      "selected":True},
+                                                     {"priority":"ALTA",
+                                                      "modality":"MR",
+                                                      "sala":"RM1.5T",
+                                                      "distretto":"TORACE",
+                                                      "nome":"RM TORACE SENZA MDC",
+                                                      "selected":True}
+                                                     ],
+                                            "id_patient":_get_current_patient_id(),
+                                            "data_inserimento":"2016-08-11T00:00:00.000Z",
+                                            "medico_richiedente":"frisco frasco",
+                                            }),
+                           content_type='application/json')
+        
+        response = json.loads(rv.data)
+        
+        print "Insert response: "
+        print response
+        
+        examination = response[0]['data']
+        
+        assert response[0]['message'] == 'Examination created correctly'
+        assert len(examination) == 1
+        
+        rv = self.app.post(path='/examination/insert', 
+                           data=json.dumps({"exams":[{"priority":"ALTA",
+                                                      "modality":"MR",
+                                                      "sala":"RM1.5T",
+                                                      "distretto":"TORACE",
+                                                      "nome":"RM TORACE SENZA MDC",
+                                                      "selected":True},
+                                                     ],
+                                            "id_patient":_get_current_patient_id(),
+                                            "data_inserimento":"2016-08-11T00:00:00.000Z",
+                                            "medico_richiedente":"frisco frasco",
+                                            }),
+                           content_type='application/json')        
+        
+        response = json.loads(rv.data)
+        examination = response[0]['data']
+        assert response[0]['message'] == "Examination already stored"
+        
+        rv = self.app.post(path='/examination/search', 
+                           data=json.dumps({'id_patient':_get_current_patient_id(),
+                                            "medico_richiedente":"frisco frasco",
+                                            "data_inserimento":"2016-08-11T00:00:00.000Z"
+                                            }),
+                           
+                           content_type='application/json')
+        response = json.loads(rv.data)
+        
+        print "Search response: "
+        print response
+        
+        examination = response[0]['data']
         
         
-
+        assert len(examination) == 1
+         
 
 if __name__ == '__main__':
     unittest.run()
