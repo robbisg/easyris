@@ -241,7 +241,6 @@ class ExaminationAPITest(EasyRisUnitTest):
         
         examination = response[0]['data']
         
-        
         assert len(examination) == 1
          
 

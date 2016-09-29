@@ -209,8 +209,6 @@ class ExaminationController(object):
             return message
         
     
-    
-    
     def _event_message(self, examination, qs):
         
         message_ = 'Examination is now %s' %(examination.status_name)
