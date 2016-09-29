@@ -9,6 +9,7 @@ from easyris.base.message.error import NotImplementedApiHeader
 import json
 from flask.globals import current_app
 import logging
+from datetime import datetime
 
 logger = logging.getLogger("easyris_logger")
 
@@ -86,10 +87,6 @@ def get_examinations():
 @has_permission('read', 'examination')
 def get_today_examinations():
     
-    from datetime import datetime
-    
-    logger.debug(request.header)
-
     if request.method == 'GET':
 
         query = dict()

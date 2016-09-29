@@ -7,7 +7,7 @@ from easyris.base.message.message import Message
 from easyris.base.message.error import NotFoundHeader
 from easyris.user.model import User
 from datetime import datetime
-from easyris.utils import parse_date
+from easyris.utils import parse_date, date_from_json
 from mongoengine import *
 import logging
 
@@ -147,8 +147,8 @@ class ExaminationController(object):
         
         if 'data_inserimento' in query.keys():
             if isinstance(query['data_inserimento'], unicode):
-                query['data_inserimento'] = datetime.strptime(query['data_inserimento'], 
-                                                              "%Y-%m-%dT%H:%M:%S.%fZ" )
+                query['data_inserimento'] = date_from_json(query['data_inserimento'])
+
                 
         if 'id_patient' in query.keys():
             query['id_patient'] = self._get_patient(str(query['id_patient']))
@@ -208,8 +208,6 @@ class ExaminationController(object):
             logger.error(message.header.message)
             return message
         
-    
-    
     
     def _event_message(self, examination, qs):
         
