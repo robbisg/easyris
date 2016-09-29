@@ -43,23 +43,23 @@ class ExaminationAPITest(EasyRisUnitTest):
         now_ = datetime.strptime(data_,"%Y-%m-%dT%H:%M:%S.%fZ" )
         milliseconds_ = (now_ - datetime.utcfromtimestamp(0)).total_seconds() * 1000
         
-        assert examination['data_inserimento']['$date'] == int(milliseconds_)     
-    
-    
-    @unittest.skip("Not yet implemented")
-    def test_data(self):
-        self.login('daniele', 'daniele')
+        assert examination['data_inserimento']['$date'] == int(milliseconds_)
+        
+        ## Test second format
+        
+        data_ = "%s/%s/%s" % (now.day, now.month, now.year)
         rv = self.app.post(path='/examination/search', 
-                           data=json.dumps({'data_inserimento':'16/0'}),
+                           data=json.dumps({'data_inserimento':data_}),
                            content_type='application/json')
-
+        
         response = json.loads(rv.data)
 
-        examination = response[0]['data'][0]
+        examination = response[0]['data'][0]        
         
-        assert response[0]['user'] == 'daniele'
-        assert examination['codice_esenzione'] == '67577568'
+        now_ = datetime.strptime(data_, "%d/%m/%Y")
+        milliseconds_ = (now_ - datetime.utcfromtimestamp(0)).total_seconds() * 1000
         
+        assert examination['data_inserimento']['$date'] == int(milliseconds_)     
         
     
     #@unittest.skip("showing class skipping")
