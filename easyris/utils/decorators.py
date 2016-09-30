@@ -3,6 +3,8 @@ from flask import make_response, redirect, request,\
                  current_app, Response, g
 from datetime import timedelta
 
+import logging
+logger = logging.getLogger("easyris_logger")
 
 def crossdomain(origin=None, methods=None, headers=None,
                 max_age=21600, attach_to_all=True,
@@ -41,7 +43,7 @@ def crossdomain(origin=None, methods=None, headers=None,
             h['Access-Control-Max-Age'] = str(max_age)
             if headers is not None:
                 h['Access-Control-Allow-Headers'] = headers
-            print resp.headers
+            logger.info(resp.headers)
             return resp
 
         f.provide_automatic_options = False
@@ -63,7 +65,7 @@ def jsonp(f):
 
 
 def has_permission(action, resource):
-
+    
     def decorator(func):
         @wraps(func)
         def wrapped(*args, **kwargs):
@@ -73,6 +75,7 @@ def has_permission(action, resource):
             else:
                 # TODO: This should be stored in db and message should be sent!
                 response = "%s cannot %s %s !!!" % (g.user.username, action, resource)
+                logger.info(response)
                 return Response(response=response, 
                             status=401) 
         return wrapped

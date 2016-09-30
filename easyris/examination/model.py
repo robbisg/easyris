@@ -7,11 +7,12 @@ from mongoengine.common import _import_class
 from easyris.user.model import User
 from easyris.patient.model import Patient
 from easyris.examination.status import NewExaminationStatus, ExaminationStatus
-from easyris.base import EasyRisDocument, EasyRisQuerySet
+from easyris.base import EasyRisMixin, EasyRisQuerySet
 from numpy.random.mtrand import randint
 
 
-
+import logging
+logger = logging.getLogger("easyris_logger")
 
 class Priority(Document):
     __collection__ = 'priority'
@@ -40,7 +41,7 @@ class Typology(Document):
     distretto_corporeo = StringField(required=True) # Testa/collo baby one two three
 
 
-class Examination(EasyRisDocument):
+class Examination(EasyRisMixin, Document):
     
     meta = {'queryset_class': EasyRisQuerySet}
     
@@ -94,7 +95,7 @@ class Examination(EasyRisDocument):
         for t in typology:
             typology_examination = today_examinations.filter(id_typology=t.id)
             if len(typology_examination) > 0:
-                print typology_examination[0].accession_number
+                logger.debug(typology_examination[0].accession_number)
                 return typology_examination[0].accession_number
             
         return self._get_accession_number(date)
@@ -115,7 +116,9 @@ class Examination(EasyRisDocument):
                 
         fields_ = {
                    'patient': ['first_name', 'last_name', 'id_patient'],
-                   'typology': ['examination_name', 'room', 'distretto_corporeo'],
+                   'typology': ['examination_name', 
+                                'room', 
+                                'distretto_corporeo'],
                    'priority': ['priority_name'],
                    'user':['username']
                    }
@@ -123,9 +126,7 @@ class Examination(EasyRisDocument):
         return document.to_mongo(fields=fields_[document.__collection__])
     
     
-            
-
-class ExaminationTemplate(EasyRisDocument):
+class ExaminationTemplate(EasyRisMixin, Document):
     """
     This should be used only for report template
     """

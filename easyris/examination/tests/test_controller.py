@@ -1,34 +1,22 @@
 from mongoengine import *
 import unittest
-from easyris.patient.model import Patient
-from easyris.examination.model import Examination, \
-                                    Priority, \
-                                    Typology
+from easyris.examination.model import Priority
 from easyris.examination.controller import ExaminationController
 from easyris.user.model import User
-from datetime import datetime
-from ...utils import patient_db, user_db, database_setup
-from easyris.examination.status import NewExaminationStatus
+from easyris.utils import database_setup
 from easyris.tests import _get_current_patient_id
+from easyris.tests.test import EasyRisUnitTest
+from datetime import datetime
 
 
 #@unittest.skip("Not checked yet")
-class TestExaminationController(unittest.TestCase):
+class TestExaminationController(EasyRisUnitTest):
     
     def setUp(self):
         
-        database = 'test_easyris'
-        port = 27017
-        
-        self.client = connect(database, port=port)
-        database_setup.run(database, port, n_loaded=5)
         self.controller = ExaminationController()
-        
-        
-    def tearDown(self):
-        self.client.drop_database('test_easyris')
-        return
-    
+        super(TestExaminationController, self).setUp()
+            
 
     def test_create(self):
         
@@ -48,7 +36,7 @@ class TestExaminationController(unittest.TestCase):
                             "sala":"RM1.5T",
                             "distretto":"TORACE",
                             "nome":"RM TORACE SENZA MDC",
-                            "selected":True}]# RM Encefalo senza mdc
+                            "selected":True}]
         query['id_patient'] = _get_current_patient_id()
         query['medico_richiedente'] = 'Mauro Caffarini'
         query['accession_number'] = '11111111'
@@ -84,10 +72,14 @@ class TestExaminationController(unittest.TestCase):
     def test_status(self):
         
         query = dict()
-        query['medico_richiedente'] = 'Mauro Caffarini'
+        today = datetime.now()
+        query['data_inserimento'] = unicode(datetime(day=today.day,
+                                                     month=today.month,
+                                                     year=today.year).isoformat()+
+                                            '.0Z')
         message = self.controller.read(**query)
         examination = message.data.first()
-        
+        print examination
         m = self.controller.start(id=str(examination.id))
         examination = m.data.first()
         assert examination.status_name == 'scheduled'

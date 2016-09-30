@@ -23,14 +23,14 @@ class EasyRisUnitTest(unittest.TestCase):
         return self.app.get('/logout', follow_redirects=True)
     
     
-    def setUp(self):
+    def setUp(self, n_loaded=5):
         
         database = 'test_easyris'
         port = 27017
         
         self.client = connect(database, port=port)
         self.app = easyris.app.test_client(use_cookies=True)
-        database_setup.run(database, port, n_loaded=5)
+        database_setup.run(database, port, n_loaded=n_loaded)
         
         
     def tearDown(self):

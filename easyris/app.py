@@ -9,6 +9,7 @@ from easyris.utils.api import cities
 from easyris.patient.api import patient
 from easyris.user.api import login_
 from easyris.examination.api.typology import typology
+from easyris.report.api import report
 from datetime import timedelta
 from flask.templating import render_template_string
 
@@ -33,6 +34,7 @@ app.register_blueprint(cities, url_prefix='/cities')
 app.register_blueprint(typology, url_prefix='/typology')
 app.register_blueprint(examination, url_prefix='/examination')
 app.register_blueprint(login_, url_prefix='')
+app.register_blueprint(report, url_prefix="/report")
 
 
 login_manager = LoginManager()

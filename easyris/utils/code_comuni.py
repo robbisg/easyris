@@ -1,9 +1,9 @@
 from mongoengine import *
 from codicefiscale import build
-from easyris.base import EasyRisQuerySet, EasyRisDocument
+from easyris.base import EasyRisQuerySet, EasyRisMixin
 
 
-class City(EasyRisDocument):
+class City(EasyRisMixin, Document):
     __collection__ = 'cf_codici_comuni'
     meta = {'queryset_class': EasyRisQuerySet}
     # Setting the possible values by using fields

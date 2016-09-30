@@ -1,7 +1,6 @@
 import click
 from easyris.utils import database_setup
 
-
 @click.command()
 @click.option('--db_name', default='easyris', help='Indicate the name of the database (default=easyris)')
 @click.option('--port', default=27017, help='The port with the database service (default=27017)')
