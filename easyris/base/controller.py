@@ -1,7 +1,7 @@
 from easyris.base.factory import ControllerMapper
 from easyris.base.action import action_factory
-import logging
 
+import logging
 logger = logging.getLogger('easyris_logger')
 
 
@@ -43,7 +43,8 @@ class EasyRisFacade(object):
         message = action.execute(controller, **kwargs)
         # Attach user to the message
         message.set_user(user)
-
+        logger.debug(message.header.user)
+        
         return message   
     
     

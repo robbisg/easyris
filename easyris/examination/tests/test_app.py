@@ -66,8 +66,13 @@ class ExaminationAPITest(EasyRisUnitTest):
     def test_status(self):
         
         self.login('daniele', 'daniele')
+        today = datetime.now()
+        today_string = unicode(datetime(day=today.day,
+                                                     month=today.month,
+                                                     year=today.year).isoformat()+
+                                            '.0Z')
         rv = self.app.post(path='/examination/search', 
-                           data=json.dumps({'medico_richiedente':'Mauro Caffarini'}),
+                           data=json.dumps({'data_inserimento':today_string}),
                            content_type='application/json')
         response = json.loads(rv.data)
         examination = response[0]['data'][0]

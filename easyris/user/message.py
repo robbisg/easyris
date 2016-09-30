@@ -30,3 +30,15 @@ class UserNotAuthenticatedHeader(MessageHeader):
                  user=None, 
                  **kwargs):
         MessageHeader.__init__(self, code, message, user, **kwargs)
+        
+
+class UserNotHavingRole(MessageHeader):
+    
+    def __init__(self, 
+                 code=403, 
+                 message='User has not role %s', 
+                 user=None,
+                 role='medico',
+                 **kwargs):
+        message = message % (role)
+        MessageHeader.__init__(self, code, message, user, **kwargs)

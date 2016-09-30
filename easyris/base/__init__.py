@@ -5,8 +5,10 @@ from mongoengine.queryset import QuerySet
 from mongoengine import signals
 from mongoengine.common import _import_class
 from mongoengine.fields import ListField
+from mongoengine.base import BaseDocument
 
-
+import logging
+logger = logging.getLogger("easyris_logger")
 
 
 class EasyRisQuerySet(QuerySet):
@@ -17,7 +19,7 @@ class EasyRisQuerySet(QuerySet):
 
 
 
-class EasyRisDocument(Document):
+class EasyRisMixin(object):
     
     meta = {
         'abstract': True,
@@ -38,7 +40,9 @@ class EasyRisDocument(Document):
         """
         if not fields:
             fields = []
-    
+#             
+#         logger.critical(self.__collection__)
+#         logger.critical(fields)
         data = SON()
         data["_id"] = None
         data['_cls'] = self._class_name
@@ -56,7 +60,12 @@ class EasyRisDocument(Document):
 
             value = self._data.get(field_name, None)
             field = self._fields.get(field_name)
-
+            
+#             logger.critical('----')
+#             logger.critical("value: "+str(value))
+#             logger.critical("field: "+str(field))
+#             logger.critical("field_name: "+str(field_name))
+            
             if field is None and self._dynamic:
                 field = self._dynamic_fields.get(field_name)
     
@@ -111,3 +120,4 @@ class EasyRisDocument(Document):
             data.pop('_cls')
     
         return data
+    

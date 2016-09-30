@@ -19,8 +19,10 @@ class PermissionController(object):
         message_data = {'is_authenticated':False,
                         'user':None,
                         'qs':None}
-        
+        logger.debug(username)
+        logger.debug(password)
         qs = User.objects(username=username)
+
         logged_user = qs.first()
         
         if len(qs) == 0:

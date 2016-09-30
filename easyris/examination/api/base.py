@@ -1,13 +1,12 @@
-from flask import Blueprint, jsonify, request, Response, g
+from flask import Blueprint, request, g
 from easyris.base.controller import EasyRisFacade
 from flask_cors.decorator import cross_origin
-from flask_login import login_required, current_user
-from easyris.utils.decorators import has_permission, jsonp, crossdomain
-from easyris.base.message.utils import build_response, message_to_http
+from flask_login import login_required
+from easyris.utils.decorators import has_permission, jsonp
+from easyris.base.message.utils import message_to_http
 from easyris.base.message import message_factory
 from easyris.base.message.error import NotImplementedApiHeader
 import json
-from flask.globals import current_app
 import logging
 from datetime import datetime
 
@@ -260,6 +259,56 @@ def show_patient_examinations(id):
 
 
 
+@examination.route('/patient/<int:id>/<string:status>', methods=['GET', 'POST', 'OPTIONS'])
+@jsonp
+@cross_origin(origin=None,
+              methods=['GET', 'POST', 'OPTIONS'],
+              allow_headers=['X-Requested-With',
+                             'Content-Type',
+                             'Origin'],
+              supports_credentials=True)
+@login_required
+@has_permission('read', 'examination')
+def show_patient_status_examinations(id, status):
+    
+    if request.method == 'GET' or request.method == 'POST':
+         
+        query = dict()
+        query['id_patient'] = str(id)
+        
+        if request.method == 'POST':
+            logger.debug(request.data)
+            logger.debug(request.headers)
+        
+            data = json.loads(request.data)
+            
+            if 'data_inserimento' in data.keys():
+                # Voglio solo la data!
+                # Do o' rest... Nun me ne fott nu cazz! :)
+                query['data_inserimento'] = data['data_inserimento']
+        
+        
+        if status in _get_status_list():
+            query['status_name'] = status
+        else:
+            message = "Status %s forbidden" % (status)
+            logger.error("User "+g.user.username+": "+message)
+            msg = message_factory(header=NotImplementedApiHeader(message=message,
+                                                                 user=g.user.username), 
+                                   data=None)
+            return message_to_http(msg)
+
+        message = system.do('read',
+                            'examination',
+                            user=g.user.username,
+                            **query)
+
+        response = message_to_http(message)
+
+        return response
+        
+        
+
 @examination.route('/<string:id>/start', methods=['POST', 'OPTIONS'])
 @jsonp
 @cross_origin(origin=None,
@@ -269,7 +318,7 @@ def show_patient_examinations(id):
                              'Origin'],
               supports_credentials=True)
 @login_required
-@has_permission('start', 'examination')
+@has_permission("start", 'examination')
 def start(id):
     
     if request.method == 'POST':
@@ -374,3 +423,11 @@ def eject(id):
 
 
 
+def _get_status_list():
+    return ['new',
+            'scheduled',
+            'running',
+            'rescheduled',
+            'completed',
+            'incompleted',
+            'reported']

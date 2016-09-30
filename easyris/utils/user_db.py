@@ -41,11 +41,11 @@ def run(database, port):
         permission_list.append(p)
     
     
-    permission_dict = {'accettazione':np.array([1, 2, 3, 5, 6, 13, 14, 18])-1,
+    permission_dict = {'accettazione':np.array([1, 2, 3, 5, 6, 13, 14, 18, 30])-1,
                        'tecnico': np.array([2, 6, 7, 8, 14, 15, 16, 18, 21, 22, 23, 24, 25])-1,
                        'medico': np.array([2, 6, 9, 10, 11, 14, 17, 18, 19, 26, 27, 28, 29, 30])-1,
                        'amministrazione': np.array([2, 6, 10, 14, 18])-1,
-                       'admin':np.array([1,2,3,4,5,6,7,8,13,14,15,16,17,18,19,20])-1
+                       'admin': np.arange(30)
                        }
     
     Role.drop_collection()
@@ -99,5 +99,25 @@ def run(database, port):
                  email='c.michetti@unich.it')
     
     user4.save()    
-
-
+    
+    role_admin = Role.objects(role_name='admin').first()
+    user5 = User(username='chpiero', 
+                 password='chpiero', 
+                 roles=[role_admin],
+                 first_name='Piero',
+                 last_name='Chiacchiaretta',
+                 telephone_number='3289876543',
+                 mobile_number='3212345678',
+                 email='p.chiacchiaretta@unich.it')
+    
+    user5.save() 
+    
+    user11 = User(username='valentina', 
+                 password='valentina', 
+                 roles=[role_medico],
+                 first_name='Valentina',
+                 last_name='Panara',
+                 telephone_number='3289876543',
+                 mobile_number='3212345678',
+                 email='v.panara@unich.it')
+    user11.save()

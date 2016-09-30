@@ -10,7 +10,6 @@ from datetime import datetime
 from easyris.utils import parse_date, date_from_json
 from mongoengine import *
 import logging
-
 logger = logging.getLogger('easyris_logger')
 
 class ExaminationController(object):
@@ -208,6 +207,8 @@ class ExaminationController(object):
             logger.error(message.header.message)
             return message
         
+        return None
+        
     
     def _event_message(self, examination, qs):
         
@@ -248,7 +249,11 @@ class ExaminationController(object):
     def finish(self, **query):
         id_ = query['id']
         qs, examination = self._pre_event(id_)
-        self._update_technician(self.user, examination)
+        output = self._update_technician(self.user, examination)
+        
+        if output != None:
+            return output
+        
         examination.status.finish(examination)
         return self._event_message(examination, qs)
     

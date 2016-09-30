@@ -7,7 +7,7 @@ from datetime import datetime
 from passlib.hash import sha256_crypt
 from flask_login import UserMixin
 import itertools
-from easyris.base import EasyRisDocument, EasyRisQuerySet
+from easyris.base import EasyRisMixin
 
 
 class UserEasyrisQuerySet(QuerySet):
@@ -46,7 +46,7 @@ class Role(Document):
 
 
 
-class User(EasyRisDocument, UserMixin):
+class User(EasyRisMixin, UserMixin, Document):
     
     meta = {'queryset_class': UserEasyrisQuerySet}
     
