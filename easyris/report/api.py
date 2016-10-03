@@ -220,19 +220,18 @@ def print_report(id):
               supports_credentials=True)
 @login_required
 @has_permission('read', 'report')
-def patient_report(id):
+def patient_report(id, status):
     
     if request.method == 'GET':
-        logger.debug(request.data)
-        logger.debug(request.headers)
         
         query = dict()
-        query['id'] = str(id)
-        message = system.do('print_report',
+        query['id_patient'] = str(id)
+        query['status_name'] = str(status)
+        message = system.do('read',
                             'report',
                             user=g.user.username,
                             **query)
 
-        response = _render(message)
+        response = message_to_http(message)
         
         return response
