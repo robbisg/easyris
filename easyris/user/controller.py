@@ -46,7 +46,12 @@ class PermissionController(object):
             logger.debug(message.header.message)
         
         return message
-        
+    
+    
+    def logout(self):
+        return
+    
+    
     
     def load_user(self, id_):
         return User.objects(id=id_).first()

@@ -132,6 +132,8 @@ class ReportController(object):
         if isinstance(query['action_list'], Message):
             return query['action_list']        
         
+        query['id_patient'] = query['id_examination'][0].id_patient.id_patient
+        
         logger.debug(query)
         
         report = Report(**query)

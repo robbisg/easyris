@@ -128,3 +128,8 @@ class ReportedExaminationStatus(ExaminationStatus):
     
     def __init__(self, name='reported', *args, **values):
         ExaminationStatus.__init__(self, name=name, *args, **values)
+        
+    def eject(self, examination):
+        status = CompletedExaminationStatus()
+        self._modify(examination, status)
+        return        

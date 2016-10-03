@@ -37,6 +37,7 @@ class Report(EasyRisMixin, Document):
     status =            EmbeddedDocumentField(ReportStatus, default=SuspendedReportStatus())
     status_name =       StringField(required=True, default='suspended')
     action_list =       ListField(EmbeddedDocumentField(ReportAction))
+    id_patient =        StringField(required=True)
     
 
     def _get_subfields(self, document):
