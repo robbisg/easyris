@@ -1,4 +1,4 @@
-from flask import Blueprint, request, g
+from flask import Blueprint, request, g, Response
 from easyris.base.controller import EasyRisFacade
 from flask_cors.decorator import cross_origin
 from flask_login import login_required
@@ -10,6 +10,7 @@ import json
 import logging
 from datetime import datetime
 from flask.templating import render_template
+from flask.globals import session
 
 logger = logging.getLogger("easyris_logger")
 
@@ -20,10 +21,13 @@ system = EasyRisFacade()
 
 
 def _render(message):
-    print message
-    return render_template()
 
-
+    html_ = render_template("RefertoTemplate.html", **message)
+    logger.debug(str(html_).__class__)
+    
+    return Response(response=json.dumps({'data':html_}),
+                        status=200,
+                        mimetype="application/json")
 
 
 @report.route('/', methods=['GET', 'OPTIONS'])
@@ -39,7 +43,7 @@ def _render(message):
 def read():
         
     if request.method == 'GET':
-        
+        logger.debug(session)
         if not g.user.is_anonymous:
             logger.info('User:'+g.user.username)
         
@@ -138,7 +142,6 @@ def save_report():
 def close_report(id):
     
     if request.method == 'POST':
-        logger.debug(request.data)
         logger.debug(request.headers)
         
         query = dict()
@@ -171,6 +174,10 @@ def open_report(id):
         logger.debug(request.headers)
         
         query = json.loads(request.data)
+        
+        if query == []:
+            query = dict()
+        
         query['id'] = str(id)
         
         message = system.do('open',
@@ -181,7 +188,38 @@ def open_report(id):
         response = message_to_http(message)
         
         return response
+
+
+@report.route('/<string:id>/pause', methods=['POST', 'OPTIONS'])
+@jsonp
+@cross_origin(origin=None,
+              methods=['POST', 'OPTIONS'],
+              allow_headers=['X-Requested-With',
+                             'Content-Type',
+                             'Origin'],
+              supports_credentials=True)
+@login_required
+@has_permission('open', 'report') # Va bene!
+def pause_report(id):
     
+    if request.method == 'POST':
+        logger.debug(request.headers)
+        
+        query = dict()
+        query['id'] = str(id)
+        
+        message = system.do('pause',
+                            'report',
+                            user=g.user.username,
+                            **query)
+
+        response = message_to_http(message)
+        
+        return response
+
+
+
+
 @report.route('/<string:id>/print', methods=['POST', 'OPTIONS'])
 @jsonp
 @cross_origin(origin=None,
@@ -195,7 +233,6 @@ def open_report(id):
 def print_report(id):
     
     if request.method == 'POST':
-        logger.debug(request.data)
         logger.debug(request.headers)
         
         query = dict()
@@ -204,10 +241,12 @@ def print_report(id):
                             'report',
                             user=g.user.username,
                             **query)
-
-        response = _render(message)
+        logger.debug(message.data)
+        response = _render(message.data)        
+        #response = message_to_http(message)
         
         return response
+
 
 
 @report.route('/patient/<string:id>/<string:status>', methods=['GET', 'OPTIONS'])

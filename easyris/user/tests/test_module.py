@@ -2,34 +2,39 @@ from easyris.tests.test import EasyRisUnitTest
 import unittest
 import json
 
+import logging
+logger = logging.getLogger('easyris_logger')
+
 
 class AuthenticationTest(EasyRisUnitTest):
     
         
     def test_login_logout(self):
         rv = self.login('mcaulo', 'massimo')
-        print rv.data
+        logger.debug(rv.data)
         message = json.loads(rv.data)
         data = message[0]['data']
-        print data
+        logger.debug(data)
         # TODO: Change assertion with messages implemented
         assert data[0]['username'] == 'mcaulo'
         assert data[0]['roles'][0]['role_name'] == 'medico'
 
         rv = self.logout()
+        response = json.loads(rv.data)
         
-        assert rv.data == 'Logged out!'
+        assert response[0]['code'] == 400
+        
         
     def test_bad_login(self):
         rv = self.login('mcaulo', 'daniele')
-        print rv.data
+        logger.debug(rv.data)
         message = json.loads(rv.data)
         code = message[0]['code']
         assert code == 402
         
     def test_no_user(self):
         rv = self.login('savastano', 'pietro')
-        print rv.data
+        logger.debug(rv.data)
         message = json.loads(rv.data)
         code = message[0]['code']
         assert code == 401

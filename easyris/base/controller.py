@@ -36,14 +36,12 @@ class EasyRisFacade(object):
 
         # We instantiate the classes
         controller = controller_class(user=user)
-        logger.debug(controller.user)
         action = action_factory(action_name)
 
         # Message from controller
         message = action.execute(controller, **kwargs)
         # Attach user to the message
         message.set_user(user)
-        logger.debug(message.header.user)
         
         return message   
     

@@ -50,6 +50,10 @@ class ExaminationStatus(EmbeddedDocument):
         self._not_enabled()
         return
     
+    def close(self, examination):
+        self._not_enabled()
+        return
+    
 
 class NewExaminationStatus(ExaminationStatus):
     
@@ -132,4 +136,13 @@ class ReportedExaminationStatus(ExaminationStatus):
     def eject(self, examination):
         status = CompletedExaminationStatus()
         self._modify(examination, status)
-        return        
+        return
+    
+    def close(self, examination):
+        status = ClosedExaminationStatus()
+        self._modify(examination, status)
+        return
+
+class ClosedExaminationStatus(ExaminationStatus):
+    def __init__(self, name='closed', *args, **values):
+        ExaminationStatus.__init__(self, name=name, *args, **values) 

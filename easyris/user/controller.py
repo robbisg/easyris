@@ -4,6 +4,7 @@ from easyris.user.message import UserLoggedHeader, \
     UserNotAuthenticatedHeader, UserNotFoundHeader
 import logging
 
+
 logger = logging.getLogger('easyris_logger')
 
 class PermissionController(object):
@@ -32,7 +33,7 @@ class PermissionController(object):
             logger.debug(message.header.message)
             return message
 
-
+        
         if logged_user.check_password(password):
             message_data['user'] = logged_user
             message_data['is_authenticated'] = True
@@ -48,13 +49,16 @@ class PermissionController(object):
         return message
     
     
-    def logout(self):
-        return
+    def logout(self, **query):
+        return Message(UserLoggedHeader(message='User logged out!'), 
+                              data=None)
     
     
     
     def load_user(self, id_):
         return User.objects(id=id_).first()
-        
+    
+    
+       
             
         

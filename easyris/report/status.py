@@ -35,14 +35,41 @@ class ReportStatus(EmbeddedDocument):
         self._not_enabled()
         return
     
-        
+    def pause(self, report):
+        self._not_enabled()
+        return
     
+    
+class OpenedReportStatus(ReportStatus):
+    
+    def __init__(self, name='opened', *args, **values):
+        ReportStatus.__init__(self, name=name, *args, **values)
+    
+    
+    def pause(self, report):
+        status = SuspendedReportStatus()
+        self._modify(report, status)
+        return 
+    
+    
+    def close(self, report):
+        status = ClosedReportStatus()
+        self._modify(report, status)
+        return        
+
+
+
+
 class SuspendedReportStatus(ReportStatus):
     
     def __init__(self, name='suspended', *args, **values):
         ReportStatus.__init__(self, name=name, *args, **values)
     
-    
+    def open(self, report):
+        status = OpenedReportStatus()
+        self._modify(report, status)
+        return
+        
     def close(self, report):
         status = ClosedReportStatus()
         self._modify(report, status)
@@ -57,6 +84,6 @@ class ClosedReportStatus(ReportStatus):
     
     
     def open(self, report):
-        status = SuspendedReportStatus()
+        status = OpenedReportStatus()
         self._modify(report, status)
         return

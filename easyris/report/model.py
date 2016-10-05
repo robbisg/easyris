@@ -2,7 +2,7 @@ from mongoengine import *
 from easyris.user.model import User
 from easyris.examination.model import Examination
 from easyris.report.status import  ReportStatus,\
-    SuspendedReportStatus
+    SuspendedReportStatus, OpenedReportStatus
 from datetime import datetime
 from easyris.base import EasyRisMixin, EasyRisQuerySet
 from mongoengine.queryset import QuerySet
@@ -34,8 +34,8 @@ class Report(EasyRisMixin, Document):
     #datareferto
     id_examination =    ListField(ReferenceField(Examination))
     report_text =       StringField(required=True)
-    status =            EmbeddedDocumentField(ReportStatus, default=SuspendedReportStatus())
-    status_name =       StringField(required=True, default='suspended')
+    status =            EmbeddedDocumentField(ReportStatus, default=OpenedReportStatus())
+    status_name =       StringField(required=True, default='opened')
     action_list =       ListField(EmbeddedDocumentField(ReportAction))
     id_patient =        StringField(required=True)
     

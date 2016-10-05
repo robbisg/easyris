@@ -65,7 +65,7 @@ class User(EasyRisMixin, UserMixin, Document):
     telephone_number = StringField(required=True)
     mobile_number = StringField(required=True)
     
-    active = BooleanField(default=True)
+    active = BooleanField(default=True)    
     
     
     def clean(self):

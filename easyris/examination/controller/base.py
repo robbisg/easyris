@@ -76,6 +76,7 @@ class ExaminationController(object):
         
         if 'data_inserimento' in query.keys():
             query['data_inserimento'] = parse_date(query['data_inserimento'])
+            logger.debug(query['data_inserimento'])
 
         query['id_creator'] = User.objects(username=query['id_creator']).first()
         
@@ -263,3 +264,10 @@ class ExaminationController(object):
         qs, examination = self._pre_event(id_)
         examination.status.eject(examination)
         return self._event_message(examination, qs)
+    
+    
+    def close(self, **query):
+        id_ = query['id']
+        qs, examination = self._pre_event(id_)
+        examination.status.close(examination)
+        return self._event_message(examination, qs)    
