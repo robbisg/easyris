@@ -5,7 +5,7 @@ from mongoengine import connect
 
 
 sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
-__version__ = '0.0.1'
+__version__ = '0.9.0'
 
 
 class EasyRis(Flask):
@@ -15,8 +15,7 @@ class EasyRis(Flask):
         static_folder='static', template_folder='templates', 
         instance_path=None, instance_relative_config=False):
         
-        # TODO: Migrate to flask-mongoengine?
-        #connect('easyris', port=27017)
+        self.logged_users = []
         
         Flask.__init__(self, 
                        import_name, 

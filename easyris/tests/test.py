@@ -34,10 +34,10 @@ class EasyRisUnitTest(unittest.TestCase):
         
         
     def tearDown(self):
+        self.logout()
         self.client.drop_database('test_easyris')
         pass
         
-
 
 
 class EasyRisTest(unittest.TestCase):

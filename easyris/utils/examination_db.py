@@ -32,13 +32,20 @@ def run(database, port, n_loaded=50):
         typology = typology_list[it]
         priority = priority_list[ipr]
         
-        if random.randint(1, 10) > 5:
+        random_number = random.randint(1, 10)
+        
+        if random_number > 5:
             now = datetime.now()
             date_ = datetime(year=now.year,
                              month=now.month,
                              day=now.day)
-            status_name = 'new'
-            status = NewExaminationStatus()
+            if random_number == 8:
+                status_name = 'completed'
+                status = CompletedExaminationStatus()
+            else:
+                status_name = 'new'
+                status = NewExaminationStatus()
+            
         else:
             date_ = datetime(year=2016,
                              month=02,

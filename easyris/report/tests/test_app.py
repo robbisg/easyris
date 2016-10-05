@@ -16,6 +16,7 @@ class ReportApiTest(EasyRisUnitTest):
         self.controller = ReportController()
         super(ReportApiTest, self).setUp(n_loaded=50)
     
+    #@unittest.skip("A me do search... nun me ne fott nu cazz")
     def test_search_patient(self):
         self.login('mcaulo', 'massimo')
         rv = self.app.get(path='/report/patient/'+self.get_id_patient_report()+'/suspended', 
@@ -31,7 +32,7 @@ class ReportApiTest(EasyRisUnitTest):
         assert report['status_name'] == 'suspended'
 
         
-    @unittest.skip("reason")
+    #@unittest.skip("reason")
     def test_save_create(self):
         self.login('mcaulo', 'massimo')
         
@@ -61,7 +62,7 @@ class ReportApiTest(EasyRisUnitTest):
         assert response[0]['data'][0]['report_text'] == "La dottoressa... Dottoressa"
         
     
-    @unittest.skip("reason")
+    #@unittest.skip("reason")
     def test_save_update(self):
         self.login('mcaulo', 'massimo')
         
@@ -79,7 +80,7 @@ class ReportApiTest(EasyRisUnitTest):
         assert report['action_list'][-1]['action'] == "update"
         
     
-    @unittest.skip("reason")
+    #@unittest.skip("reason")
     def test_close(self):
         self.login('mcaulo', 'massimo')
         
@@ -98,7 +99,7 @@ class ReportApiTest(EasyRisUnitTest):
         assert report['status_name'] == "closed"
         
     
-    @unittest.skip("reason")
+    #@unittest.skip("reason")
     def test_open(self):
         self.login('mcaulo', 'massimo')
         
@@ -118,11 +119,11 @@ class ReportApiTest(EasyRisUnitTest):
         response = json.loads(rv.data)
         report = response[0]['data'][0]
         assert response[0]['code'] == 500
-        assert report['status_name'] == "suspended"
+        assert report['status_name'] == "opened"
         assert report['action_list'][-1]['action'] == "open"
     
     
-    @unittest.skip("reason")
+    #@unittest.skip("reason")
     def test_open_wrong(self):
         self.login('mcaulo', 'massimo')
         
@@ -155,6 +156,105 @@ class ReportApiTest(EasyRisUnitTest):
         assert report['action_list'][-1]['action'] != "open"
     
     
+    #@unittest.skip('reason')
+    def test_single_examination(self):
+        
+        self.login('mcaulo', 'massimo')
+        examination_list = _get_correct_examinations()
+        examination_json = [str(e.id) for e in examination_list[:1]]
+        
+        rv = self.app.post(path='/report/save', 
+                           data=json.dumps({'id_examination': examination_json,
+                                            'report_text': "La dottoressa... Dottoressa",
+                                            }),
+                           content_type='application/json')
+        
+        response = json.loads(rv.data)
+        assert response[0]['code'] == 500
+    
+    
+    def test_process(self):
+        self.login('mcaulo', 'massimo')
+        
+        # Creo un esame 
+        examination_list = _get_correct_examinations()
+        examination_json = [str(e.id) for e in examination_list]
+        
+        rv = self.app.post(path='/report/save', 
+                           data=json.dumps({'id_examination': examination_json,
+                                            'report_text': "La dottoressa... Dottoressa",
+                                            }),
+                           content_type='application/json')
+        response = json.loads(rv.data)
+        logger.debug(response)
+        assert response[0]['code'] == 500
+        id_report = str(response[0]['data'][0]['_id']['$oid'])
+        
+        # Lo modifico
+        rv = self.app.post(path='/report/save', 
+                           data=json.dumps({
+                                            'report_text': "Oltre 15 anni",
+                                            'id': id_report,
+                                            }),
+                           content_type='application/json')
+        response = json.loads(rv.data)
+        logger.debug(response)
+        report = response[0]['data'][0]
+        assert response[0]['code'] == 500
+        assert report['status_name'] == "opened"
+        assert report['report_text'] == "Oltre 15 anni"
+        
+        # Lo metto in pausa
+        rv = self.app.post(path='/report/%s/pause' % (id_report), 
+                           data=json.dumps({}),
+                           content_type='application/json')
+        response = json.loads(rv.data)
+        logger.debug(response)
+        report = response[0]['data'][0]
+        assert response[0]['code'] == 500
+        assert report['status_name'] == "suspended"
+        
+        
+        # Lo riapro
+        rv = self.app.post(path='/report/%s/open' % (id_report), 
+                           data=json.dumps({}),
+                           content_type='application/json')
+        response = json.loads(rv.data)
+        report = response[0]['data'][0]
+        assert response[0]['code'] == 500
+        assert report['status_name'] == "opened"       
+        
+        # Lo chiudo
+        rv = self.app.post(path='/report/%s/close' % (id_report), 
+                   data=json.dumps({}),
+                   content_type='application/json')
+        response = json.loads(rv.data)
+        report = response[0]['data'][0]
+        assert response[0]['code'] == 500
+        assert report['status_name'] == "closed"    
+        
+        
+        # Lo riapro dopo chiusura
+        rv = self.app.post(path='/report/%s/open' % (id_report), 
+                           data=json.dumps({'password':'massimo'}),
+                           content_type='application/json')
+        response = json.loads(rv.data)
+        report = response[0]['data'][0]
+        assert response[0]['code'] == 500
+        assert report['status_name'] == "opened"        
+        assert report['action_list'][-1]['action'] == "open"       
+        
+        
+        # Lo richiudo
+        rv = self.app.post(path='/report/%s/close' % (id_report), 
+                   data=json.dumps({}),
+                   content_type='application/json')
+        response = json.loads(rv.data)
+        report = response[0]['data'][0]
+        assert response[0]['code'] == 500
+        assert report['status_name'] == "closed" 
+        assert report['action_list'][-1]['action'] == "close"
+        
     
     def get_id_report(self):
         

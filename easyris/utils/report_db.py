@@ -8,6 +8,8 @@ import collections
 import random
 import numpy as np
 import datetime
+from easyris.report.status import SuspendedReportStatus
+from easyris.examination.status import ClosedExaminationStatus
 
 def run(database, port, n_loaded=50):
     
@@ -17,7 +19,10 @@ def run(database, port, n_loaded=50):
     
     user = User.objects(username='mcaulo').first()
     
-    examination_list = Examination.objects(status_name='completed')
+    examination_list = Examination.objects(status_name='completed',
+                                           data_inserimento=datetime.datetime(year=2016,
+                                                                     month=02,
+                                                                     day=02))
     
     # Trovo i pazienti con piu esami
     id_patient_list = [e.id_patient.id_patient for e in examination_list]
@@ -32,7 +37,10 @@ def run(database, port, n_loaded=50):
         id_patient = counter.keys()[i]
         patient = Patient.objects(id_patient=id_patient).first()
         patient_examination = Examination.objects(id_patient=patient.id,
-                                                  status_name='completed')
+                                                  status_name='completed',
+                                                  data_inserimento=datetime.datetime(year=2016,
+                                                                            month=02,
+                                                                            day=02))
         
         dates_ = np.unique([e.data_inserimento for e in patient_examination])
         
@@ -52,9 +60,16 @@ def run(database, port, n_loaded=50):
                         id_examination = [e for e in same_date_examination],
                         report_text = "Il paziente bla bla bla",
                         action_list = [report_log],
-                        id_patient = id_patient
+                        id_patient = id_patient,
+                        status = SuspendedReportStatus(),
+                        status_name='suspended'
                         )
         
         report.save()
+        
+        for e in same_date_examination:
+            e.modify(status=ClosedExaminationStatus(),
+                     status_name='closed')
+            e.save()
     
     

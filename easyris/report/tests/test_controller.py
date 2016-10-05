@@ -110,10 +110,12 @@ class TestReportController(EasyRisUnitTest):
         
         report = Report.objects(id=report.id).first()
         
-        assert report.status_name == 'suspended'
+        assert report.status_name == 'opened'
         assert message.header.code == 500
         assert len(report.action_list) == 3
         assert report.action_list[-1].action == 'open'
+        
+        
         
         
         

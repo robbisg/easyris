@@ -1,4 +1,4 @@
-from flask import g
+from flask import g, current_app
 from flask.ext.cors import CORS, cross_origin
 from flask.ext.login import LoginManager, login_user, logout_user, \
      login_required, current_user
@@ -17,13 +17,14 @@ from mongoengine import connect
 from easyris.examination.api.base import examination
 
 import flask
+from werkzeug.local import LocalProxy
+from flask.globals import _app_ctx_stack
 # TODO: Move all the configuration in a function
 # TODO: as mentioned in Application factories section
 
 #app = Flask(__name__)
 app = EasyRis(__name__)
 app.config['SESSION_COOKIE_HTTPONLY'] = False
-app.config['LOGGED_USERS'] = []
 
 # This is to prevent bad url in frontend
 app.url_map.strict_slashes = False
@@ -42,11 +43,12 @@ login_manager.init_app(app)
 
 app.debug = True
 # TODO: Decide about session duration
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
 # TODO: Keep it in the database??
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 toolbar = DebugToolbarExtension(app)
+
 
 @app.route('/')
 def entry():
@@ -67,6 +69,9 @@ def before_request():
 def load_user(userid):
     # Return an instance of the User model
     return app.get_user(userid)
+      
+
+
 
 
 def enable_logging():

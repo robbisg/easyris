@@ -11,7 +11,7 @@ def parse_date(date):
         date_ = datetime.strptime(date, 
                                   "%Y-%m-%dT%H:%M:%S.%fZ" )
         
-    return date_
+    return datetime(year=date_.year, day=date_.day, month=date_.month)
 
 
 def date_from_json(date):
