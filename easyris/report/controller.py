@@ -90,6 +90,11 @@ class ReportController(object):
     
     
     def _check_examination(self, list_id_examinations):
+        
+        if len(list_id_examinations)==0:
+            message = "No examination"
+            return Message(ReportErrorHeader(message=message),
+                           data=None)
 
         examination_list = Examination.objects(id__in=list_id_examinations)
         
@@ -156,7 +161,7 @@ class ReportController(object):
         logger.debug(query)
         
         report = Report(**query)
-        
+        # report = db_wrapper.insert('report', **query)
         try:
             report.save()
         except (FieldDoesNotExist,
@@ -176,6 +181,8 @@ class ReportController(object):
         
         message = "Report correctly created"
         report = Report.objects(id=report.id)
+        # query = {'id':report.id}
+        # report = db_wrapper.query('report', **query)
         message = Message(ReportCorrectHeader(message=message),
                           data=report)
         
@@ -190,6 +197,7 @@ class ReportController(object):
         logger.debug(query)
         
         report = Report.objects(**query)
+        #report = db_wrapper.query('report', **query)
         
         if report.count() == 0:
             message = Message(ReportErrorHeader(message="No Reports in database"),
@@ -240,6 +248,7 @@ class ReportController(object):
         
         self._currentReport = report
         report = Report.objects(**query)
+        #report = db_wrapper.query('report', **query)
         message = "Report correctly updated"
         message = Message(ReportCorrectHeader(message=message),
                           data=report)

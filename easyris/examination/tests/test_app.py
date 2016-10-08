@@ -72,7 +72,8 @@ class ExaminationAPITest(EasyRisUnitTest):
                                                      year=today.year).isoformat()+
                                             '.0Z')
         rv = self.app.post(path='/examination/search', 
-                           data=json.dumps({'data_inserimento':today_string}),
+                           data=json.dumps({'data_inserimento':today_string,
+                                            'status_name':'new'}),
                            content_type='application/json')
         response = json.loads(rv.data)
         examination = response[0]['data'][0]
