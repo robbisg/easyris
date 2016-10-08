@@ -77,6 +77,7 @@ class TestExaminationController(EasyRisUnitTest):
                                                      month=today.month,
                                                      year=today.year).isoformat()+
                                             '.0Z')
+        query['status_name'] = 'new'
         message = self.controller.read(**query)
         examination = message.data.first()
         print examination
