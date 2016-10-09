@@ -28,8 +28,11 @@ class ReportController(object):
         report = Report.objects(id=str(id_report))
         
         if report == None:
-            logger.error("No report in the database")
-            return 'ERR'
+            message = 'No report with this id'
+            Message(ReportErrorHeader(message=message),
+                           data=None)
+            logger.error(message)
+            return message
         
         self._currentReport = report.first()
         return report
@@ -230,6 +233,9 @@ class ReportController(object):
         
         report = self._get_report(id_report).first()
         
+        if isinstance(report, Message):
+            return report
+        
         if report.status_name == 'closed':
             message = "The report is closed"
             return Message(ReportErrorHeader(message=message),
@@ -247,7 +253,7 @@ class ReportController(object):
             return message
         
         self._currentReport = report
-        report = Report.objects(**query)
+        report = Report.objects(id=str(id_report))
         #report = db_wrapper.query('report', **query)
         message = "Report correctly updated"
         message = Message(ReportCorrectHeader(message=message),
