@@ -94,7 +94,7 @@ def search():
                              'Origin'],
               supports_credentials=True)
 @login_required
-@has_permission('delete', 'report')
+@has_permission('create', 'report')
 def delete_report(id):
     
     if request.method == 'POST':
@@ -194,7 +194,7 @@ def open_report(id):
         
         query = json.loads(request.data)
         
-        if query == []:
+        if query['password'] == '':
             query = dict()
         
         query['id'] = str(id)
