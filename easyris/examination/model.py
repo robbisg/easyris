@@ -69,6 +69,8 @@ class Examination(EasyRisMixin, Document):
     codice_esenzione = StringField()
     examination_note = StringField()
     
+    provenienza = StringField()
+    
     
     def clean(self):
         self.accession_number = self.set_accession_number(date=self.data_inserimento,
