@@ -43,9 +43,6 @@ def _render(message):
 def read():
         
     if request.method == 'GET':
-        logger.debug(session)
-        if not g.user.is_anonymous:
-            logger.info('User:'+g.user.username)
         
         query = dict()
             
@@ -74,11 +71,7 @@ def search():
         
     if request.method == 'POST':
         
-        if not g.user.is_anonymous:
-            logger.info('User:'+g.user.username)
-        
         logger.debug(request.data)
-        logger.debug(request.headers)
         
         query = json.loads(request.data)
             
@@ -90,7 +83,33 @@ def search():
         response = message_to_http(message)
 
         return response
+    
+    
+@report.route('/<string:id>/delete', methods=['POST', 'OPTIONS'])
+@jsonp
+@cross_origin(origin=None,
+              methods=['POST', 'OPTIONS'],
+              allow_headers=['X-Requested-With',
+                             'Content-Type',
+                             'Origin'],
+              supports_credentials=True)
+@login_required
+@has_permission('create', 'report')
+def delete_report(id):
+    
+    if request.method == 'POST':
+        
+        query = dict()
+        query['id'] = str(id)
+          
+        message = system.do('delete',
+                            'report',
+                            user=g.user.username,
+                            **query)
 
+        response = message_to_http(message)
+        
+        return response
 
 
 
@@ -175,7 +194,7 @@ def open_report(id):
         
         query = json.loads(request.data)
         
-        if query == []:
+        if query['password'] == '':
             query = dict()
         
         query['id'] = str(id)

@@ -114,17 +114,20 @@ class ReportController(object):
         
         if len(np.unique(patient_list)) > 1:
             message = "Examinations are from different patient"
+            logger.debug(np.unique(patient_list))
             return Message(ReportErrorHeader(message=message),
                            data=None)
         
         
         if len(np.unique(data_examination)) > 1:
             message = "Examinations are from different date"
+            logger.debug(np.unique(data_examination))
             return Message(ReportErrorHeader(message=message),
                            data=None)
         
         if 'closed' in status_list:
             message = "Examinations are already reported"
+            logger.debug(np.unique(status_list))
             return Message(ReportErrorHeader(message=message),
                            data=None)
             
@@ -176,9 +179,10 @@ class ReportController(object):
             message = Message(ReportErrorHeader(message=txt_message))
             return message
         
+        # Porto gli esami a reported
         e_controller = ExaminationController(user=self.user)
         for ex_ in report.id_examination:
-            _ = e_controller.close(id=str(ex_.id))
+            _ = e_controller.eject(id=str(ex_.id))
         
         self._currentReport = report
         
@@ -195,9 +199,8 @@ class ReportController(object):
 
     def read(self, **query):
         
-        # TODO: Check fields
-        
-        logger.debug(query)
+        if query != {}:
+            logger.debug(query)
         
         report = Report.objects(**query)
         #report = db_wrapper.query('report', **query)
@@ -252,6 +255,13 @@ class ReportController(object):
         if message != None:
             return message
         
+        # Porto gli esami a closed
+        e_controller = ExaminationController(user=self.user)
+        for ex_ in report.id_examination:
+            if ex_.status_name == 'closed':
+                break
+            _ = e_controller.close(id=str(ex_.id))
+        
         self._currentReport = report
         report = Report.objects(id=str(id_report))
         #report = db_wrapper.query('report', **query)
@@ -262,9 +272,34 @@ class ReportController(object):
         return message  
         
     
-    def delete(self, **query):       
+    def delete(self, **query):
+                
+        # Cancellare il report       
+        report = Report.objects(**query)
+        #report = db_wrapper.query('report', **query)
         
-        return     
+        if report.count() == 0:
+            message = Message(ReportErrorHeader(message="No Reports in database"),
+                              data=report)
+            return message
+        
+        report = report.first()
+        
+        e_controller = ExaminationController(user=self.user)
+        for ex_ in report.id_examination:
+            _ = e_controller.eject(id=str(ex_.id))
+            
+        try:
+            report.delete()
+        except Exception, err:
+            message = Message(ReportErrorHeader(message="Error in deleting"),
+                              data=report)
+            return message
+        
+        message = Message(ReportCorrectHeader(message='Report deleted'),
+                          data=None)
+        
+        return message
         
     
     def _pre_event(self, id_):
@@ -331,11 +366,7 @@ class ReportController(object):
                 
         id_ = query['id']
         qs, report = self._pre_event(id_)
-        
-        if report.status_name == 'opened':
-            return message_factory(header=ReportErrorHeader(message="Report is open!"),
-                                   data=None)
-        
+                
         
         if report.status_name == 'closed':
             

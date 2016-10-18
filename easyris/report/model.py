@@ -46,7 +46,8 @@ class Report(EasyRisMixin, Document):
                    'examination': ['id_typology', 
                                    'id_patient', 
                                    'id_technician', 
-                                   'data_inserimento'],
+                                   'data_inserimento',
+                                   'status_name'],
                    'report_action': ['action', 'user', 'data']
                    }
         

@@ -14,7 +14,9 @@ class ReportApiTest(EasyRisUnitTest):
     def setUp(self):
         
         self.controller = ReportController()
-        super(ReportApiTest, self).setUp(n_loaded=50)
+        super(ReportApiTest, self).setUp(n_examination=50, 
+                                         n_patient=15, 
+                                         n_report=10)
     
     #@unittest.skip("A me do search... nun me ne fott nu cazz")
     def test_search_patient(self):
@@ -37,7 +39,7 @@ class ReportApiTest(EasyRisUnitTest):
         self.login('mcaulo', 'massimo')
         
         examination_list = _get_correct_examinations()
-        examination_json = [str(e.id) for e in examination_list]
+        examination_json = [str(e.id) for e in examination_list]       
         
         rv = self.app.post(path='/report/save', 
                            data=json.dumps({'id_examination': examination_json,
@@ -58,8 +60,11 @@ class ReportApiTest(EasyRisUnitTest):
         
         response = json.loads(rv.data)
         logger.debug(response)
+        report_text = response[0]['data'][0]['report_text']
+        examination = response[0]['data'][0]['id_examination'][0]
         assert response[0]['code'] == 500
-        assert response[0]['data'][0]['report_text'] == "La dottoressa... Dottoressa"
+        assert report_text == "La dottoressa... Dottoressa"
+        assert examination['status_name'] == 'reported'
         
     
     #@unittest.skip("reason")
@@ -77,8 +82,9 @@ class ReportApiTest(EasyRisUnitTest):
         report = response[0]['data'][0]
         logger.debug(response)
         logger.debug(report)
+        examination = response[0]['data'][0]['id_examination'][0]
         assert report['action_list'][-1]['action'] == "update"
-        
+        assert examination['status_name'] == 'closed'
     
     #@unittest.skip("reason")
     def test_close(self):
@@ -98,6 +104,31 @@ class ReportApiTest(EasyRisUnitTest):
         assert report['action_list'][-1]['action'] == "close"
         assert report['status_name'] == "closed"
         
+    
+    
+    def test_delete(self):
+        self.login('mcaulo', 'massimo')
+        
+        rv = self.app.get(path='/report')
+        response = json.loads(rv.data)
+        id_report = str(response[0]['data'][0]['_id']['$oid'])
+        examination = response[0]['data'][0]['id_examination'][0]
+        assert examination['status_name'] != 'completed'
+        
+        rv = self.app.post(path='/report/%s/delete' % (id_report), 
+                           data=json.dumps({}),
+                           content_type='application/json')
+        response = json.loads(rv.data)
+        assert response[0]['code'] == 500
+        
+        id_examination = examination['_id']['$oid']
+        
+        rv = self.app.post(path='/report/search', 
+                           data=json.dumps({'id':str(id_report)}),
+                           content_type='application/json')
+        
+        response = json.loads(rv.data)
+        assert response[0]['code'] == 501
     
     #@unittest.skip("reason")
     def test_open(self):
@@ -217,7 +248,8 @@ class ReportApiTest(EasyRisUnitTest):
         
         # Lo riapro
         rv = self.app.post(path='/report/%s/open' % (id_report), 
-                           data=json.dumps({}),
+                           data=json.dumps({'password':'massimo'
+                                            }),
                            content_type='application/json')
         response = json.loads(rv.data)
         report = response[0]['data'][0]

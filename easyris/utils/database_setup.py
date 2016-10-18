@@ -39,6 +39,9 @@ def run(db_name='easyris', port=27017, **kwargs):
         n_loaded = kwargs['n_loaded']
     else:
         n_loaded = 100
+    
+    if 'n_patient' in kwargs.keys():
+        n_loaded = kwargs['n_patient']
     patient_db.run(db_name, port, n_loaded=n_loaded)
 
     # Import priority_db.csv
@@ -51,9 +54,13 @@ def run(db_name='easyris', port=27017, **kwargs):
     user_db.run(db_name, port)
     
     print "Creating dummy examinations."
+    if 'n_examination' in kwargs.keys():
+        n_loaded = kwargs['n_examination']
     examination_db.run(db_name, port, n_loaded=n_loaded*2)
     
     print "Creating dummy reports."
+    if 'n_report' in kwargs.keys():
+        n_loaded = kwargs['n_report']
     report_db.run(db_name, port, n_loaded=n_loaded)
 
 
