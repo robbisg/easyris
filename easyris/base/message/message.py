@@ -1,6 +1,7 @@
 import json
 from bson.json_util import dumps
 
+
 class MessageHeader(object):
        
     # TODO: Store message in database. Avoid duplicate code.
@@ -68,14 +69,22 @@ class Message(object):
             
         return dumps([json_])
     
+    #@celery_.task
     def to_db(self):
         # TODO: Implement it!
         # TODO: Asynchronous celery task to mongo
+        #print 'Message to database'
         return None
     
     
     def set_user(self, user):
         self.header.set_user(user)
+        
+        
+    def __str__(self, *args, **kwargs):
+        string_ = 'Message:'+self.header.message+'\n'
+        string_ += 'Data: '+str(self.data)
+        return string_
         
 
 def message_factory(header, data):
