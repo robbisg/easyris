@@ -143,6 +143,10 @@ class ReportedExaminationStatus(ExaminationStatus):
         self._modify(examination, status)
         return
 
+
 class ClosedExaminationStatus(ExaminationStatus):
+    
     def __init__(self, name='closed', *args, **values):
-        ExaminationStatus.__init__(self, name=name, *args, **values) 
+        ExaminationStatus.__init__(self, name=name, *args, **values)
+        
+        

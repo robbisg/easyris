@@ -22,7 +22,7 @@ def state_funcion(name, id):
     
     query = dict()
     query['id'] = id
-
+    
     message = system.do(name,
                         'examination',
                         user=g.user.username,
@@ -55,10 +55,6 @@ def not_implemented(username):
 @has_permission('read', 'examination')
 def get_examinations():
     
-    
-    if not g.user.is_anonymous:
-        logger.info('User:'+g.user.username)
-
     if request.method == 'GET':
 
         query = dict()
@@ -94,7 +90,7 @@ def get_today_examinations():
         query['data_inserimento'] = datetime(day=now.day,
                                              month=now.month,
                                              year=now.year)
-        
+        logger.info(query)
         message = system.do('read',
                             'examination',
                             user=g.user.username,
@@ -125,14 +121,10 @@ def show(id):
                             'examination',
                             user=g.user.username,
                             id_examination=id)
-        #TODO id_examination equivale al id di mongodb riguardante l'esame
-
+        
         response = message_to_http(message)
         return response
 
-    if request.method == 'POST':
-        # What is this??
-        return message
 
 @examination.route('/<string:id>/delete', methods=['POST', 'OPTIONS'])
 @jsonp
@@ -149,6 +141,7 @@ def delete(id):
     if request.method == 'POST':
         return not_implemented(g.user.username)
 
+
 @examination.route('/<string:id>/edit', methods=['POST', 'OPTIONS'])
 @jsonp
 @cross_origin(origin=None,
@@ -163,6 +156,7 @@ def update(id):
 
     if request.method == 'POST':
         return not_implemented(g.user.username)
+
 
 @examination.route('/search', methods=['POST', 'OPTIONS'])
 @jsonp
@@ -180,8 +174,7 @@ def search():
     """
     if request.method == 'POST':
 
-        logger.debug(request.data)
-        logger.debug(request.headers)
+        logger.info(request.data)
 
         query = json.loads(request.data)
         
@@ -211,8 +204,7 @@ def insert():
 
     if request.method == 'POST':
 
-        logger.debug(request.data)
-        logger.debug(request.headers)
+        logger.info(request.data)
         
         query = json.loads(request.data)
         
@@ -277,14 +269,12 @@ def show_patient_status_examinations(id, status):
         query['id_patient'] = str(id)
         
         if request.method == 'POST':
-            logger.debug(request.data)
-            logger.debug(request.headers)
+            logger.info(request.data)
         
             data = json.loads(request.data)
             
             if 'data_inserimento' in data.keys():
-                # Voglio solo la data!
-                # Do o' rest... Nun me ne fott nu cazz! :)
+                # I need only date!
                 query['data_inserimento'] = data['data_inserimento']
         
         
