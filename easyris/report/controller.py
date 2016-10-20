@@ -287,7 +287,11 @@ class ReportController(object):
         
         e_controller = ExaminationController(user=self.user)
         for ex_ in report.id_examination:
-            _ = e_controller.eject(id=str(ex_.id))
+            if ex_.status_name != 'closed':
+                _ = e_controller.eject(id=str(ex_.id))
+            else:
+                message = Message(ReportErrorHeader(message='Cannot delete the report'))
+                return message
             
         try:
             report.delete()
@@ -415,6 +419,16 @@ class ReportController(object):
                                    data=None) 
         
         report.status.pause(report)
+        
+        # Se l'esame e' stato aperto ma non salvato porto
+        # gli esami a closed
+        e_controller = ExaminationController(user=self.user)
+        for ex_ in report.id_examination:
+            if ex_.status_name == 'reported':
+                _ = e_controller.close(id=str(ex_.id))
+            else:
+                continue
+        
         self._update_log(self.user, 'pause', report)
         return self._event_message(report, qs)
     
@@ -436,6 +450,7 @@ class ReportController(object):
         data['examination_tecnico_first_name'] = report.id_examination[0].id_technician.first_name
         data['examination_tecnico_last_name'] = report.id_examination[0].id_technician.last_name
         
+        data['report_id'] = id_
         
         data['examination_title'] = []
         for e in report.id_examination:
@@ -455,6 +470,7 @@ class ReportController(object):
                                               user=self.user),
                           data = data
                           )
+        
         logger.debug(message.header.message)
         logger.debug(message.data)
         return message
