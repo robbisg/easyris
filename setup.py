@@ -78,9 +78,10 @@ setup(
                         'flask-script',
                         'flask-debugtoolbar',
 			            'pyopenssl',
-			            #'libffi-dev',
+			            'celery',
 			            'cryptography',
-                        'click'
+                        'click',
+                        'pdfkit'
                         ],
 
     #RN: Aggiunto pyopenssl, cryptography, libffi-dev
