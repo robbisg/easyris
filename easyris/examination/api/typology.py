@@ -23,15 +23,10 @@ logger = logging.getLogger("easyris_logger")
 @login_required
 @has_permission('read', 'patient') # Who is?
 def get_typology():
-    # TODO: Log stuff!
-    logger.debug(request.headers)
-    if not g.user.is_anonymous:
-        logger.debug('User:'+g.user.username)
 
     if request.method == 'GET':
 
         query = dict()
-
         message = system.do('read',
                             'typology',
                             user=g.user.username,

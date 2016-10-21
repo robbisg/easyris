@@ -16,7 +16,6 @@ system = EasyRisFacade()
 controller = PatientController()
 
 
-# TODO: Implement the confirmation of patient data!
 @patient.route('/', methods=['GET', 'OPTIONS'])
 @cross_origin(origin=None, 
              methods=['GET', 'OPTIONS'], 
@@ -27,8 +26,7 @@ controller = PatientController()
 @login_required
 @has_permission('read', 'patient')
 def get_patients():
-    # TODO: Rimanda nome, cognome, id, cf, telefono
-    # TODO: Log stuff!
+
     logger.debug(request.headers)
     
     if request.method == 'GET':
@@ -45,8 +43,8 @@ def get_patients():
         return response
 
 
-#TODO: Is correct to have int as id??
-@patient.route('/<int:id>', methods=['GET', 'POST', 'OPTIONS'])
+
+@patient.route('/<string:id>', methods=['GET', 'POST', 'OPTIONS'])
 @jsonp
 @cross_origin(origin=None, 
              methods=['GET', 'POST', 'OPTIONS'], 
@@ -69,13 +67,9 @@ def show(id):
         response = message_to_http(message)        
         return response
     
-    if request.method == 'POST':
-        # What is this??
-        return message
 
 
-
-@patient.route('/<int:id>/delete', methods=['POST', 'OPTIONS'])
+@patient.route('/<string:id>/delete', methods=['POST', 'OPTIONS'])
 @jsonp
 @cross_origin(origin=None, 
              methods=['POST', 'OPTIONS'], 
@@ -90,8 +84,7 @@ def delete(id):
     if request.method == 'POST':
         query = json.loads(request.data)
         logger.debug(query)
-        # TODO: Check if they exist?!?!
-        # TODO: Is it good to extract fields from request?
+        
         status = query['status']
         note = query['note']
         message = system.do('delete', 
@@ -106,7 +99,7 @@ def delete(id):
     
 
 
-@patient.route('/<int:id>/edit', methods=['POST', 'OPTIONS'])
+@patient.route('/<string:id>/edit', methods=['POST', 'OPTIONS'])
 @jsonp
 @cross_origin(origin=None, 
              methods=['POST', 'OPTIONS'], 
@@ -153,7 +146,7 @@ def search():
     """
     if request.method == 'POST':
 
-        logger.debug(request.data)
+        logger.info(request.data)
         logger.debug(request.headers)
         
         query = json.loads(request.data)
@@ -190,7 +183,7 @@ def insert():
     
     if request.method == 'POST':
         
-        logger.debug(request.data)
+        logger.info(request.data)
         logger.debug(request.headers)
         
         query = json.loads(request.data)

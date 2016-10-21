@@ -3,7 +3,7 @@ from easyris.base.controller import EasyRisFacade
 from flask_cors.decorator import cross_origin
 from flask_login import login_required
 from easyris.utils.decorators import has_permission, jsonp
-from easyris.base.message.utils import message_to_http
+from easyris.base.message.utils import message_to_http, save_pdf
 from easyris.base.message import message_factory
 from easyris.base.message.error import NotImplementedApiHeader
 import json
@@ -20,11 +20,12 @@ report = Blueprint('report', __name__)
 system = EasyRisFacade()
 
 
+
 def _render(message):
 
     html_ = render_template("RefertoTemplate.html", **message)
-    logger.debug(str(html_).__class__)
-    
+    #logger.debug(str(html_).__class__)
+    save_pdf.delay(html_, message['report_id']+'.pdf')
     return Response(response=json.dumps({'data':html_}),
                         status=200,
                         mimetype="application/json")

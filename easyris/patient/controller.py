@@ -49,8 +49,7 @@ class PatientController(object):
         
         message = Message(PatientCorrectHeader(message='Patient correctly created!'),
                               data=patient)
-        
-        logger.info(message.header.message)
+
         return message
     
     
@@ -91,7 +90,7 @@ class PatientController(object):
         # Everything ok!!!
         message = Message(PatientCorrectHeader(message='Patient correctly modified!'),
                           data=patient)
-        logger.info(message.header.message)
+        
         return message
     
     
@@ -106,7 +105,6 @@ class PatientController(object):
         query['status'] = 'Attivo'
         
         patients = Patient.objects(**query)
-        #logger.debug(patients)
         
         # Patient list empty
         if patients.count() == 0:
@@ -118,12 +116,10 @@ class PatientController(object):
         message = Message(PatientCorrectHeader(),
                           data=patients)
         
-        logger.info(message.header.message)
         return message
 
     
     def delete(self, status, note):
-        # TODO: Is it useful?? Yes for me!
         return self.update(status=status, status_note=note)
         
 
@@ -132,7 +128,7 @@ class PatientController(object):
         patient = Patient.objects(id_patient=str(id_))
         
         #TODO: Is there a more elegant way to deal with that?
-        if patient == None:
+        if len(patient) == 0:
             logger.error('No Patient in the database')
             return 'ERR'
         

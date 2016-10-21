@@ -14,9 +14,7 @@ class EasyRis(Flask):
     def __init__(self, import_name, static_path=None, static_url_path=None, 
         static_folder='static', template_folder='templates', 
         instance_path=None, instance_relative_config=False):
-        
-        self.logged_users = []
-        
+                
         Flask.__init__(self, 
                        import_name, 
                        static_path=static_path, 
