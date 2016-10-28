@@ -1,123 +1,39 @@
-from mongoengine import Document, StringField, ReferenceField, DateTimeField, EmbeddedDocumentField
-from bson.son import SON
-from mongoengine.base.common import get_document, ALLOW_INHERITANCE
-from mongoengine.queryset import QuerySet
-from mongoengine import signals
-from mongoengine.common import _import_class
-from mongoengine.fields import ListField
-from mongoengine.base import BaseDocument
+from easyris.base.database import EasyRisQuerySet, EasyRisMixin
+from flask import Flask
+from easyris.user.controller import PermissionController
+from mongoengine import connect
 
-import logging
-logger = logging.getLogger("easyris_logger")
-
-
-class EasyRisQuerySet(QuerySet):
-
-    def as_pymongo(self):
+class EasyRis(Flask):
+    ## Should be a Singleton??
+    
+    def __init__(self, import_name, static_path=None, static_url_path=None, 
+        static_folder='static', template_folder='templates', 
+        instance_path=None, instance_relative_config=False):
         
-        return [e._to_easyris() for e in self.all()]
-
-
-
-class EasyRisMixin(object):
-    
-    meta = {
-        'abstract': True,
-    }
-    
-    def _get_subfields(self, document, fields=dict()):
-        """
-        This should always be overrided to get fields 
-        from the document passed
-        """
-        return
-    
-    
-    
-    def _to_easyris(self, use_db_field=True, fields=None):
-        """
-        Return as SON data ready for use with MongoDB.
-        """
-        if not fields:
-            fields = []
-#             
-#         logger.critical(self.__collection__)
-#         logger.critical(fields)
-        data = SON()
-        data["_id"] = None
-        data['_cls'] = self._class_name
-        EmbeddedDocumentField = _import_class("EmbeddedDocumentField")
-        ListField = _import_class("ListField")
-        ReferenceField = _import_class("ReferenceField")
-        Document = _import_class("Document")
-        # only root fields ['test1.a', 'test2'] => ['test1', 'test2']
-        root_fields = set([f.split('.')[0] for f in fields])
-    
-        for field_name in self:
+        Flask.__init__(self, 
+                       import_name, 
+                       static_path=static_path, 
+                       static_url_path=static_url_path, 
+                       static_folder=static_folder, 
+                       template_folder=template_folder, 
+                       instance_path=instance_path, 
+                       instance_relative_config=instance_relative_config)
             
-            if root_fields and field_name not in root_fields:
-                continue
+    @staticmethod
+    def login(user, password):
+        """
+        Deprecated
+        """
+        controller = PermissionController()
+        logged_user = controller.login(user, password)
 
-            value = self._data.get(field_name, None)
-            field = self._fields.get(field_name)
-            
-#             logger.critical('----')
-#             logger.critical("value: "+str(value))
-#             logger.critical("field: "+str(field))
-#             logger.critical("field_name: "+str(field_name))
-            
-            if field is None and self._dynamic:
-                field = self._dynamic_fields.get(field_name)
-    
-            if value is not None:
-    
-                if fields:
-                    key = '%s.' % field_name
-                    embedded_fields = [
-                        i.replace(key, '') for i in fields
-                        if i.startswith(key)]
-    
-                else:
-                    embedded_fields = []
-                
-                
-                if isinstance(field, ReferenceField):
-                    value = self._get_subfields(self[field_name])
-                    
-                elif isinstance(field, ListField):
-                    
-                    value = self._get_subfields(value)
-                else:
-                    
-                    value = field.to_mongo(value, 
-                                           #use_db_field=use_db_field,
-                                           #fields=embedded_fields
-                                           )
-    
-            # Handle self generating fields
-            if value is None and field._auto_gen:
-                value = field.generate()
-                self._data[field_name] = value
-    
-            if value is not None:
-                if use_db_field:
-                    data[field.db_field] = value
-                else:
-                    data[field.name] = value
-    
-        # If "_id" has not been set, then try and set it
+        if logged_user != None:
+            #g.user = logged_user
+            return True, logged_user
+        return False, None
         
-        if isinstance(self, Document):
-            if data["_id"] is None:
-                data["_id"] = self._data.get("id", None)
     
-        if data['_id'] is None:
-            data.pop('_id')
-    
-        # Only add _cls if allow_inheritance is True
-        if (not hasattr(self, '_meta') or
-                not self._meta.get('allow_inheritance', ALLOW_INHERITANCE)):
-            data.pop('_cls')
-    
-        return data
-    
+    def get_user(self, id_user):
+        # This seems good! :)
+        controller = PermissionController()
+        return controller.load_user(id_user)

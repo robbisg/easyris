@@ -24,8 +24,12 @@ system = EasyRisFacade()
 def _render(message):
 
     html_ = render_template("RefertoTemplate.html", **message)
+<<<<<<< Updated upstream
     #logger.debug(str(html_).__class__)
     save_pdf.delay(html_, message['report_id']+'.pdf')
+=======
+    
+>>>>>>> Stashed changes
     return Response(response=json.dumps({'data':html_}),
                         status=200,
                         mimetype="application/json")

@@ -1,18 +1,8 @@
-from flask import g, current_app
-from flask.ext.cors import CORS, cross_origin
-from flask.ext.login import LoginManager, login_user, logout_user, \
-     login_required, current_user
-from flask_debugtoolbar import DebugToolbarExtension
-
-from easyris import EasyRis
-from easyris.utils.api import cities
-from easyris.patient.api import patient
-from easyris.user.api import login_
-from easyris.examination.api.typology import typology
-from easyris.report.api import report
-from datetime import timedelta
+from flask import g
+from flask.ext.login import LoginManager,current_user
 from flask.templating import render_template_string
 
+<<<<<<< Updated upstream
 from mongoengine import connect
 from easyris.examination.api.base import examination
 
@@ -44,7 +34,11 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 toolbar = DebugToolbarExtension(app)
+=======
+from easyris import create_app
+>>>>>>> Stashed changes
 
+app = create_app("easyris.cfg")
 
 @app.route('/')
 def entry():
@@ -61,11 +55,15 @@ def before_request():
     g.user = current_user
 
 
-@login_manager.user_loader
+@app.login_manager.user_loader
 def load_user(userid):
     # Return an instance of the User model
     return app.get_user(userid)
+<<<<<<< Updated upstream
     
+=======
+      
+>>>>>>> Stashed changes
 
 
 def enable_logging():
@@ -104,17 +102,19 @@ def enable_logging():
 if __name__ == '__main__':
     
     # TODO: Secure connection???
-    connect('easyris')
+    # connect('easyris')
+    
+
     
     handler = enable_logging()
-    
     app.logger.addHandler(handler)
     
     app.run(host='0.0.0.0', 
             port=5000, 
             debug=True,
             threaded=True,
-		    ssl_context=('/etc/webserver-ssl/webserver.crt', '/etc/webserver-ssl/webserver.key')
+		    ssl_context=('/etc/webserver-ssl/webserver.crt', 
+                         '/etc/webserver-ssl/webserver.key')
 		  )
     
-    toolbar.init_app(app)
+    app.toolbar.init_app(app)
