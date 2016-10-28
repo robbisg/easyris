@@ -10,6 +10,7 @@ from datetime import datetime
 from easyris.utils import parse_date, date_from_json
 from mongoengine import *
 import logging
+from easyris.base.message.utils import send_to_pacs
 logger = logging.getLogger('easyris_logger')
 
 class ExaminationController(object):
@@ -111,6 +112,8 @@ class ExaminationController(object):
                 continue
             
             examination = Examination(**query)
+            
+            send_to_pacs(examination)
         
             try:
                 examination.save()
