@@ -112,13 +112,11 @@ def send_to_pacs(data):
     # Send to log?
     try:
         _ = urllib2.urlopen(request)
-    except Exception, err:
+    except Exception,err:
         print err
-    
-    return 
     
 @celery_.task(bind=True)
 def pacs_error_handler(self, uuid):
-    result = self.celery_.AsyncResult(uuid)
+    result = self.app.AsyncResult(uuid)
     print('Task {0} raised exception: {1!r}\n{2!r}'.format(
           uuid, result.result, result.traceback))

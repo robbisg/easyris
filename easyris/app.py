@@ -22,7 +22,7 @@ from easyris.examination.api.base import examination
 #app = Flask(__name__)
 app = EasyRis(__name__)
 app.config['SESSION_COOKIE_HTTPONLY'] = False
-app.config['PACS_URL'] = "http://192.168.30.225:6000//api/v1/orders"
+app.config['PACS_URL'] = "http://192.168.30.225:6000/api/v1/orders"
 # This is to prevent bad url in frontend
 app.url_map.strict_slashes = False
 
