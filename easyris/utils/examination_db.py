@@ -9,7 +9,6 @@ from easyris.examination.status import CompletedExaminationStatus,\
     NewExaminationStatus
 
 def run(database, port, n_loaded=50):
-    # TODO: Creare alcuni esami completati
     
     client = connect(database, port=port)
     

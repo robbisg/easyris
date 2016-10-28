@@ -23,14 +23,15 @@ class EasyRisUnitTest(unittest.TestCase):
         return self.app.get('/logout', follow_redirects=True)
     
     
-    def setUp(self, n_loaded=5):
+    def setUp(self, n_loaded=5, **kwargs):
         
         database = 'test_easyris'
         port = 27017
         
         self.client = connect(database, port=port)
+        easyris.app.config['PACS_URL'] = "http://localhost:6000//api/v1/orders"
         self.app = easyris.app.test_client(use_cookies=True)
-        database_setup.run(database, port, n_loaded=n_loaded)
+        database_setup.run(database, port, n_loaded=n_loaded, **kwargs)
         
         
     def tearDown(self):

@@ -3,7 +3,7 @@ from easyris.base.controller import EasyRisFacade
 from flask_cors.decorator import cross_origin
 from flask_login import login_required
 from easyris.utils.decorators import has_permission, jsonp
-from easyris.base.message.utils import message_to_http
+from easyris.base.message.utils import message_to_http, save_pdf
 from easyris.base.message import message_factory
 from easyris.base.message.error import NotImplementedApiHeader
 import json
@@ -20,11 +20,12 @@ report = Blueprint('report', __name__)
 system = EasyRisFacade()
 
 
+
 def _render(message):
 
     html_ = render_template("RefertoTemplate.html", **message)
-    logger.debug(str(html_).__class__)
-    
+    #logger.debug(str(html_).__class__)
+    save_pdf.delay(html_, message['report_id']+'.pdf')
     return Response(response=json.dumps({'data':html_}),
                         status=200,
                         mimetype="application/json")
@@ -43,9 +44,6 @@ def _render(message):
 def read():
         
     if request.method == 'GET':
-        logger.debug(session)
-        if not g.user.is_anonymous:
-            logger.info('User:'+g.user.username)
         
         query = dict()
             
@@ -74,11 +72,7 @@ def search():
         
     if request.method == 'POST':
         
-        if not g.user.is_anonymous:
-            logger.info('User:'+g.user.username)
-        
         logger.debug(request.data)
-        logger.debug(request.headers)
         
         query = json.loads(request.data)
             
@@ -90,7 +84,33 @@ def search():
         response = message_to_http(message)
 
         return response
+    
+    
+@report.route('/<string:id>/delete', methods=['POST', 'OPTIONS'])
+@jsonp
+@cross_origin(origin=None,
+              methods=['POST', 'OPTIONS'],
+              allow_headers=['X-Requested-With',
+                             'Content-Type',
+                             'Origin'],
+              supports_credentials=True)
+@login_required
+@has_permission('create', 'report')
+def delete_report(id):
+    
+    if request.method == 'POST':
+        
+        query = dict()
+        query['id'] = str(id)
+          
+        message = system.do('delete',
+                            'report',
+                            user=g.user.username,
+                            **query)
 
+        response = message_to_http(message)
+        
+        return response
 
 
 
@@ -175,7 +195,7 @@ def open_report(id):
         
         query = json.loads(request.data)
         
-        if query == []:
+        if query['password'] == '':
             query = dict()
         
         query['id'] = str(id)

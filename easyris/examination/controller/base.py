@@ -10,6 +10,8 @@ from datetime import datetime
 from easyris.utils import parse_date, date_from_json
 from mongoengine import *
 import logging
+from easyris.base.message.utils import send_to_pacs, _build_pacs_data,\
+    pacs_error_handler
 logger = logging.getLogger('easyris_logger')
 
 class ExaminationController(object):
@@ -111,6 +113,9 @@ class ExaminationController(object):
                 continue
             
             examination = Examination(**query)
+            
+            pacs_data = _build_pacs_data(examination)
+            send_to_pacs.apply_async(link_error=pacs_error_handler.s(), kwargs={'data':pacs_data}, )
         
             try:
                 examination.save()
@@ -127,7 +132,6 @@ class ExaminationController(object):
             examination = self._get_examination(examination.id)
             examination.status = NewExaminationStatus(examination)
         
-        # TODO: Return the list of created examinations
         
         if examination == None:
             message = "Examination already stored"
@@ -157,8 +161,8 @@ class ExaminationController(object):
         if 'id_examination' in query.keys():
             query['id'] = query.pop('id_examination')
         
-        
-        logger.debug(query)
+        if query != {}:
+            logger.debug(query)
         
         examination = Examination.objects(**query)
         
@@ -173,10 +177,8 @@ class ExaminationController(object):
         return message
         
     
-    def update(self, **query):
-        # TODO: Check if examinatin
-        
-        return
+    def update(self, **query):       
+        pass
     
     def delete(self, **query):   
         
@@ -214,7 +216,6 @@ class ExaminationController(object):
     def _event_message(self, examination, qs):
         
         message_ = 'Examination is now %s' %(examination.status_name)
-        logger.debug(message_)
         return Message(ExaminationCorrectHeader(message=message_),
                        data=qs)
     

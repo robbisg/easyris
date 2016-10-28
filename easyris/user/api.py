@@ -30,7 +30,7 @@ def user():
 def login():
 
     if request.method == 'POST':
-        logger.debug(request.headers)
+
         logger.debug(request.data)
         
         query = json.loads(request.data)
@@ -39,31 +39,17 @@ def login():
                             'user',
                             **query)
         
-        username = query['username']
                 
         is_authenticated = message.data['is_authenticated']
         user = message.data['user']
         qs = message.data['qs']
         message.data = qs
-        
-        current_app.logged_users = []
-        logger.debug(current_app.logged_users)
-        
-        if username in current_app.logged_users:
-            return message_factory(UserNotAuthenticatedHeader(message="User already logged!"), 
-                                   data=None)
-        
+                
         if is_authenticated:
             login_user(user)
-            g.user = user
-            current_app.logged_users.append(username)      
+            g.user = user  
 
-        
         response = message_to_http(message)
-        
-        logger.debug("Config\n"+str(current_app.config))
-        logger.debug("Session\n"+str(session))
-        logger.debug(current_app.logged_users)
         
         return response
 
@@ -85,10 +71,8 @@ def logout():
                             'user',
                             **query)
     
-    logger.debug(session)
     
     logger.debug(g.user.username+" has logged out!")
-    #current_app.logged_users.remove(g.user.username)
     logout_user()
     
     return message_to_http(message) 

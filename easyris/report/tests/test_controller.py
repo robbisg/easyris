@@ -23,6 +23,7 @@ class TestReportController(EasyRisUnitTest):
         query = dict()
         
         examination_list = _get_correct_examinations()
+        print [str(e.data_inserimento) for e in examination_list]
         
         query['action'] = 'create'
         query['user'] = 'mcaulo'

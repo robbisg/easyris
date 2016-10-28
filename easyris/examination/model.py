@@ -69,6 +69,8 @@ class Examination(EasyRisMixin, Document):
     codice_esenzione = StringField()
     examination_note = StringField()
     
+    provenienza = StringField()
+    
     
     def clean(self):
         self.accession_number = self.set_accession_number(date=self.data_inserimento,
@@ -95,7 +97,7 @@ class Examination(EasyRisMixin, Document):
         for t in typology:
             typology_examination = today_examinations.filter(id_typology=t.id)
             if len(typology_examination) > 0:
-                logger.debug(typology_examination[0].accession_number)
+                #logger.debug(typology_examination[0].accession_number)
                 return typology_examination[0].accession_number
             
         return self._get_accession_number(date)

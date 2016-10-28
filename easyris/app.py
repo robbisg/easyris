@@ -16,16 +16,13 @@ from flask.templating import render_template_string
 from mongoengine import connect
 from easyris.examination.api.base import examination
 
-import flask
-from werkzeug.local import LocalProxy
-from flask.globals import _app_ctx_stack
 # TODO: Move all the configuration in a function
 # TODO: as mentioned in Application factories section
 
 #app = Flask(__name__)
 app = EasyRis(__name__)
 app.config['SESSION_COOKIE_HTTPONLY'] = False
-
+app.config['PACS_URL'] = "http://192.168.30.225:6000/api/v1/orders"
 # This is to prevent bad url in frontend
 app.url_map.strict_slashes = False
 
@@ -36,7 +33,6 @@ app.register_blueprint(typology, url_prefix='/typology')
 app.register_blueprint(examination, url_prefix='/examination')
 app.register_blueprint(login_, url_prefix='')
 app.register_blueprint(report, url_prefix="/report")
-
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -69,9 +65,7 @@ def before_request():
 def load_user(userid):
     # Return an instance of the User model
     return app.get_user(userid)
-      
-
-
+    
 
 
 def enable_logging():
@@ -80,7 +74,9 @@ def enable_logging():
     logger = logging.getLogger('easyris_logger')
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
-    fh = logging.handlers.RotatingFileHandler('/home/vagrant/easyris.log')
+    fh = logging.handlers.RotatingFileHandler('/home/vagrant/easyris.log',
+                                              maxBytes=2*1024*1024,
+                                              backupCount=5)
     fh.setLevel(logging.DEBUG)
     # create console handler with a higher log level
     ch = logging.StreamHandler()
