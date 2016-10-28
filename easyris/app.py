@@ -75,7 +75,8 @@ def enable_logging():
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
     fh = logging.handlers.RotatingFileHandler('/home/vagrant/easyris.log',
-                                              maxBytes=1024)
+                                              maxBytes=2*1024*1024,
+                                              backupCount=5)
     fh.setLevel(logging.DEBUG)
     # create console handler with a higher log level
     ch = logging.StreamHandler()
