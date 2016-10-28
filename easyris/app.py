@@ -22,7 +22,7 @@ from easyris.examination.api.base import examination
 #app = Flask(__name__)
 app = EasyRis(__name__)
 app.config['SESSION_COOKIE_HTTPONLY'] = False
-
+app.config['PACS_URL'] = "http://192.168.30.225:6000//api/v1/orders"
 # This is to prevent bad url in frontend
 app.url_map.strict_slashes = False
 
@@ -75,7 +75,8 @@ def enable_logging():
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
     fh = logging.handlers.RotatingFileHandler('/home/vagrant/easyris.log',
-                                              maxBytes=1024)
+                                              maxBytes=2*1024*1024,
+                                              backupCount=5)
     fh.setLevel(logging.DEBUG)
     # create console handler with a higher log level
     ch = logging.StreamHandler()

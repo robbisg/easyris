@@ -21,8 +21,8 @@ def run(database, port, n_loaded=50):
     
     examination_list = Examination.objects(status_name='completed',
                                            data_inserimento=datetime.datetime(year=2016,
-                                                                     month=02,
-                                                                     day=02))
+                                                                              month=02,
+                                                                              day=02))
     
     # Trovo i pazienti con piu esami
     id_patient_list = [e.id_patient.id_patient for e in examination_list]
@@ -31,6 +31,7 @@ def run(database, port, n_loaded=50):
     if len(counter) < n_loaded:
         n_loaded = len(counter) / 2
     
+    print n_loaded
     
     for i in range(n_loaded):
         
@@ -41,7 +42,7 @@ def run(database, port, n_loaded=50):
                                                   data_inserimento=datetime.datetime(year=2016,
                                                                             month=02,
                                                                             day=02))
-        
+
         dates_ = np.unique([e.data_inserimento for e in patient_examination])
         
         for d_ in dates_:
@@ -50,26 +51,26 @@ def run(database, port, n_loaded=50):
                                                         data_inserimento=data_,
                                                         status_name='completed')
         
-        
+
         report_log = ReportAction(
                                      user=user,
                                      action='create'
                                      )
-        
+               
+
         report = Report(
                         id_examination = [e for e in same_date_examination],
                         report_text = "Il paziente bla bla bla",
                         action_list = [report_log],
                         id_patient = id_patient,
-                        status = SuspendedReportStatus(),
+                        status=SuspendedReportStatus(),
                         status_name='suspended'
                         )
-        
+
         report.save()
         
         for e in same_date_examination:
             e.modify(status=ClosedExaminationStatus(),
                      status_name='closed')
             e.save()
-    
-    
+        

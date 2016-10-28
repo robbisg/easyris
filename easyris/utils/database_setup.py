@@ -62,6 +62,8 @@ def run(db_name='easyris', port=27017, **kwargs):
     if 'n_report' in kwargs.keys():
         n_loaded = kwargs['n_report']
     report_db.run(db_name, port, n_loaded=n_loaded)
+    
+    return
 
 
 
