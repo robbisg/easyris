@@ -12,7 +12,7 @@ class ExaminationAPITest(EasyRisUnitTest):
     
     #@unittest.skip("skipping")
     def test_search(self):
-        
+        print "Qua ci arrivo?"
         self.login('daniele', 'daniele')
         rv = self.app.post(path='/examination/search', 
                            data=json.dumps({'medico_richiedente':'Mauro Caffarini'}),

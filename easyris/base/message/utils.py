@@ -7,6 +7,8 @@ from celery import Celery
 from mongoengine import connect
 import pdfkit
 import os
+import urllib2
+import json
 
 logger = logging.getLogger('easyris_logger')
 celery_ = Celery('easyris_celery')
@@ -96,16 +98,12 @@ def _build_pacs_data(examination):
     
     return data
 
-
-def send_to_pacs(examination):
-    
-    import urllib2
-    import json
-    
-    # from file
-    url = "http://localhost:6000//api/v1/orders"
+@celery_.task
+def send_to_pacs(data):
+    #url = current_app.config['PACS_URL']
+    url = "http://192.168.30.225:6000//api/v1/orders"
+    print url
     headers = {'Accept': 'application/json','Content-Type':'application/json'}
-    data = _build_pacs_data(examination)
     
     request = urllib2.Request(url, data=json.dumps(data), headers=headers)
     logger.debug(request.get_full_url())
@@ -119,3 +117,8 @@ def send_to_pacs(examination):
     
     return 
     
+@celery_.task(bind=True)
+def pacs_error_handler(self, uuid):
+    result = self.celery_.AsyncResult(uuid)
+    print('Task {0} raised exception: {1!r}\n{2!r}'.format(
+          uuid, result.result, result.traceback))
