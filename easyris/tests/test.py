@@ -1,5 +1,5 @@
 import os
-import easyris.app as easyris
+from easyris import create_app
 import unittest
 import json
 from mongoengine import connect
@@ -29,8 +29,8 @@ class EasyRisUnitTest(unittest.TestCase):
         port = 27017
         
         self.client = connect(database, port=port)
-        easyris.app.config['PACS_URL'] = "http://localhost:6000//api/v1/orders"
-        self.app = easyris.app.test_client(use_cookies=True)
+        app = create_app(database_name=database, database_port=port)
+        self.app = app.test_client(use_cookies=True)
         database_setup.run(database, port, n_loaded=n_loaded, **kwargs)
         
         
@@ -44,7 +44,8 @@ class EasyRisUnitTest(unittest.TestCase):
 class EasyRisTest(unittest.TestCase):
     
     def setUp(self):
-        self.app = easyris.app.test_client()
+        self.app = create_app().test_client()
+        print self.app
         
     def test_home(self):
         rv = self.app.get('/')

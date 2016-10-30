@@ -68,8 +68,8 @@ class ExaminationAPITest(EasyRisUnitTest):
         self.login('daniele', 'daniele')
         today = datetime.now()
         today_string = unicode(datetime(day=today.day,
-                                                     month=today.month,
-                                                     year=today.year).isoformat()+
+                                        month=today.month,
+                                        year=today.year).isoformat()+
                                             '.0Z')
         rv = self.app.post(path='/examination/search', 
                            data=json.dumps({'data_inserimento':today_string,

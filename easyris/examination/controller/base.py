@@ -10,7 +10,7 @@ from datetime import datetime
 from easyris.utils import parse_date, date_from_json
 from mongoengine import *
 import logging
-from easyris.base.message.utils import send_to_pacs, _build_pacs_data,\
+from easyris.base.async import send_to_pacs, _build_pacs_data,\
     pacs_error_handler
 logger = logging.getLogger('easyris_logger')
 

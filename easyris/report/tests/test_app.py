@@ -15,7 +15,7 @@ class ReportApiTest(EasyRisUnitTest):
         
         self.controller = ReportController()
         super(ReportApiTest, self).setUp(n_examination=50, 
-                                         n_patient=15, 
+                                         n_patient=5, 
                                          n_report=10)
     
     #@unittest.skip("A me do search... nun me ne fott nu cazz")
