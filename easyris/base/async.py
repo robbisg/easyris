@@ -7,9 +7,9 @@ import json
 import logging
 from celery import Celery
 
-
 logger = logging.getLogger('easyris_logger')
 celery_ = Celery('easyris_celery')
+
 
 @celery_.task
 def message_to_db(username, message, code):
@@ -64,6 +64,7 @@ def _build_pacs_data(examination):
     
     return data
 
+
 @celery_.task
 def send_to_pacs(data):
 
@@ -76,9 +77,13 @@ def send_to_pacs(data):
     url = str(config_.get('pacs', 'url'))
     #print url.__class__
     #url="http://192.168.30.225:6000/api/v1/orders"
-    headers = {'Accept': 'application/json','Content-Type':'application/json'}
+    headers = {'Accept': 'application/json',
+               'Content-Type':'application/json'}
     
-    request = urllib2.Request(url, data=json.dumps(data), headers=headers)
+    request = urllib2.Request(url, 
+                              data=json.dumps(data), 
+                              headers=headers)
+    
     logger.debug(request.get_full_url())
     print request.get_full_url()
     logger.debug(request.data)
@@ -88,7 +93,8 @@ def send_to_pacs(data):
         _ = urllib2.urlopen(request)
     except Exception,err:
         print err
-    
+
+
 @celery_.task(bind=True)
 def pacs_error_handler(self, uuid):
     result = self.app.AsyncResult(uuid)

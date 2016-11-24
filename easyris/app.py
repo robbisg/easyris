@@ -17,6 +17,8 @@ def init_app(**kwargs):
     handler = enable_logging()
     app.logger.addHandler(handler)
     
+    #TODO: Inserire dentro config i certificati?
+    
     app.run(host='0.0.0.0', 
             port=5000, 
             debug=True,
