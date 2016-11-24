@@ -77,4 +77,13 @@ def logout():
     
     return message_to_http(message) 
 
-
+@login_.route('/password', methods=['POST', 'OPTIONS'])
+@cross_origin(origin=None, 
+              methods=['POST', 'OPTIONS'], 
+              allow_headers=['X-Requested-With', 
+                      'Content-Type', 
+                      'Origin'],
+              supports_credentials=True)
+@login_required
+def modify_password():
+    return

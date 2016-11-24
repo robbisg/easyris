@@ -52,6 +52,10 @@ class PermissionController(object):
                               data=None)
     
     
+    def modify_password(self, **query):
+        return
+    
+    
     
     def load_user(self, id_):
         return User.objects(id=id_).first()
