@@ -10,7 +10,7 @@ from datetime import datetime
 from easyris.utils import parse_date, date_from_json
 from mongoengine import *
 import logging
-from easyris.base.message.utils import send_to_pacs, _build_pacs_data,\
+from easyris.base.async import send_to_pacs, _build_pacs_data,\
     pacs_error_handler
 logger = logging.getLogger('easyris_logger')
 
@@ -116,7 +116,7 @@ class ExaminationController(object):
             
             pacs_data = _build_pacs_data(examination)
             send_to_pacs.apply_async(link_error=pacs_error_handler.s(), kwargs={'data':pacs_data}, )
-        
+            #send_to_pacs(pacs_data)
             try:
                 examination.save()
             except (FieldDoesNotExist,

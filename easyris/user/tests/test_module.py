@@ -1,4 +1,4 @@
-from easyris.tests.test import EasyRisUnitTest
+from easyris.tests.test import EasyRisAppTest
 import unittest
 import json
 
@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger('easyris_logger')
 
 
-class AuthenticationTest(EasyRisUnitTest):
+class AuthenticationTest(EasyRisAppTest):
     
         
     def test_login_logout(self):

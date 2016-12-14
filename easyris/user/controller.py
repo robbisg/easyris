@@ -21,7 +21,7 @@ class PermissionController(object):
                         'user':None,
                         'qs':None}
         qs = User.objects(username=username)
-
+        
         logged_user = qs.first()
         
         if len(qs) == 0:
@@ -50,6 +50,10 @@ class PermissionController(object):
     def logout(self, **query):
         return Message(UserLoggedHeader(message='User logged out!'), 
                               data=None)
+    
+    
+    def modify_password(self, **query):
+        return
     
     
     

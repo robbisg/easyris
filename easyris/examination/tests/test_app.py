@@ -1,18 +1,15 @@
 import unittest
 import json
 from datetime import datetime
-from mongoengine import connect
-from easyris.utils import patient_db, user_db
 from easyris.tests import _get_current_patient_id
-from easyris.tests.test import EasyRisUnitTest
-import easyris.app as easyris
+from easyris.tests.test import EasyRisAppTest
 
 #@unittest.skip("showing class skipping")
-class ExaminationAPITest(EasyRisUnitTest):
+class ExaminationAPITest(EasyRisAppTest):
     
     #@unittest.skip("skipping")
     def test_search(self):
-        print "Qua ci arrivo?"
+
         self.login('daniele', 'daniele')
         rv = self.app.post(path='/examination/search', 
                            data=json.dumps({'medico_richiedente':'Mauro Caffarini'}),
@@ -30,7 +27,8 @@ class ExaminationAPITest(EasyRisUnitTest):
     def test_search_date(self):
         
         now = datetime.now()
-        data_ = "%s-%s-%sT00:00:00.000Z" % (now.year, now.month, now.day)
+        #data_ = "%s-%s-%sT00:00:00.000Z" % (now.year, now.month, now.day)
+        data_ = "%s-%s-%sT00:00:00.000Z" % (2016, 12, 10)
         self.login('daniele', 'daniele')
         rv = self.app.post(path='/examination/search', 
                            data=json.dumps({'data_inserimento':data_}),
@@ -47,7 +45,7 @@ class ExaminationAPITest(EasyRisUnitTest):
         
         ## Test second format
         
-        data_ = "%s/%s/%s" % (now.day, now.month, now.year)
+        data_ = "%s/%s/%s" % (10, 12, 2016)
         rv = self.app.post(path='/examination/search', 
                            data=json.dumps({'data_inserimento':data_}),
                            content_type='application/json')
@@ -66,10 +64,10 @@ class ExaminationAPITest(EasyRisUnitTest):
     def test_status(self):
         
         self.login('daniele', 'daniele')
-        today = datetime.now()
-        today_string = unicode(datetime(day=today.day,
-                                                     month=today.month,
-                                                     year=today.year).isoformat()+
+        #today = datetime.now()
+        today_string = unicode(datetime(day=10,
+                                        month=12,
+                                        year=2016).isoformat()+
                                             '.0Z')
         rv = self.app.post(path='/examination/search', 
                            data=json.dumps({'data_inserimento':today_string,
