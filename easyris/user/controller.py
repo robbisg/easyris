@@ -21,7 +21,7 @@ class PermissionController(object):
                         'user':None,
                         'qs':None}
         qs = User.objects(username=username)
-
+        
         logged_user = qs.first()
         
         if len(qs) == 0:

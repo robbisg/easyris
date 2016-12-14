@@ -116,7 +116,7 @@ class ExaminationController(object):
             
             pacs_data = _build_pacs_data(examination)
             send_to_pacs.apply_async(link_error=pacs_error_handler.s(), kwargs={'data':pacs_data}, )
-        
+            #send_to_pacs(pacs_data)
             try:
                 examination.save()
             except (FieldDoesNotExist,

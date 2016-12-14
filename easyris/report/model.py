@@ -22,6 +22,7 @@ class ReportAction(EasyRisMixin, EmbeddedDocument):
         fields_ = {
                     'user':['username', 'first_name', 'last_name', 'roles']
                    }
+        
         return document.to_mongo(fields=fields_[document.__collection__])
 
 
@@ -51,6 +52,7 @@ class Report(EasyRisMixin, Document):
                    'report_action': ['action', 'user', 'data']
                    }
         
+
         dereference = DeReference()
         document = dereference(document)
 

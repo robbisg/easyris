@@ -44,7 +44,7 @@ def login():
         user = message.data['user']
         qs = message.data['qs']
         message.data = qs
-                
+        
         if is_authenticated:
             login_user(user)
             g.user = user  

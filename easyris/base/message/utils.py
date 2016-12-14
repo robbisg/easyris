@@ -10,7 +10,6 @@ logger = logging.getLogger('easyris_logger')
 
 def message_to_http(message):
     
-    message.to_db()
     response = Response(response=message.to_json(),
                         status=200,
                         mimetype="application/json")

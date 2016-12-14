@@ -1,5 +1,6 @@
 from easyris.log.event import Log
 from mongoengine import connect
+from pymongo import ReadPreference
 import pdfkit
 import os
 import urllib2
@@ -14,7 +15,11 @@ celery_ = Celery('easyris_celery')
 @celery_.task
 def message_to_db(username, message, code):
     
-    _ = connect('easyris_log')
+    # TODO: substitute with connection
+    _ = connect('easyris_log', 
+                host='mongodb://192.168.50.100:27017,192.168.50.99:27017', 
+                replicaSet='rs0', 
+                read_preference=ReadPreference.PRIMARY_PREFERRED)
     log = Log(username=str(username),
               message=str(message),
               code=str(code))
@@ -25,7 +30,7 @@ def message_to_db(username, message, code):
 
 @celery_.task
 def save_pdf(html, filename):
-    pdfkit.from_string(html, os.path.join('/home/vagrant/',filename))
+    pdfkit.from_string(html, os.path.join('/vagrant/',filename))
     print 'Save '+filename
     return
 
@@ -41,6 +46,7 @@ def _build_pacs_data(examination):
     
     data = {
             "order": {
+                #"easyrisnumber":                        str("0000"),
                 "patient_id":                           str(examination.id_patient.id_patient),
                 "patients_birth_date":                  patient_birthdate,
                 "patients_sex":                         str(examination.id_patient.gender),
