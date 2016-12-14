@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":1,"key":{"_id":1},"name":"_id_","ns":"easyris_test.patient"},{"v":1,"unique":true,"key":{"id_patient":1},"name":"id_patient_1","ns":"easyris_test.patient","background":false,"sparse":false},{"v":1,"unique":true,"key":{"codice_fiscale":1},"name":"codice_fiscale_1","ns":"easyris_test.patient","background":false,"sparse":false}]}

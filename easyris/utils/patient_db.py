@@ -1,15 +1,19 @@
-#!/usr/bin/env python
 import csv
 from mongoengine import connect
 from datetime import datetime
 from easyris.patient.model import Patient
+from easyris.base.database import parse_db_config, easyris_connect
 import os
 
 
-def run(database, port, n_loaded=100):
+def run(database_config, n_loaded=100):
     
-    client = connect(database, port=port)
-    db = client.get_database(database)
+    db_config = parse_db_config(database_config)
+    print db_config
+    conn = easyris_connect(**db_config)
+    database = db_config['database_name']
+    db = conn.get_database(database)
+    print db
 
     if 'city' not in db.collection_names():
         # We imported the short version

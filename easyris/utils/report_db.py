@@ -10,10 +10,13 @@ import numpy as np
 import datetime
 from easyris.report.status import SuspendedReportStatus
 from easyris.examination.status import ClosedExaminationStatus
+from easyris.base.database import parse_db_config, easyris_connect
 
-def run(database, port, n_loaded=50):
+def run(database_config, n_loaded=50):
     
-    client = connect(database, port=port)
+    db_config = parse_db_config(database_config)
+
+    _ = easyris_connect(**db_config)
     
     Report.drop_collection()
     

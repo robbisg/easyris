@@ -6,7 +6,7 @@ from mongoengine import signals
 from mongoengine.common import _import_class
 from mongoengine.fields import ListField
 from mongoengine.base import BaseDocument
-
+import os
 import logging
 logger = logging.getLogger("easyris_logger")
 
@@ -120,3 +120,64 @@ class EasyRisMixin(object):
             data.pop('_cls')
     
         return data
+    
+    
+    
+def parse_db_config(config_filename):
+    
+    import ConfigParser
+    import sys
+    
+    config = ConfigParser.ConfigParser()
+    config.read(os.path.join(sys.path[0], config_filename))
+    
+    db_config = dict(config.items('mongodb'))
+    
+    nodes = db_config.pop('database_config').split(',')
+    
+    host_string = []
+    for node in nodes:
+        node_string = "%s:%s" % (config.get(node, 'database_ip') ,
+                                 config.get(node, 'database_port'))
+        host_string.append(node_string)
+    host_string = ','.join(host_string)
+    #host_string = "mongodb://%s" % (host_string)
+    
+    db_config['host'] = host_string
+    
+    
+    if 'database_rs' in db_config:
+        from pymongo import ReadPreference
+        db_config['read_preference'] = ReadPreference.PRIMARY_PREFERRED
+        db_config['replicaSet'] = db_config.pop('database_rs')
+               
+    return db_config
+
+
+def easyris_connect(database_name='easyris', 
+                     host='localhost:27017', 
+                     **kwargs):
+        
+    from mongoengine import connect
+    # read_preference=ReadPreference.SECONDARY_PREFERRED
+    host = 'mongodb://'+host
+    
+    client = connect(database_name, 
+                     host=host, 
+                     **kwargs)
+    
+    
+    return client
+
+
+def restore_db(db_filename):
+    db_config = parse_db_config(db_filename)
+    db_name = db_config['database_name']
+    command = "mongorestore --quiet -d %s %s" % (db_name, 'easyris/utils/'+db_name)
+    print command
+    os.system(command)
+    
+    
+    
+    
+    

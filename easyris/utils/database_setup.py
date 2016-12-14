@@ -12,23 +12,28 @@ def import_csv(database, collection, filepath):
     print("Importing %s" %(filename))
     command = "mongoimport --db %s \
                            --collection %s \
+                           --quiet \
                            --type csv --headerline \
                            --file %s > /dev/null " %(database, collection, filepath)
                            
     os.system(command)
 
 
-def run(db_name='easyris', port=27017, **kwargs):
+def run(database_config="config/database.cfg", **kwargs):
     
-    conn = connect(db_name, port=port)
-    conn_check = str(conn.database_names()[0])
+    from easyris.base.database import parse_db_config, easyris_connect
+    db_config = parse_db_config(database_config)
+    print db_config
+    conn = easyris_connect(**db_config)
+    db_name = db_config['database_name']
     
-    if conn_check == db_name:
+    # Always delete database
+    if db_name in conn.database_names():
         print "Database found. Deleting it!"
         conn.drop_database(db_name)
     else:
         print "Database not found..."
-
+    
     print " ---- Database population ---"
     path = os.path.dirname(os.path.realpath(__file__))
     # Import city
@@ -42,7 +47,7 @@ def run(db_name='easyris', port=27017, **kwargs):
     
     if 'n_patient' in kwargs.keys():
         n_loaded = kwargs['n_patient']
-    patient_db.run(db_name, port, n_loaded=n_loaded)
+    patient_db.run(database_config, n_loaded=n_loaded)
 
     # Import priority_db.csv
     import_csv(db_name, 'priority', os.path.join(path, "files/priority_db.csv"))
@@ -51,22 +56,17 @@ def run(db_name='easyris', port=27017, **kwargs):
     import_csv(db_name, 'typology', os.path.join(path, "files/nomenclatura_esami.csv"))
 
     print "Populating users, permissions and roles."
-    user_db.run(db_name, port)
+    user_db.run(database_config)
     
     print "Creating dummy examinations."
     if 'n_examination' in kwargs.keys():
         n_loaded = kwargs['n_examination']
-    examination_db.run(db_name, port, n_loaded=n_loaded*2)
+    examination_db.run(database_config, n_loaded=n_loaded*2)
     
     print "Creating dummy reports."
     if 'n_report' in kwargs.keys():
         n_loaded = kwargs['n_report']
-    report_db.run(db_name, port, n_loaded=n_loaded)
+    report_db.run(database_config, n_loaded=n_loaded)
     
     return
-
-
-
-
-
 
