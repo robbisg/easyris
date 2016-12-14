@@ -72,10 +72,10 @@ class TestExaminationController(EasyRisUnitTest):
     def test_status(self):
         
         query = dict()
-        today = datetime.now()
-        query['data_inserimento'] = unicode(datetime(day=today.day,
-                                                     month=today.month,
-                                                     year=today.year).isoformat()+
+        #today = datetime.now()
+        query['data_inserimento'] = unicode(datetime(day=10,
+                                                     month=12,
+                                                     year=2016).isoformat()+
                                             '.0Z')
         query['status_name'] = 'new'
         message = self.controller.read(**query)

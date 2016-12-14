@@ -1,12 +1,9 @@
 import unittest
 import json
-from mongoengine import connect
-from easyris.utils import patient_db, user_db
-from easyris.tests.test import EasyRisUnitTest
-import easyris.app as easyris
+from easyris.tests.test import EasyRisAppTest
 
 #@unittest.skip("showing class skipping")
-class EasyRisTest(EasyRisUnitTest):
+class EasyRisTest(EasyRisAppTest):
     
             
     def test_search(self):

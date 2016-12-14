@@ -44,7 +44,7 @@ def login():
         user = message.data['user']
         qs = message.data['qs']
         message.data = qs
-                
+        
         if is_authenticated:
             login_user(user)
             g.user = user  
@@ -77,4 +77,13 @@ def logout():
     
     return message_to_http(message) 
 
-
+@login_.route('/password', methods=['POST', 'OPTIONS'])
+@cross_origin(origin=None, 
+              methods=['POST', 'OPTIONS'], 
+              allow_headers=['X-Requested-With', 
+                      'Content-Type', 
+                      'Origin'],
+              supports_credentials=True)
+@login_required
+def modify_password():
+    return

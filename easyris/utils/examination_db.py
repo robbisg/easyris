@@ -1,6 +1,7 @@
 from easyris.user.model import User, Permission, Role
 from easyris.patient.model import Patient
 from easyris.examination.model import Examination, Priority, Typology
+from easyris.base.database import parse_db_config, easyris_connect
 from mongoengine import connect
 import itertools
 import random
@@ -8,9 +9,11 @@ from datetime import datetime
 from easyris.examination.status import CompletedExaminationStatus,\
     NewExaminationStatus
 
-def run(database, port, n_loaded=50):
+def run(database_config, n_loaded=50):
     
-    client = connect(database, port=port)
+    db_config = parse_db_config(database_config)
+    _ = easyris_connect(**db_config)
+    #client = connect(database, port=port)
     
     Examination.drop_collection()
     

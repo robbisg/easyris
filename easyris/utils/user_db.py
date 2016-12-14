@@ -3,15 +3,19 @@ from mongoengine import connect
 import itertools
 import numpy as np
 
-def run(database, port):
+def run(database_config):
     
-    client = connect(database, port=port)
+    from easyris.base.database import parse_db_config, easyris_connect
+    
+    db_config = parse_db_config(database_config)
+    conn = easyris_connect(**db_config)
     
     actions = ['create', 'read', 'update', 'delete']
 
     actions_examination_status = ['start','go','stop','pause','finish','eject']
     actions_report_status = ['close', 'save', 'print', 'open']
-    resources = ['patient', 
+    resources = [
+                 'patient', 
                  'examination', 
                  'report',
                  'examination_status',
@@ -55,6 +59,7 @@ def run(database, port):
         
     User.drop_collection()
     role_medico = Role.objects(role_name='medico').first()
+
     user1 = User(username='mcaulo', 
                  password='massimo', 
                  roles=[role_medico],
@@ -64,6 +69,7 @@ def run(database, port):
                  mobile_number='3212345678',
                  email='mcaulo@unich.it')
     user1.save()
+    
     
     role_acc = Role.objects(role_name='accettazione').first()
     user2 = User(username='gaetano', 
@@ -121,3 +127,4 @@ def run(database, port):
                  mobile_number='3212345678',
                  email='v.panara@unich.it')
     user11.save()
+

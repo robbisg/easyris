@@ -28,22 +28,7 @@ class ControllerMapper(Mapper):
        
 
 class ActionMapper(Mapper):
-    
-    '''
-    _map = {
-            'create': Create,
-            'read':   Read,
-            'update': Update,
-            'delete': Delete,
-            'start': Start,
-            'go': Go,
-            'stop': Stop,
-            'pause': Pause,
-            'finish': Finish,
-            'eject': Eject,
-            }
-    '''
-    
+        
     @classmethod
     def get_mapped(cls, name):
         return action_factory(name)

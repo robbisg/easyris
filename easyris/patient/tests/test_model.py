@@ -1,16 +1,20 @@
-from mongoengine import *
 import unittest
 
-from ..model import Patient
-from ..controller import PatientController
-from ...utils import patient_db, user_db, database_setup
+from easyris.patient.model import Patient
+from easyris.patient.controller import PatientController
 
 from datetime import datetime
+from easyris.tests.test import EasyRisUnitTest
 
  
 #@unittest.skip("showing class skipping")        
-class TestPatientController(unittest.TestCase):
-
+class TestPatientController(EasyRisUnitTest):
+    
+    def setUp(self, n_loaded=5, **kwargs):
+        EasyRisUnitTest.setUp(self, n_loaded=n_loaded, **kwargs)
+        self.controller = PatientController()
+    
+    """
     def setUp(self):
         
         database = 'test_easyris'
@@ -23,7 +27,7 @@ class TestPatientController(unittest.TestCase):
         
     def tearDown(self):
         self.client.drop_database('test_easyris')
-        
+    """   
     
     def test_add(self):
 
@@ -113,8 +117,12 @@ class TestPatientController(unittest.TestCase):
 
         
     
-class TestPatientCases(unittest.TestCase):
+class TestPatientCases(EasyRisUnitTest):
     
+    def setUp(self, n_loaded=5, **kwargs):
+        EasyRisUnitTest.setUp(self, n_loaded=n_loaded, **kwargs)
+        self.controller = PatientController()
+    """
     def setUp(self):
         
         database = 'test_easyris'
@@ -127,7 +135,7 @@ class TestPatientCases(unittest.TestCase):
         
     def tearDown(self):
         self.client.drop_database('test_easyris')
-        
+    """   
 
     def test_add_same_patient(self):
         

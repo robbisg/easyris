@@ -8,23 +8,12 @@ from easyris.user.model import User
 from datetime import datetime
 from ...utils import patient_db, user_db, database_setup
 from easyris.examination.status import NewExaminationStatus
+from easyris.tests.test import EasyRisUnitTest
 
 #@unittest.skip("Not checked yet")
-class TestExamination(unittest.TestCase):
-
-    def setUp(self):
+class TestExamination(EasyRisUnitTest):
         
-        database = 'test_easyris'
-        port = 27017
-        
-        self.client = connect(database, port=port)
-        database_setup.run(database, port, n_loaded=5)
-        
-        
-    def tearDown(self):
-        self.client.drop_database('test_easyris')
-        return
-    
+            
     def test_model(self):
         print "---- Testing Examination ----"
         patient1 = Patient.objects(first_name="Tecla").first()

@@ -21,7 +21,7 @@ class UserEasyrisQuerySet(QuerySet):
         return [e._to_easyris(fields=fields) for e in self.all()]
 
 
-class Permission(Document):
+class Permission(EasyRisMixin, Document):
     
     __collection__ = 'permission'
     
@@ -30,7 +30,7 @@ class Permission(Document):
     
     
 
-class Role(Document):
+class Role(EasyRisMixin, Document):
     
     __collection__ = 'role'
     
@@ -105,6 +105,7 @@ class User(EasyRisMixin, UserMixin, Document):
         fields_ = {
                    'role': ['role_name']
                    }
+        
         
         dereference = DeReference()
         document = dereference(document)

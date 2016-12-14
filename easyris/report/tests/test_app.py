@@ -1,21 +1,19 @@
 import unittest
 import json
 from easyris.report.controller import ReportController
-from datetime import datetime
 from easyris.examination import _get_correct_examinations
-from easyris.tests import _get_current_patient_id
-from easyris.tests.test import EasyRisUnitTest
+from easyris.tests.test import EasyRisAppTest
 
 import logging
 logger = logging.getLogger("easyris_logger")
 
-class ReportApiTest(EasyRisUnitTest):
+class ReportApiTest(EasyRisAppTest):
     
     def setUp(self):
         
         self.controller = ReportController()
         super(ReportApiTest, self).setUp(n_examination=50, 
-                                         n_patient=15, 
+                                         n_patient=5, 
                                          n_report=10)
     
     #@unittest.skip("A me do search... nun me ne fott nu cazz")
@@ -86,7 +84,7 @@ class ReportApiTest(EasyRisUnitTest):
         assert report['action_list'][-1]['action'] == "update"
         assert examination['status_name'] == 'closed'
     
-    #@unittest.skip("reason")
+   # @unittest.skip("reason")
     def test_close(self):
         self.login('mcaulo', 'massimo')
         
@@ -205,7 +203,7 @@ class ReportApiTest(EasyRisUnitTest):
         response = json.loads(rv.data)
         assert response[0]['code'] == 500
     
-    
+    #@unittest.skip("oh")
     def test_process(self):
         self.login('mcaulo', 'massimo')
         
