@@ -22,7 +22,9 @@ def before_request():
     
 
 
-def create_app(config_filename="config/easyris.cfg", **kwargs):
+def create_app(config_filename="config/easyris.cfg", 
+                database_cfg="config/database.cfg",
+                **kwargs):
     
     app = EasyRis(__name__)
     app.config.from_pyfile(config_filename)
@@ -31,7 +33,7 @@ def create_app(config_filename="config/easyris.cfg", **kwargs):
     app.config.update(**kwargs)
 
     from datetime import timedelta
-    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=app.config['PERMANENT_SESSION_LIFETIME'])
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=int(app.config['PERMANENT_SESSION_LIFETIME']))
 
     # This is to prevent bad url in frontend
     app.url_map.strict_slashes = False
@@ -72,20 +74,21 @@ def create_app(config_filename="config/easyris.cfg", **kwargs):
         return app.get_user(userid)
     
     app.login_manager.user_loader(load_user)
-    
-    
+     
     # Database connection
-    from mongoengine import connect
-    db_name = app.config['DATABASE_NAME']
-    db_port = app.config['DATABASE_PORT']
-    connect(db_name, port=db_port)
-    
+
+    from easyris.base.database import parse_db_config, easyris_connect
+    db_config = parse_db_config(database_cfg)
+    db_client = easyris_connect(**db_config)
+    app.config['DB_CLIENT'] = db_client
     #connect(
     #        name='easyris',
     #        username='user',
     #        password='12345',
     #        host='mongodb://admin:qwerty@localhost/production'
     #        )
+    
+
     
     return app
     
