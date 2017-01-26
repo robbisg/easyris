@@ -81,6 +81,5 @@ def create_app(config_filename="config/easyris.cfg",
     db_client = easyris_connect(**db_config)
     app.config['DB_CLIENT'] = db_client
     
-    
     return app
     
