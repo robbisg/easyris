@@ -76,19 +76,10 @@ def create_app(config_filename="config/easyris.cfg",
     app.login_manager.user_loader(load_user)
      
     # Database connection
-
     from easyris.base.database import parse_db_config, easyris_connect
     db_config = parse_db_config(database_cfg)
     db_client = easyris_connect(**db_config)
     app.config['DB_CLIENT'] = db_client
-    #connect(
-    #        name='easyris',
-    #        username='user',
-    #        password='12345',
-    #        host='mongodb://admin:qwerty@localhost/production'
-    #        )
-    
-
     
     return app
     

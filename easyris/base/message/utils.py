@@ -1,5 +1,4 @@
 from easyris.base.message.message import Message
-from easyris.base.async import message_to_db
 from flask import Response
 from bson.json_util import dumps
 import logging
@@ -16,9 +15,7 @@ def message_to_http(message):
     
     logger.debug("User "+str(message.header.user)+"\n"+str(message.header.message))
     
-    message_to_db.delay(username=message.header.user, 
-                        message=message.header.message, 
-                        code=message.header.code)
+    
     return response
 
 

@@ -38,38 +38,38 @@ class PatientController(object):
         except (FieldDoesNotExist,
                 NotUniqueError,
                 SaveConditionError) as err:
-            
+                
             message = Message(PatientErrorHeader(message=err.message))
             logger.error(err.message)
-            
+
             return message
-        
+
         patient = self._get_patient(patient.id_patient)
         self._currentPatient = patient.first()
-        
+
         message = Message(PatientCorrectHeader(message='Patient correctly created!'),
-                              data=patient)
+                                               data=patient)
 
         return message
     
     
     def update(self, **query):
-        
+
         # Check if a patient has been selected
-        if self._currentPatient == None:
+        if self._currentPatient is None:
             # Get the id from query
             if 'id_patient' in query.keys():
                 _ = self._get_patient(str(query['id_patient']))
-        
+
         patient = self._currentPatient
-        
+
         if 'birthdate' in query.keys():
             query['birthdate'] = parse_date(query['birthdate'])
             logger.debug(query['birthdate'])
-            
+
         if '_id' in query.keys():
             _ = query.pop('_id')
-        
+
         # Try to modify
         if not patient.modify(**query):
             message = Message(PatientErrorHeader(message='Error in modifying'))

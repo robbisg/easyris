@@ -6,7 +6,6 @@ from easyris.patient.controller import PatientController
 from easyris.base.message.message import Message
 from easyris.base.message.error import NotFoundHeader
 from easyris.user.model import User
-from datetime import datetime
 from easyris.utils import parse_date, date_from_json
 from mongoengine import *
 import logging

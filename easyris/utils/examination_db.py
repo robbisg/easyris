@@ -29,11 +29,10 @@ def run(database_config, n_loaded=50):
         ip = random.randint(0, len(patient_list)-1)
         it = random.randint(0, len(typology_list)-1)
         ipr= random.randint(0, len(priority_list)-1)
-
+        
         patient = patient_list[ip]
         typology = typology_list[it]
         priority = priority_list[ipr]
-        
         random_number = random.randint(1, 10)
         
         if random_number > 5:
@@ -57,17 +56,17 @@ def run(database_config, n_loaded=50):
     
     
         examination = Examination(id_patient=patient,
-                         medico_richiedente='Mauro Caffarini',
-                         data_inserimento=date_,
-                         id_priority=priority,
-                         id_typology=typology,
-                         id_technician=user2,
-                         id_creator=user1,
-                         status_name=status_name,
-                         status=status,
-                         codice_esenzione='67577568',
-                         examination_note='ok'
-                         )
+                                 medico_richiedente='Mauro Caffarini',
+                                 data_inserimento=date_,
+                                 id_priority=priority,
+                                 id_typology=typology,
+                                 id_technician=user2,
+                                 id_creator=user1,
+                                 status_name=status_name,
+                                 status=status,
+                                 codice_esenzione='67577568',
+                                 examination_note='ok'
+                                 )
         
         examination.save()
         

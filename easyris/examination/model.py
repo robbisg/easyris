@@ -34,7 +34,7 @@ class Typology(Document):
     annotazioni = StringField(required=False)
     categorie = StringField(required=False)
     modality = StringField(required=True) # MR, TAC, ECO
-    room = StringField(required=True) # Stanza fisica dove sta il device
+    room = StringField(required=True) # Stanza fisica dove sta il device (MVL station_id)
     scheduled_station_ae_title = StringField(required=False) # Campo PACS
     device_description = StringField(required=False) # Descrizione scanner/device
     examination_name = StringField(required=True)
@@ -74,13 +74,13 @@ class Examination(EasyRisMixin, Document):
     
     def clean(self):
         self.accession_number = self.set_accession_number(date=self.data_inserimento,
-                                                          patient=self.id_patient,
+                                                          #patient=self.id_patient,
                                                           room=self.id_typology.room,
                                                           body_part=self.id_typology.distretto_corporeo)
     
     
     
-    def set_accession_number(self, date, patient, room, body_part):
+    def set_accession_number(self, date, room, body_part):
 
         klass = self.__class__
         current_patient_ex = klass.objects(id_patient=self.id_patient.id)

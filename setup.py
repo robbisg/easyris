@@ -74,7 +74,7 @@ setup(
                         'flask-security', 
                         'flask-mongoengine', 
                         'flask-cors',
-#                     'numpy',
+                        'codicefiscale',
                         'flask-script',
                         'flask-debugtoolbar',
 			            'pyopenssl',

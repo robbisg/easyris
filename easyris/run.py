@@ -1,6 +1,7 @@
 from easyris import create_app
 from easyris.log import enable_logging
 import click
+import os
 
 '''
 @click.command()
@@ -24,12 +25,15 @@ if __name__ == '__main__':
     handler = enable_logging()
     app.logger.addHandler(handler)
     
+    ssl_path = app.config['SSL_PATH']
+    
     app.run(host='0.0.0.0', 
             port=5000, 
             debug=True,
             threaded=True,
-            ssl_context=('/etc/webserver-ssl/webserver.crt', 
-                         '/etc/webserver-ssl/webserver.key')
+            ssl_context=(os.path.join(ssl_path, "webserver.crt"),
+                         os.path.join(ssl_path, "webserver.key")
+                         )
           )
     
     app.toolbar.init_app(app)

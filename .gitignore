@@ -19,3 +19,4 @@ easyris.egg*
 .idea/uiDesigner.xml
 .idea/inspectionProfiles/Project_Default.xml
 *.orig
+*.cfg

@@ -165,8 +165,7 @@ def easyris_connect(database_name='easyris',
     client = connect(database_name, 
                      host=host, 
                      **kwargs)
-    
-    
+        
     return client
 
 
