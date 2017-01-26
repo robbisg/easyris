@@ -10,6 +10,7 @@ from easyris.log import store_event
 import json
 import logging
 from datetime import datetime
+from easyris.base.async import save_event
 
 
 event = Blueprint('event', __name__)
@@ -25,16 +26,22 @@ event = Blueprint('event', __name__)
               supports_credentials=True)
 def post_event():
     
-    if request.method == 'GET':
+    if request.method == 'POST':
         
         print str(request)
         print request.headers
         print request.user_agent
         print request.remote_addr
         print request.referrer
-        #query = json.loads(request.data)
+        query = json.loads(request.data)
+        query['ip'] = request.remote_addr
+        query['user_agent'] = str(request.user_agent)
         
-        message = store_event()
+        message = save_event.delay(query)
         
         #response = message_to_http(message)
-        return str(request.environ['REMOTE_ADDR'])
+        return "message"
+    
+    
+    
+    

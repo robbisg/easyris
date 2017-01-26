@@ -1,4 +1,4 @@
-from easyris.log.event import Log
+from easyris.log.event import Log, Event
 from mongoengine import connect
 from pymongo import ReadPreference
 import pdfkit
@@ -14,8 +14,11 @@ celery_ = Celery('easyris_celery')
 
 @celery_.task
 def message_to_db(username, message, code):
+    """
+    Deprecated:
+    We only use text file
+    """
     
-    # TODO: substitute with connection
     _ = connect('easyris_log', 
                 host='mongodb://192.168.50.100:27017,192.168.50.99:27017', 
                 replicaSet='rs0', 
@@ -28,6 +31,25 @@ def message_to_db(username, message, code):
     return
 
 
+
+@celery_.task
+def save_event(event_dict):
+    
+    from easyris.base.database import parse_db_config, easyris_connect
+    
+    db_config = parse_db_config("config/database.cfg")
+    db_config['database_name'] = 'easyris_log'
+    db_client = easyris_connect(**db_config)
+    
+    print event_dict
+    
+    event = Event(**event_dict)
+    event.save()
+    
+    return "Event saved!"
+
+
+
 @celery_.task
 def save_pdf(html, filename):
     pdfkit.from_string(html, os.path.join('/vagrant/',filename))
@@ -37,6 +59,8 @@ def save_pdf(html, filename):
 
 def _build_pacs_data(examination):
     
+    
+    
     patient_birthdate = "%s-%02d-%02d" % (examination.id_patient.birthdate.year,
                                           examination.id_patient.birthdate.month,
                                           examination.id_patient.birthdate.day)
@@ -44,14 +68,16 @@ def _build_pacs_data(examination):
     dott_first = examination.medico_richiedente.split(' ')[0]
     dott_last = examination.medico_richiedente.split(' ')[-1]
     
+    #station_id = station_id_dict[examination.id_typology.station_id]
+    
     data = {
             "order": {
-                #"easyrisnumber":                        str("0000"),
+                "accession_number":                     str(examination.id), # Passare a monte!
                 "patient_id":                           str(examination.id_patient.id_patient),
                 "patients_birth_date":                  patient_birthdate,
                 "patients_sex":                         str(examination.id_patient.gender),
                 "requested_procedure_description":      str(examination.id_typology.descrizione_breve),
-                "station_id":                           "1", # Per adesso 3 poi si vedra
+                "station_id":                           "1", # str(station_id)
                 "patients_weight":                      "80", # Non ce l'abbiamo
                 "patients_name_attributes": {
                     "family":                           str(examination.id_patient.last_name),

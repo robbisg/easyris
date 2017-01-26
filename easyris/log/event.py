@@ -19,6 +19,7 @@ class Event(Document):
     data_log = DateTimeField(required=True, default=datetime.now())
     username = StringField(required=True)
     page = StringField(required=True)
-    event = StringField(required=True)
+    element = StringField(required=True)
+    event_type = StringField(required=True)
     ip = StringField(required=True)
     user_agent = StringField(required=True)

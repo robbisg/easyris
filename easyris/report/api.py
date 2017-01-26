@@ -24,13 +24,12 @@ def _render(message):
     html_ = render_template("RefertoTemplate.html", **message)
 
     #logger.debug(str(html_).__class__)
-    save_pdf.delay(html_, message['report_id']+'.pdf')
-
-    
+    save_pdf.delay(html_, message['report_id']+'.pdf')    
 
     return Response(response=json.dumps({'data':html_}),
                         status=200,
                         mimetype="application/json")
+
 
 
 @report.route('/', methods=['GET', 'OPTIONS'])
@@ -86,6 +85,7 @@ def search():
         response = message_to_http(message)
 
         return response
+    
     
     
 @report.route('/<string:id>/delete', methods=['POST', 'OPTIONS'])
@@ -179,6 +179,7 @@ def close_report(id):
         return response
     
 
+
 @report.route('/<string:id>/open', methods=['POST', 'OPTIONS'])
 @jsonp
 @cross_origin(origin=None,
@@ -210,6 +211,7 @@ def open_report(id):
         response = message_to_http(message)
         
         return response
+
 
 
 @report.route('/<string:id>/pause', methods=['POST', 'OPTIONS'])

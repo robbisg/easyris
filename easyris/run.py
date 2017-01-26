@@ -28,8 +28,8 @@ if __name__ == '__main__':
             port=5000, 
             debug=True,
             threaded=True,
-            ssl_context=('/etc/webserver-ssl/webserver.crt', 
-                         '/etc/webserver-ssl/webserver.key')
+            ssl_context=('/etc/nginx/ssl/webserver.crt', 
+                         '/etc/nginx/ssl/webserver.key')
           )
     
     app.toolbar.init_app(app)
