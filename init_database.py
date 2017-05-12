@@ -1,5 +1,5 @@
 import click
-from easyris.utils import database_setup
+from qScience.example import setup
 import os
 
 @click.command()
@@ -7,7 +7,7 @@ import os
 #@click.option('--port', default=27017, help='The port with the database service (default=27017)')
 def init_database(db_config):
     """Initialize the database using a db_name and a port"""
-    database_setup.run(db_config)
+    setup.run(db_config)
 
 
 

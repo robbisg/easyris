@@ -1,1 +1,0 @@
-from easyris.patient.message.base import *

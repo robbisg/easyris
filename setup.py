@@ -25,8 +25,8 @@ def find_version(*file_paths):
 
 
 setup(
-    name="easyris",
-    version=find_version('easyris', '__init__.py'),
+    name="qScience",
+    version=find_version('qScience', '__init__.py'),
     description="EasyRIS by Serve",
 
 
@@ -91,7 +91,7 @@ setup(
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
-       'easyris': ['templates/*',
+       'qScience': ['templates/*',
                    'config/*'],
     },
 
